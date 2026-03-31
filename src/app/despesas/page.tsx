@@ -65,8 +65,8 @@ async function DespesasContent() {
         </Card>
       </div>
 
-      <Card>
-        <CardContent className="p-0">
+      <Card className="overflow-x-auto">
+        <CardContent className="p-0 min-w-0">
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead className="bg-slate-50 border-b">

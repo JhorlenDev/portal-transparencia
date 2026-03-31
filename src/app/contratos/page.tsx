@@ -50,9 +50,10 @@ async function ContratosContent() {
         </Card>
       </div>
 
-      <Card>
-        <CardContent className="p-0">
-          <table className="w-full">
+      <Card className="overflow-x-auto">
+        <CardContent className="p-0 min-w-0">
+          <div className="overflow-x-auto">
+            <table className="w-full">
             <thead className="bg-slate-50 border-b">
               <tr>
                 <th className="text-left px-4 py-3 text-sm font-medium text-slate-600">Nº/Ano</th>
@@ -95,7 +96,8 @@ async function ContratosContent() {
                 </tr>
               )}
             </tbody>
-          </table>
+            </table>
+          </div>
         </CardContent>
       </Card>
     </>
