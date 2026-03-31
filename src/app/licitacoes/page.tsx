@@ -113,7 +113,7 @@ async function LicitacoesContent({ searchParams }: PageProps) {
             </thead>
             <tbody>
               {licitacoes.length > 0 ? licitacoes.map((licitacao) => (
-                <tr key={licitacao.id} className="border-b border-slate-200 hover:bg-slate-50">
+                <tr key={licitacao.id} id={`record-${licitacao.id}`} className="border-b border-slate-200 hover:bg-slate-50 transition-colors target:bg-yellow-100 target:border-yellow-400">
                   <td className="px-4 py-3">
                     <span className="font-bold text-purple-600">{licitacao.numero}/{licitacao.ano}</span>
                     <p className="text-xs text-slate-600">{licitacao.modalidade}</p>

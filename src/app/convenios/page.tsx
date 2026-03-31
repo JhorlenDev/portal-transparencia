@@ -92,7 +92,7 @@ async function ConveniosContent({
             </thead>
             <tbody>
               {convenios.length > 0 ? convenios.map((conv) => (
-                <tr key={conv.id} className="border-b border-slate-200 hover:bg-slate-50">
+                <tr key={conv.id} id={`record-${conv.id}`} className="border-b border-slate-200 hover:bg-slate-50 transition-colors target:bg-yellow-100 target:border-yellow-400">
                   <td className="px-4 py-3">
                     <span className="font-bold text-cyan-600">{conv.numero}/{conv.ano}</span>
                     <p className="text-xs text-slate-600">{conv.tipo}</p>

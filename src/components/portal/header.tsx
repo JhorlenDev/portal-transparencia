@@ -1,9 +1,9 @@
 "use client"
 
-import React, { useState } from "react"
+import React, { useState, useEffect, useRef } from "react"
 import Link from "next/link"
 import { useRouter, usePathname } from "next/navigation"
-import { Search, Menu } from "lucide-react"
+import { Search, Menu, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 
@@ -42,10 +42,51 @@ export default function Header({ config }: { config?: Record<string, string | nu
   const pathname = usePathname()
   const [searchQuery, setSearchQuery] = useState("")
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-  
+  const [searchResults, setSearchResults] = useState<any>(null)
+  const [isSearching, setIsSearching] = useState(false)
+  const [showDropdown, setShowDropdown] = useState(false)
+  const dropdownRef = useRef<HTMLFormElement>(null)
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setShowDropdown(false)
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside)
+    return () => document.removeEventListener("mousedown", handleClickOutside)
+  }, [])
+
+  useEffect(() => {
+    if (searchQuery.length < 2) {
+      setSearchResults(null)
+      setShowDropdown(false)
+      return
+    }
+
+    const timer = setTimeout(async () => {
+      setIsSearching(true)
+      try {
+        const res = await fetch(`/api/busca?q=${encodeURIComponent(searchQuery)}`)
+        if (res.ok) {
+          const data = await res.json()
+          setSearchResults(data)
+          setShowDropdown(true)
+        }
+      } catch (error) {
+        console.error(error)
+      } finally {
+        setIsSearching(false)
+      }
+    }, 300)
+
+    return () => clearTimeout(timer)
+  }, [searchQuery])
+
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
     if (searchQuery.trim()) {
+      setShowDropdown(false)
       router.push(`/busca?q=${encodeURIComponent(searchQuery)}`)
     }
   }
@@ -76,7 +117,7 @@ export default function Header({ config }: { config?: Record<string, string | nu
             </div>
           </Link>
 
-          <form onSubmit={handleSearch} className="flex-1 max-w-xl hidden md:flex" role="search">
+          <form onSubmit={handleSearch} className="flex-1 max-w-xl hidden md:flex" role="search" ref={dropdownRef}>
             <div className="relative w-full">
               <Input
                 type="search"
@@ -84,6 +125,7 @@ export default function Header({ config }: { config?: Record<string, string | nu
                 className="pr-10 bg-slate-50 border-slate-200 focus:bg-white"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
+                onFocus={() => { if (searchResults) setShowDropdown(true) }}
                 aria-label="Campo de busca"
               />
               <Button
@@ -92,8 +134,130 @@ export default function Header({ config }: { config?: Record<string, string | nu
                 className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7 p-0 bg-emerald-600 hover:bg-emerald-800"
                 aria-label="Buscar"
               >
-                <Search className="h-4 w-4" />
+                {isSearching ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
               </Button>
+
+              {showDropdown && searchResults && (
+                <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-xl border border-slate-100 max-h-[80vh] overflow-y-auto z-50">
+                  <div className="p-2 space-y-4">
+                    {searchResults.despesas?.length > 0 && (
+                      <div>
+                        <div className="px-3 py-1.5 text-xs font-semibold text-emerald-800 uppercase tracking-wider bg-emerald-50 rounded-md">Despesas</div>
+                        <ul className="mt-1 space-y-1">
+                          {searchResults.despesas.slice(0, 3).map((d: any) => (
+                            <li key={d.id}>
+                              <Link 
+                                href={`/despesas?search=${encodeURIComponent(searchQuery)}#record-${d.id}`}
+                                onClick={() => setShowDropdown(false)}
+                                className="block px-3 py-2 rounded-lg hover:bg-slate-50 text-sm transition-colors"
+                              >
+                                <p className="font-medium text-slate-800 truncate">{d.credorNome || 'Sem credor'}</p>
+                                <p className="text-xs text-slate-500 truncate">{d.objeto}</p>
+                              </Link>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+
+                    {searchResults.receitas?.length > 0 && (
+                      <div>
+                        <div className="px-3 py-1.5 text-xs font-semibold text-blue-800 uppercase tracking-wider bg-blue-50 rounded-md">Receitas</div>
+                        <ul className="mt-1 space-y-1">
+                          {searchResults.receitas.slice(0, 3).map((r: any) => (
+                            <li key={r.id}>
+                              <Link 
+                                href={`/receitas?search=${encodeURIComponent(searchQuery)}#record-${r.id}`}
+                                onClick={() => setShowDropdown(false)}
+                                className="block px-3 py-2 rounded-lg hover:bg-slate-50 text-sm transition-colors"
+                              >
+                                <p className="font-medium text-slate-800 truncate">{r.naturezaReceita}</p>
+                                <p className="text-xs text-slate-500 truncate">{r.categoriaEconomica}</p>
+                              </Link>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+
+                    {searchResults.licitacoes?.length > 0 && (
+                      <div>
+                        <div className="px-3 py-1.5 text-xs font-semibold text-purple-800 uppercase tracking-wider bg-purple-50 rounded-md">Licitações</div>
+                        <ul className="mt-1 space-y-1">
+                          {searchResults.licitacoes.slice(0, 3).map((l: any) => (
+                            <li key={l.id}>
+                              <Link 
+                                href={`/licitacoes?search=${encodeURIComponent(searchQuery)}#record-${l.id}`}
+                                onClick={() => setShowDropdown(false)}
+                                className="block px-3 py-2 rounded-lg hover:bg-slate-50 text-sm transition-colors"
+                              >
+                                <p className="font-medium text-slate-800 truncate">Nº {l.numero}/{l.ano}</p>
+                                <p className="text-xs text-slate-500 truncate">{l.objeto}</p>
+                              </Link>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+
+                    {searchResults.contratos?.length > 0 && (
+                      <div>
+                        <div className="px-3 py-1.5 text-xs font-semibold text-amber-800 uppercase tracking-wider bg-amber-50 rounded-md">Contratos</div>
+                        <ul className="mt-1 space-y-1">
+                          {searchResults.contratos.slice(0, 3).map((c: any) => (
+                            <li key={c.id}>
+                              <Link 
+                                href={`/contratos?search=${encodeURIComponent(searchQuery)}#record-${c.id}`}
+                                onClick={() => setShowDropdown(false)}
+                                className="block px-3 py-2 rounded-lg hover:bg-slate-50 text-sm transition-colors"
+                              >
+                                <p className="font-medium text-slate-800 truncate">{c.contratadoNome}</p>
+                                <p className="text-xs text-slate-500 truncate">{c.objeto}</p>
+                              </Link>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+
+                    {searchResults.servidores?.length > 0 && (
+                      <div>
+                        <div className="px-3 py-1.5 text-xs font-semibold text-rose-800 uppercase tracking-wider bg-rose-50 rounded-md">Servidores</div>
+                        <ul className="mt-1 space-y-1">
+                          {searchResults.servidores.slice(0, 3).map((s: any) => (
+                            <li key={s.id}>
+                              <Link 
+                                href={`/servidores?search=${encodeURIComponent(searchQuery)}#record-${s.id}`}
+                                onClick={() => setShowDropdown(false)}
+                                className="block px-3 py-2 rounded-lg hover:bg-slate-50 text-sm transition-colors"
+                              >
+                                <p className="font-medium text-slate-800 truncate">{s.nome}</p>
+                                <p className="text-xs text-slate-500 truncate">{s.cargo}</p>
+                              </Link>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+
+                    {Object.values(searchResults).every((arr: any) => arr?.length === 0) && (
+                      <div className="p-4 text-center text-sm text-slate-600">
+                        Nenhum resultado encontrado para "{searchQuery}"
+                      </div>
+                    )}
+
+                    {!Object.values(searchResults).every((arr: any) => arr?.length === 0) && (
+                      <Link 
+                        href={`/busca?q=${encodeURIComponent(searchQuery)}`}
+                        onClick={() => setShowDropdown(false)}
+                        className="block mt-2 p-3 text-center text-sm font-medium text-emerald-700 bg-slate-50 hover:bg-emerald-50 rounded-lg transition-colors"
+                      >
+                        Ver todos os resultados
+                      </Link>
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
           </form>
 

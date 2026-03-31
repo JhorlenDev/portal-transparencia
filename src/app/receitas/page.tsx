@@ -112,7 +112,7 @@ async function ReceitasContent({ searchParams }: PageProps) {
                   ? ((receita.valorArrecadado || 0) / receita.valorPrevisto) * 100 
                   : 0
                 return (
-                  <tr key={receita.id} className="border-b border-slate-200 hover:bg-slate-50">
+                  <tr key={receita.id} id={`record-${receita.id}`} className="border-b border-slate-200 hover:bg-slate-50 transition-colors target:bg-yellow-100 target:border-yellow-400">
                     <td className="px-4 py-3 font-mono text-sm">{receita.codigoNatureza}</td>
                     <td className="px-4 py-3 font-medium">{receita.naturezaReceita}</td>
                     <td className="px-4 py-3">

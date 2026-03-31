@@ -87,7 +87,7 @@ async function ServidoresContent({
             </thead>
             <tbody>
               {servidores.length > 0 ? servidores.map((servidor) => (
-                <tr key={servidor.id} className="border-b border-slate-200 hover:bg-slate-50">
+                <tr key={servidor.id} id={`record-${servidor.id}`} className="border-b border-slate-200 hover:bg-slate-50 transition-colors target:bg-yellow-100 target:border-yellow-400">
                   <td className="px-4 py-3">
                     <p className="font-medium">{servidor.nome}</p>
                     <p className="text-xs text-slate-600">{servidor.matricula}</p>

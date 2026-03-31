@@ -129,7 +129,7 @@ async function DespesasContent({ searchParams }: PageProps) {
               </thead>
               <tbody>
                 {despesas.length > 0 ? despesas.map((despesa) => (
-                  <tr key={despesa.id} className="border-b border-slate-200 hover:bg-slate-50">
+                  <tr key={despesa.id} id={`record-${despesa.id}`} className="border-b border-slate-200 hover:bg-slate-50 transition-colors target:bg-yellow-100 target:border-yellow-400">
                     <td className="px-4 py-3">
                       <span className="font-medium">{despesa.numeroEmpenho}</span>
                       <p className="text-xs text-slate-600">

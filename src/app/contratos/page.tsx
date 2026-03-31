@@ -99,7 +99,7 @@ async function ContratosContent({ searchParams }: PageProps) {
             </thead>
             <tbody>
               {contratos.length > 0 ? contratos.map((contrato) => (
-                <tr key={contrato.id} className="border-b border-slate-200 hover:bg-slate-50">
+                <tr key={contrato.id} id={`record-${contrato.id}`} className="border-b border-slate-200 hover:bg-slate-50 transition-colors target:bg-yellow-100 target:border-yellow-400">
                   <td className="px-4 py-3">
                     <span className="font-bold text-amber-800">{contrato.numero}/{contrato.ano}</span>
                     <p className="text-xs text-slate-600">{contrato.tipoContrato || '-'}</p>

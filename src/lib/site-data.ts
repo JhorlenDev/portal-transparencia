@@ -344,6 +344,35 @@ export async function getServidores(filters?: ServidoresFilters) {
   })
 }
 
+export async function getGlobalSearch(query: string) {
+  if (!query) return { despesas: [], receitas: [], licitacoes: [], contratos: [], servidores: [] }
+
+  const [despesas, receitas, licitacoes, contratos, servidores] = await Promise.all([
+    prisma.despesa.findMany({
+      where: { OR: [{ credorNome: { contains: query } }, { credorCpfCnpj: { contains: query } }, { objeto: { contains: query } }, { numeroEmpenho: { contains: query } }] },
+      take: 5
+    }),
+    prisma.receita.findMany({
+      where: { OR: [{ naturezaReceita: { contains: query } }, { categoriaEconomica: { contains: query } }, { fonteRecursoNome: { contains: query } }] },
+      take: 5
+    }),
+    prisma.licitacao.findMany({
+      where: { OR: [{ objeto: { contains: query } }, { numero: { contains: query } }, { modalidade: { contains: query } }] },
+      take: 5
+    }),
+    prisma.contrato.findMany({
+      where: { OR: [{ objeto: { contains: query } }, { contratadoNome: { contains: query } }, { numero: { contains: query } }, { contratadoCnpj: { contains: query } }] },
+      take: 5
+    }),
+    prisma.servidor.findMany({
+      where: { OR: [{ nome: { contains: query } }, { matricula: { contains: query } }, { cargo: { contains: query } }, { lotacao: { contains: query } }] },
+      take: 5
+    })
+  ])
+
+  return { despesas, receitas, licitacoes, contratos, servidores }
+}
+
 export async function getServidoresStats(anoReferencia?: number) {
   const year = anoReferencia || new Date().getFullYear()
   const total = await prisma.servidor.count({ where: { anoReferencia: year } })
