@@ -105,7 +105,7 @@ async function DespesasContent({ searchParams }: PageProps) {
                 <p className="text-2xl font-bold text-slate-800">{formatCurrency(stats.pago)}</p>
               </div>
               <div className="w-12 h-12 bg-emerald-100 rounded-xl flex items-center justify-center">
-                <DollarSign className="h-6 w-6 text-emerald-600" />
+                <DollarSign className="h-6 w-6 text-emerald-700" />
               </div>
             </div>
           </CardContent>
@@ -152,7 +152,7 @@ async function DespesasContent({ searchParams }: PageProps) {
                     <td className="px-4 py-3 text-right font-medium text-amber-600">
                       {formatCurrency(despesa.valorLiquidado || 0)}
                     </td>
-                    <td className="px-4 py-3 text-right font-bold text-emerald-600">
+                    <td className="px-4 py-3 text-right font-bold text-emerald-700">
                       {formatCurrency(despesa.valorPago || 0)}
                     </td>
                   </tr>
@@ -198,7 +198,7 @@ export default async function Despesas({ searchParams }: PageProps) {
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
         <div>
           <h1 className="text-2xl font-bold text-slate-800 flex items-center gap-3">
-            <DollarSign className="h-7 w-7 text-emerald-600" />
+            <DollarSign className="h-7 w-7 text-emerald-700" />
             Despesas Públicas
           </h1>
           <p className="text-slate-600 mt-1">

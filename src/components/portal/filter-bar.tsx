@@ -145,7 +145,7 @@ export function FilterBar({
                 className="pl-10"
               />
               {isFiltering && (
-                <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-emerald-600 animate-spin" />
+                <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-emerald-700 animate-spin" />
               )}
             </div>
 
@@ -342,7 +342,7 @@ export function DetailsModal({
                 <tbody>
                   {columns.map((col, i) => (
                     <tr key={i} className="border-b border-slate-100">
-                      <td className="px-3 py-2 font-mono text-xs text-emerald-600">{col.campo}</td>
+                      <td className="px-3 py-2 font-mono text-xs text-emerald-700">{col.campo}</td>
                       <td className="px-3 py-2 text-slate-500">{col.tipo}</td>
                       <td className="px-3 py-2 text-slate-700">{col.descricao}</td>
                       <td className="px-3 py-2 font-mono text-xs text-slate-500">{col.exemplo}</td>
@@ -361,9 +361,9 @@ export function DetailsModal({
                 className="flex flex-col items-center justify-center p-6 border-2 border-slate-200 rounded-xl hover:border-emerald-500 hover:bg-emerald-50 transition-colors disabled:opacity-50"
               >
                 {isDownloading ? (
-                  <Loader2 className="h-10 w-10 text-emerald-600 animate-spin mb-2" />
+                  <Loader2 className="h-10 w-10 text-emerald-700 animate-spin mb-2" />
                 ) : (
-                  <FileSpreadsheet className="h-10 w-10 text-emerald-600 mb-2" />
+                  <FileSpreadsheet className="h-10 w-10 text-emerald-700 mb-2" />
                 )}
                 <span className="font-medium text-slate-700">Download CSV</span>
                 <span className="text-xs text-slate-500 mt-1">Planilha editável</span>

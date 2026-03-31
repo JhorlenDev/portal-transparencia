@@ -15,7 +15,7 @@ export function Breadcrumbs({ items }: BreadcrumbsProps) {
     <nav className="flex items-center gap-1 text-sm text-slate-500 mb-4">
       <Link 
         href="/" 
-        className="flex items-center gap-1 hover:text-emerald-600 transition-colors"
+        className="flex items-center gap-1 hover:text-emerald-700 transition-colors"
       >
         <Home className="h-4 w-4" />
         <span className="sr-only">Home</span>
@@ -27,7 +27,7 @@ export function Breadcrumbs({ items }: BreadcrumbsProps) {
           {item.href ? (
             <Link 
               href={item.href} 
-              className="hover:text-emerald-600 transition-colors"
+              className="hover:text-emerald-700 transition-colors"
             >
               {item.label}
             </Link>

@@ -69,10 +69,10 @@ async function ReceitasContent({ searchParams }: PageProps) {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-slate-500">Total Arrecadado</p>
-                <p className="text-2xl font-bold text-emerald-600">{formatCurrency(stats.arrecadado)}</p>
+                <p className="text-2xl font-bold text-emerald-700">{formatCurrency(stats.arrecadado)}</p>
               </div>
               <div className="w-12 h-12 bg-emerald-100 rounded-xl flex items-center justify-center">
-                <ArrowUpRight className="h-6 w-6 text-emerald-600" />
+                <ArrowUpRight className="h-6 w-6 text-emerald-700" />
               </div>
             </div>
           </CardContent>
@@ -123,7 +123,7 @@ async function ReceitasContent({ searchParams }: PageProps) {
                     <td className="px-4 py-3 text-right font-medium text-slate-600">
                       {formatCurrency(receita.valorPrevisto)}
                     </td>
-                    <td className="px-4 py-3 text-right font-bold text-emerald-600">
+                    <td className="px-4 py-3 text-right font-bold text-emerald-700">
                       {formatCurrency(receita.valorArrecadado || 0)}
                     </td>
                     <td className="px-4 py-3 text-right">

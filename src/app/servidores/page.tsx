@@ -107,7 +107,7 @@ async function ServidoresContent({
                   <td className="px-4 py-3 text-right font-medium">
                     {formatCurrency(servidor.remuneracaoBruta || 0)}
                   </td>
-                  <td className="px-4 py-3 text-right font-bold text-emerald-600">
+                  <td className="px-4 py-3 text-right font-bold text-emerald-700">
                     {formatCurrency(servidor.remuneracaoLiquida || 0)}
                   </td>
                 </tr>

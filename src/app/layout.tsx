@@ -48,19 +48,21 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const config = await getSiteConfig()
+
   return (
     <html lang="pt-BR">
       <body className={`${inter.className} min-h-screen flex flex-col bg-slate-50`}>
-        <Header />
+        <Header config={config} />
         <main className="flex-1" id="conteudo">
           {children}
         </main>
-        <Footer />
+        <Footer config={config} />
       </body>
     </html>
   );

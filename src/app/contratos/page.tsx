@@ -118,7 +118,7 @@ async function ContratosContent({ searchParams }: PageProps) {
                       {contrato.status}
                     </span>
                   </td>
-                  <td className="px-4 py-3 text-right font-bold text-emerald-600">
+                  <td className="px-4 py-3 text-right font-bold text-emerald-700">
                     {formatCurrency(contrato.valorInicial)}
                   </td>
                 </tr>

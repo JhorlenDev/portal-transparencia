@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState, useEffect } from "react"
+import React, { useState } from "react"
 import Link from "next/link"
 import { useRouter, usePathname } from "next/navigation"
 import { Search, Menu } from "lucide-react"
@@ -37,25 +37,12 @@ function DesktopMenuItem({ item, pathname }: { item: typeof menuItems[0]; pathna
   )
 }
 
-export default function Header() {
+export default function Header({ config }: { config?: Record<string, string | null> }) {
   const router = useRouter()
   const pathname = usePathname()
   const [searchQuery, setSearchQuery] = useState("")
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-  const [siteConfig, setSiteConfig] = useState<Record<string, string>>({
-    nome_site: 'Portal da Transparência',
-    subtitulo_site: 'Prefeitura Municipal'
-  })
-
-  useEffect(() => {
-    fetch('/api/configuracao-site')
-      .then(res => res.json())
-      .then(data => {
-        if (data.nome_site) setSiteConfig(data)
-      })
-      .catch(() => {})
-  }, [])
-
+  
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
     if (searchQuery.trim()) {
@@ -63,8 +50,8 @@ export default function Header() {
     }
   }
 
-  const nomeSite = siteConfig?.nome_site || 'Portal da Transparência'
-  const subtitulo = siteConfig?.subtitulo_site || 'Prefeitura Municipal'
+  const nomeSite = config?.nome_site || 'Portal da Transparência'
+  const subtitulo = config?.subtitulo_site || 'Prefeitura Municipal'
 
   return (
     <>

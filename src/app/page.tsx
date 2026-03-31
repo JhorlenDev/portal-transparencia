@@ -70,7 +70,7 @@ export default async function Home() {
                 />
                 <Button
                   type="submit"
-                  className="absolute right-2 top-1/2 -translate-y-1/2 h-10 w-10 p-0 bg-emerald-600 hover:bg-emerald-700 rounded-lg"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 h-10 w-10 p-0 bg-emerald-700 hover:bg-emerald-800 rounded-lg"
                   aria-label="Realizar busca"
                 >
                   <Search className="h-5 w-5" aria-hidden="true" />
@@ -127,7 +127,7 @@ export default async function Home() {
             <Card className="lg:col-span-2">
               <CardHeader className="flex flex-row items-center justify-between pb-4">
                 <CardTitle className="text-lg font-bold flex items-center gap-2">
-                  <DollarSign className="h-5 w-5 text-emerald-600" />
+                  <DollarSign className="h-5 w-5 text-emerald-700" />
                   Últimas Despesas
                 </CardTitle>
                 <Link href="/despesas">
@@ -143,10 +143,10 @@ export default async function Home() {
                       <div className="flex-1 min-w-0">
                         <p className="font-medium text-slate-800 truncate">{despesa.credorNome || 'Sem credor'}</p>
                         <p className="text-sm text-slate-500 truncate">{despesa.objeto || 'Sem objeto'}</p>
-                        <p className="text-xs text-slate-400 mt-1">{despesa.orgaoNome || 'Sem órgão'} • {despesa.numeroEmpenho}</p>
+                        <p className="text-xs text-slate-500 mt-1">{despesa.orgaoNome || 'Sem órgão'} • {despesa.numeroEmpenho}</p>
                       </div>
                       <div className="text-right ml-4">
-                        <p className="font-bold text-emerald-600">{formatCurrency(despesa.valorEmpenhado || 0)}</p>
+                        <p className="font-bold text-emerald-700">{formatCurrency(despesa.valorEmpenhado || 0)}</p>
                         <span className="text-xs text-slate-500">{despesa.tipoMovimento}</span>
                       </div>
                     </div>
@@ -194,7 +194,7 @@ export default async function Home() {
                       aria-label="Portal Nacional de Contratações (abre em nova aba)"
                     >
                       <span>Portal Nacional de Contratações</span>
-                      <svg className="h-4 w-4 text-slate-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                      <svg className="h-4 w-4 text-slate-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                         <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
                         <polyline points="15 3 21 3 21 9" />
                         <line x1="10" y1="14" x2="21" y2="3" />
@@ -210,7 +210,7 @@ export default async function Home() {
                       aria-label="Fala.BR da CGU (abre em nova aba)"
                     >
                       <span>Fala.BR (CGU)</span>
-                      <svg className="h-4 w-4 text-slate-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                      <svg className="h-4 w-4 text-slate-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                         <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
                         <polyline points="15 3 21 3 21 9" />
                         <line x1="10" y1="14" x2="21" y2="3" />
@@ -233,11 +233,11 @@ export default async function Home() {
               </div>
               <div>
                 <h3 className="text-xl font-bold">Dados Abertos</h3>
-                <p className="text-slate-400">Baixe dados em formatos abertos (CSV, JSON).</p>
+                <p className="text-slate-300">Baixe dados em formatos abertos (CSV, JSON).</p>
               </div>
             </div>
             <Link href="/dados-abertos">
-              <Button size="lg" className="bg-emerald-600 hover:bg-emerald-700 gap-2">
+              <Button size="lg" className="bg-emerald-700 hover:bg-emerald-800 gap-2">
                 <Database className="h-5 w-5" />
                 Acessar Catálogo
               </Button>

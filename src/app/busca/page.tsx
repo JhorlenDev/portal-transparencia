@@ -38,7 +38,7 @@ export default function Busca({ searchParams }: { searchParams: { q?: string } }
               <Card>
                 <CardContent className="p-4">
                   <Link href="/despesas" className="block">
-                    <h3 className="font-medium text-emerald-600 hover:underline">Despesas</h3>
+                    <h3 className="font-medium text-emerald-700 hover:underline">Despesas</h3>
                     <p className="text-sm text-slate-600 mt-1">
                       Encontramos <strong>15</strong> despesas relacionadas a "{query}"
                     </p>
