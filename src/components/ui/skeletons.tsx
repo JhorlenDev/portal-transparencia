@@ -2,7 +2,7 @@ import { Skeleton } from "./skeleton"
 
 function CardSkeleton() {
   return (
-    <div className="rounded-xl border bg-card p-6">
+    <div className="rounded-xl bg-card p-6">
       <Skeleton className="h-4 w-1/3 mb-4" />
       <Skeleton className="h-8 w-1/2" />
     </div>
@@ -11,7 +11,7 @@ function CardSkeleton() {
 
 function StatsCardSkeleton() {
   return (
-    <div className="rounded-xl border p-5">
+    <div className="rounded-xl p-5">
       <div className="flex items-center justify-between">
         <Skeleton className="h-4 w-24" />
         <Skeleton className="h-12 w-12 rounded-xl" />
@@ -22,7 +22,7 @@ function StatsCardSkeleton() {
 
 function TableRowSkeleton() {
   return (
-    <tr className="border-b">
+    <tr>
       <td className="px-4 py-3"><Skeleton className="h-4 w-24" /></td>
       <td className="px-4 py-3"><Skeleton className="h-4 w-32" /></td>
       <td className="px-4 py-3"><Skeleton className="h-4 w-20" /></td>
@@ -34,9 +34,9 @@ function TableRowSkeleton() {
 
 function TableSkeleton({ rows = 5 }: { rows?: number }) {
   return (
-    <div className="rounded-md border">
+    <div className="rounded-md">
       <table className="w-full">
-        <thead className="bg-slate-50 border-b">
+        <thead className="bg-slate-50">
           <tr>
             <th className="text-left px-4 py-3"><Skeleton className="h-4 w-20" /></th>
             <th className="text-left px-4 py-3"><Skeleton className="h-4 w-32" /></th>
