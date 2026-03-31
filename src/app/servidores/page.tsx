@@ -1,9 +1,26 @@
-import { Users, Download } from "lucide-react"
+import { Users } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent } from "@/components/ui/card"
+import { getServidores, getServidoresStats } from "@/lib/site-data"
 
-export default function Servidores() {
+export const dynamic = 'force-dynamic'
+
+function formatCurrency(value: number): string {
+  return new Intl.NumberFormat('pt-BR', {
+    style: 'currency',
+    currency: 'BRL',
+    minimumFractionDigits: 2
+  }).format(value)
+}
+
+export default async function Servidores() {
+  const currentYear = new Date().getFullYear()
+  const [servidores, stats] = await Promise.all([
+    getServidores(currentYear),
+    getServidoresStats(currentYear)
+  ])
+
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
@@ -17,10 +34,30 @@ export default function Servidores() {
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-        <Card><CardContent className="p-4"><p className="text-sm text-slate-500">Total de Servidores</p><p className="text-2xl font-bold">1.245</p></CardContent></Card>
-        <Card><CardContent className="p-4"><p className="text-sm text-slate-500">Efetivos</p><p className="text-2xl font-bold text-green-600">987</p></CardContent></Card>
-        <Card><CardContent className="p-4"><p className="text-sm text-slate-500">Comissionados</p><p className="text-2xl font-bold text-blue-600">156</p></CardContent></Card>
-        <Card><CardContent className="p-4"><p className="text-sm text-slate-500">Folha Total Bruta</p><p className="text-lg font-bold">R$ 4.567.890</p></CardContent></Card>
+        <Card>
+          <CardContent className="p-4">
+            <p className="text-sm text-slate-500">Total de Servidores</p>
+            <p className="text-2xl font-bold">{stats.total}</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4">
+            <p className="text-sm text-slate-500">Em {currentYear}</p>
+            <p className="text-2xl font-bold">{stats.total}</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4">
+            <p className="text-sm text-slate-500">Folha Bruta</p>
+            <p className="text-lg font-bold">{formatCurrency(stats.totalRemuneracao)}</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4">
+            <p className="text-sm text-slate-500">Ano Referência</p>
+            <p className="text-xl font-bold">{currentYear}</p>
+          </CardContent>
+        </Card>
       </div>
 
       <Card className="mb-6 bg-amber-50 border-amber-200">
@@ -28,19 +65,6 @@ export default function Servidores() {
           <p className="text-sm text-amber-800">
             <strong>Aviso LGPD:</strong> A divulgação de remuneração de servidores públicos é assegurada pela Lei de Acesso à Informação (Lei nº 12.527/2011).
           </p>
-        </CardContent>
-      </Card>
-
-      <Card className="mb-6">
-        <CardContent className="p-4">
-          <div className="flex flex-col md:flex-row gap-4">
-            <div className="flex-1"><Input type="search" placeholder="Buscar por nome, cargo ou matrícula..." /></div>
-            <div className="flex gap-2">
-              <Button variant="outline">Março</Button>
-              <Button variant="outline">2026</Button>
-              <Button variant="outline" className="gap-2"><Download className="h-4 w-4" />CSV</Button>
-            </div>
-          </div>
         </CardContent>
       </Card>
 
@@ -58,16 +82,38 @@ export default function Servidores() {
               </tr>
             </thead>
             <tbody>
-              {[1, 2, 3, 4, 5].map((i) => (
-                <tr key={i} className="border-b hover:bg-slate-50">
-                  <td className="px-4 py-3"><p className="font-medium">Servidor {i} da Silva</p><p className="text-xs text-slate-500">Mat. 100{i}</p></td>
-                  <td className="px-4 py-3 text-sm">Professor</td>
-                  <td className="px-4 py-3 text-sm">Secretaria de Educação</td>
-                  <td className="px-4 py-3"><span className="px-2 py-1 bg-green-100 text-green-700 rounded text-xs">Efetivo</span></td>
-                  <td className="px-4 py-3 text-right font-medium">R$ {5500 + (i * 500)},00</td>
-                  <td className="px-4 py-3 text-right font-bold text-emerald-600">R$ {4500 + (i * 400)},00</td>
+              {servidores.length > 0 ? servidores.map((servidor) => (
+                <tr key={servidor.id} className="border-b hover:bg-slate-50">
+                  <td className="px-4 py-3">
+                    <p className="font-medium">{servidor.nome}</p>
+                    <p className="text-xs text-slate-500">{servidor.matricula}</p>
+                  </td>
+                  <td className="px-4 py-3">
+                    <p className="text-sm">{servidor.cargo}</p>
+                    {servidor.funcao && <p className="text-xs text-slate-500">{servidor.funcao}</p>}
+                  </td>
+                  <td className="px-4 py-3 text-sm">{servidor.lotacao || '-'}</td>
+                  <td className="px-4 py-3">
+                    <span className={`px-2 py-1 rounded text-xs ${
+                      servidor.vinculo === 'efetivo' ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'
+                    }`}>
+                      {servidor.vinculo}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3 text-right font-medium">
+                    {formatCurrency(servidor.remuneracaoBruta || 0)}
+                  </td>
+                  <td className="px-4 py-3 text-right font-bold text-emerald-600">
+                    {formatCurrency(servidor.remuneracaoLiquida || 0)}
+                  </td>
                 </tr>
-              ))}
+              )) : (
+                <tr>
+                  <td colSpan={6} className="px-4 py-8 text-center text-slate-500">
+                    Nenhum servidor encontrado para {currentYear}
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </CardContent>
