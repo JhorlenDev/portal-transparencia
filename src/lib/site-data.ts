@@ -133,10 +133,29 @@ export async function getLatestContratos(limit = 5) {
 }
 
 // Receitas
-export async function getReceitas(exercicio?: number) {
-  const year = exercicio || new Date().getFullYear()
+export interface ReceitasFilters {
+  exercicio?: number
+  categoria?: string
+  search?: string
+}
+
+export async function getReceitas(filters?: ReceitasFilters) {
+  const year = filters?.exercicio || new Date().getFullYear()
+  const where: any = { exercicio: year }
+  
+  if (filters?.categoria) {
+    where.categoriaEconomica = filters.categoria
+  }
+  
+  if (filters?.search) {
+    where.OR = [
+      { naturezaReceita: { contains: filters.search } },
+      { codigoNatureza: { contains: filters.search } }
+    ]
+  }
+  
   return prisma.receita.findMany({
-    where: { exercicio: year },
+    where,
     orderBy: { exercicio: 'desc' }
   })
 }
@@ -154,10 +173,31 @@ export async function getReceitasStats(exercicio?: number) {
 }
 
 // Despesas
-export async function getDespesas(exercicio?: number) {
-  const year = exercicio || new Date().getFullYear()
+export interface DespesasFilters {
+  exercicio?: number
+  categoria?: string
+  search?: string
+  status?: string
+}
+
+export async function getDespesas(filters?: DespesasFilters) {
+  const year = filters?.exercicio || new Date().getFullYear()
+  const where: any = { exercicio: year }
+  
+  if (filters?.categoria) {
+    where.categoriaDespesa = filters.categoria
+  }
+  
+  if (filters?.search) {
+    where.OR = [
+      { objeto: { contains: filters.search } },
+      { credorNome: { contains: filters.search } },
+      { numeroEmpenho: { contains: filters.search } }
+    ]
+  }
+  
   return prisma.despesa.findMany({
-    where: { exercicio: year },
+    where,
     orderBy: { dataEmpenho: 'desc' }
   })
 }
@@ -176,10 +216,32 @@ export async function getDespesasStats(exercicio?: number) {
 }
 
 // Licitações
-export async function getLicitacoes(ano?: number, status?: string) {
-  const year = ano || new Date().getFullYear()
+export interface LicitacoesFilters {
+  ano?: number
+  status?: string
+  search?: string
+  modalidade?: string
+}
+
+export async function getLicitacoes(filters?: LicitacoesFilters) {
+  const year = filters?.ano || new Date().getFullYear()
   const where: any = { ano: year }
-  if (status) where.status = status
+  
+  if (filters?.status) {
+    where.status = filters.status
+  }
+  
+  if (filters?.modalidade) {
+    where.modalidade = filters.modalidade
+  }
+  
+  if (filters?.search) {
+    where.OR = [
+      { objeto: { contains: filters.search } },
+      { numero: { contains: filters.search } }
+    ]
+  }
+  
   return prisma.licitacao.findMany({
     where,
     orderBy: { dataAbertura: 'desc' }
@@ -198,10 +260,33 @@ export async function getLicitacoesStats(ano?: number) {
 }
 
 // Contratos
-export async function getContratos(ano?: number, status?: string) {
-  const year = ano || new Date().getFullYear()
+export interface ContratosFilters {
+  ano?: number
+  status?: string
+  search?: string
+  tipo?: string
+}
+
+export async function getContratos(filters?: ContratosFilters) {
+  const year = filters?.ano || new Date().getFullYear()
   const where: any = { ano: year }
-  if (status) where.status = status
+  
+  if (filters?.status) {
+    where.status = filters.status
+  }
+  
+  if (filters?.tipo) {
+    where.tipoContrato = filters.tipo
+  }
+  
+  if (filters?.search) {
+    where.OR = [
+      { objeto: { contains: filters.search } },
+      { contratadoNome: { contains: filters.search } },
+      { numero: { contains: filters.search } }
+    ]
+  }
+  
   return prisma.contrato.findMany({
     where,
     orderBy: { dataInicioVigencia: 'desc' }
@@ -219,10 +304,35 @@ export async function getContratosStats() {
 }
 
 // Servidores
-export async function getServidores(anoReferencia?: number) {
-  const year = anoReferencia || new Date().getFullYear()
+export interface ServidoresFilters {
+  anoReferencia?: number
+  vinculo?: string
+  search?: string
+  lotacao?: string
+}
+
+export async function getServidores(filters?: ServidoresFilters) {
+  const year = filters?.anoReferencia || new Date().getFullYear()
+  const where: any = { anoReferencia: year }
+  
+  if (filters?.vinculo) {
+    where.vinculo = filters.vinculo
+  }
+  
+  if (filters?.lotacao) {
+    where.lotacao = filters.lotacao
+  }
+  
+  if (filters?.search) {
+    where.OR = [
+      { nome: { contains: filters.search } },
+      { matricula: { contains: filters.search } },
+      { cargo: { contains: filters.search } }
+    ]
+  }
+  
   return prisma.servidor.findMany({
-    where: { anoReferencia: year },
+    where,
     orderBy: { nome: 'asc' }
   })
 }
@@ -238,10 +348,33 @@ export async function getServidoresStats(anoReferencia?: number) {
 }
 
 // Convênios
-export async function getConvenios(ano?: number, status?: string) {
-  const year = ano || new Date().getFullYear()
+export interface ConveniosFilters {
+  ano?: number
+  status?: string
+  search?: string
+  tipo?: string
+}
+
+export async function getConvenios(filters?: ConveniosFilters) {
+  const year = filters?.ano || new Date().getFullYear()
   const where: any = { ano: year }
-  if (status) where.status = status
+  
+  if (filters?.status) {
+    where.status = filters.status
+  }
+  
+  if (filters?.tipo) {
+    where.tipo = filters.tipo
+  }
+  
+  if (filters?.search) {
+    where.OR = [
+      { objeto: { contains: filters.search } },
+      { concedente: { contains: filters.search } },
+      { numero: { contains: filters.search } }
+    ]
+  }
+  
   return prisma.convenio.findMany({
     where,
     orderBy: { dataInicioVigencia: 'desc' }

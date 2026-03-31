@@ -1,11 +1,21 @@
 import { Suspense } from "react"
 import { TrendingUp, ArrowUpRight } from "lucide-react"
-import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
-import { PageSkeleton, StatsCardSkeleton, TableSkeleton } from "@/components/ui/skeletons"
+import { PageSkeleton } from "@/components/ui/skeletons"
+import { FilterBar } from "@/components/portal/filter-bar"
+import { Breadcrumbs } from "@/components/portal/breadcrumbs"
+import { StructuredData } from "@/components/portal/structured-data"
 import { getReceitas, getReceitasStats } from "@/lib/site-data"
 
 export const dynamic = 'force-dynamic'
+
+export async function generateMetadata() {
+  const currentYear = new Date().getFullYear()
+  return {
+    title: `Receitas Públicas ${currentYear} | Portal da Transparência`,
+    description: `Consulte a previsão e arrecadação das receitas municipais. Dados atualizados de ${currentYear}.`,
+  }
+}
 
 function formatCurrency(value: number): string {
   return new Intl.NumberFormat('pt-BR', {
@@ -15,10 +25,22 @@ function formatCurrency(value: number): string {
   }).format(value)
 }
 
-async function ReceitasContent() {
-  const currentYear = new Date().getFullYear()
+interface PageProps {
+  searchParams: Promise<{ q?: string; ano?: string; categoria?: string }>
+}
+
+async function ReceitasContent({ searchParams }: PageProps) {
+  const params = await searchParams
+  const currentYear = parseInt(params.ano || String(new Date().getFullYear()))
+  
+  const filters = {
+    exercicio: currentYear,
+    search: params.q || undefined,
+    categoria: params.categoria || undefined
+  }
+  
   const [receitas, stats] = await Promise.all([
-    getReceitas(currentYear),
+    getReceitas(filters),
     getReceitasStats(currentYear)
   ])
 
@@ -133,9 +155,23 @@ async function ReceitasContent() {
   )
 }
 
-export default function Receitas() {
+export default async function Receitas({ searchParams }: PageProps) {
+  const currentYear = new Date().getFullYear()
+  const years = Array.from({ length: 5 }, (_, i) => currentYear - i)
+
+  const webpageData = {
+    title: `Receitas Públicas ${currentYear} | Portal da Transparência`,
+    description: `Consulte a previsão e arrecadação das receitas municipais. Dados atualizados de ${currentYear}.`,
+    url: '/receitas'
+  }
+
   return (
     <div className="container mx-auto px-4 py-8">
+      <Breadcrumbs items={[
+        { label: "Transparência", href: "/" },
+        { label: "Receitas" }
+      ]} />
+      
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
         <div>
           <h1 className="text-2xl font-bold text-slate-800 flex items-center gap-3">
@@ -148,8 +184,12 @@ export default function Receitas() {
         </div>
       </div>
 
+      <FilterBar page="receitas" years={years} searchPlaceholder="Buscar por natureza, código..." />
+
+      <StructuredData type="webpage" data={webpageData} />
+
       <Suspense fallback={<PageSkeleton />}>
-        <ReceitasContent />
+        <ReceitasContent searchParams={searchParams} />
       </Suspense>
     </div>
   )

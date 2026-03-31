@@ -1,8 +1,12 @@
 import { Suspense } from "react"
+import { Metadata } from "next"
 import { Users } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
 import { PageSkeleton } from "@/components/ui/skeletons"
 import { getServidores, getServidoresStats } from "@/lib/site-data"
+import { FilterBar } from "@/components/portal/filter-bar"
+import { Breadcrumbs } from "@/components/portal/breadcrumbs"
+import { StructuredData } from "@/components/portal/structured-data"
 
 export const dynamic = 'force-dynamic'
 
@@ -14,15 +18,32 @@ function formatCurrency(value: number): string {
   }).format(value)
 }
 
-async function ServidoresContent() {
+const statuses = [
+  { value: "efetivo", label: "Efetivo" },
+  { value: "temporario", label: "Temporário" },
+  { value: "comissionado", label: "Comissionado" }
+]
+
+async function ServidoresContent({
+  searchParams
+}: {
+  searchParams: Promise<{ q?: string; ano?: string; vinculo?: string; lotacao?: string }>
+}) {
+  const params = await searchParams
   const currentYear = new Date().getFullYear()
   const [servidores, stats] = await Promise.all([
-    getServidores(currentYear),
+    getServidores({ anoReferencia: currentYear, search: params.q || undefined, vinculo: params.vinculo || undefined }),
     getServidoresStats(currentYear)
   ])
 
   return (
     <>
+      <FilterBar
+        page="servidores"
+        statuses={statuses}
+        searchPlaceholder="Buscar por nome, matrícula ou cargo..."
+      />
+
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
         <Card>
           <CardContent className="p-4">
@@ -106,9 +127,37 @@ async function ServidoresContent() {
   )
 }
 
-export default function Servidores() {
+export async function generateMetadata({
+  searchParams
+}: {
+  searchParams: Promise<{ q?: string; ano?: string; vinculo?: string; lotacao?: string }>
+}): Promise<Metadata> {
+  const params = await searchParams
+  const baseTitle = "Servidores Públicos"
+  const title = params.q || params.vinculo ? `${baseTitle} - Busca` : baseTitle
+
+  return {
+    title,
+    description: "Quadro de pessoal e remuneração dos servidores municipais. Transparência360 - Portal de Transparência Pública.",
+  }
+}
+
+export default function Servidores({
+  searchParams
+}: {
+  searchParams: Promise<{ q?: string; ano?: string; vinculo?: string; lotacao?: string }>
+}) {
+  const currentYear = new Date().getFullYear()
+
   return (
     <div className="container mx-auto px-4 py-8">
+      <Breadcrumbs
+        items={[
+          { label: "Início", href: "/" },
+          { label: "Servidores Públicos", href: "/servidores" }
+        ]}
+      />
+
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
         <div>
           <h1 className="text-2xl font-bold text-slate-800 flex items-center gap-3">
@@ -119,8 +168,21 @@ export default function Servidores() {
         </div>
       </div>
 
+      <StructuredData
+        type="webpage"
+        data={{
+          title: "Servidores Públicos",
+          description: "Quadro de pessoal e remuneração dos servidores municipais.",
+          url: "/servidores",
+          breadcrumbs: [
+            { name: "Início", url: "/" },
+            { name: "Servidores Públicos", url: "/servidores" }
+          ]
+        }}
+      />
+
       <Suspense fallback={<PageSkeleton />}>
-        <ServidoresContent />
+        <ServidoresContent searchParams={searchParams} />
       </Suspense>
     </div>
   )

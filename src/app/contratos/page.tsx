@@ -2,9 +2,24 @@ import { Suspense } from "react"
 import { FileText } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
 import { PageSkeleton } from "@/components/ui/skeletons"
+import { FilterBar } from "@/components/portal/filter-bar"
+import { Breadcrumbs } from "@/components/portal/breadcrumbs"
+import { StructuredData } from "@/components/portal/structured-data"
 import { getContratos, getContratosStats } from "@/lib/site-data"
 
 export const dynamic = 'force-dynamic'
+
+export async function generateMetadata() {
+  const currentYear = new Date().getFullYear()
+  return {
+    title: `Contratos Administrativos ${currentYear} | Portal da Transparência`,
+    description: `Consulte todos os contratos administrativos, atas de registro de preços e aditivos do município. Dados atualizados de ${currentYear}.`,
+    openGraph: {
+      title: `Contratos Administrativos ${currentYear} | Portal da Transparência`,
+      description: `Consulte todos os contratos administrativos do município.`,
+    }
+  }
+}
 
 function formatCurrency(value: number): string {
   return new Intl.NumberFormat('pt-BR', {
@@ -14,15 +29,34 @@ function formatCurrency(value: number): string {
   }).format(value)
 }
 
-async function ContratosContent() {
-  const currentYear = new Date().getFullYear()
+interface PageProps {
+  searchParams: Promise<{ q?: string; ano?: string; status?: string; tipo?: string }>
+}
+
+async function ContratosContent({ searchParams }: PageProps) {
+  const params = await searchParams
+  const currentYear = parseInt(params.ano || String(new Date().getFullYear()))
+
   const [contratos, stats] = await Promise.all([
-    getContratos(currentYear),
+    getContratos({ ano: currentYear, search: params.q || undefined, status: params.status || undefined }),
     getContratosStats()
   ])
 
   return (
     <>
+      <StructuredData 
+        type="webpage" 
+        data={{
+          title: `Contratos Administrativos ${currentYear}`,
+          description: `Lista de contratos administrativos do município. ${contratos.length} registros encontrados.`,
+          url: `/contratos${params.ano ? `?ano=${params.ano}` : ''}`,
+          breadcrumbs: [
+            { name: "Home", url: "/" },
+            { name: "Contratos", url: "/contratos" }
+          ]
+        }}
+      />
+      
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
         <Card>
           <CardContent className="p-4">
@@ -104,9 +138,22 @@ async function ContratosContent() {
   )
 }
 
-export default function Contratos() {
+const statuses = [
+  { value: "vigente", label: "Vigente" },
+  { value: "encerrado", label: "Encerrado" }
+]
+
+export default async function Contratos({ searchParams }: PageProps) {
+  const currentYear = new Date().getFullYear()
+  const years = Array.from({ length: 5 }, (_, i) => currentYear - i)
+  
   return (
     <div className="container mx-auto px-4 py-8">
+      <Breadcrumbs items={[
+        { label: "Transparência", href: "/" },
+        { label: "Contratos" }
+      ]} />
+
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
         <div>
           <h1 className="text-2xl font-bold text-slate-800 flex items-center gap-3">
@@ -117,8 +164,15 @@ export default function Contratos() {
         </div>
       </div>
 
+      <FilterBar 
+        page="contratos"
+        years={years}
+        statuses={statuses}
+        searchPlaceholder="Buscar por objeto, número..."
+      />
+
       <Suspense fallback={<PageSkeleton />}>
-        <ContratosContent />
+        <ContratosContent searchParams={searchParams} />
       </Suspense>
     </div>
   )

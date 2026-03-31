@@ -3,8 +3,19 @@ import { HandCoins } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
 import { PageSkeleton } from "@/components/ui/skeletons"
 import { getConvenios, getConveniosStats } from "@/lib/site-data"
+import { FilterBar } from "@/components/portal/filter-bar"
+import { Breadcrumbs } from "@/components/portal/breadcrumbs"
+import { StructuredData } from "@/components/portal/structured-data"
+import { Metadata } from "next"
 
 export const dynamic = 'force-dynamic'
+
+export async function generateMetadata(): Promise<Metadata> {
+  return {
+    title: "Convênios e Transferências | Transparência 360",
+    description: "Consulta de convênios, termos de colaboração e transferências de recursos do governo."
+  }
+}
 
 function formatCurrency(value: number): string {
   return new Intl.NumberFormat('pt-BR', {
@@ -14,10 +25,26 @@ function formatCurrency(value: number): string {
   }).format(value)
 }
 
-async function ConveniosContent() {
+const statuses = [
+  { value: "em_execucao", label: "Em Execução" },
+  { value: "encerrado", label: "Encerrado" },
+  { value: "rescindido", label: "Rescindido" }
+]
+
+const breadcrumbs = [
+  { label: "Início", href: "/" },
+  { label: "Convênios", href: "/convenios" }
+]
+
+async function ConveniosContent({
+  searchParams
+}: {
+  searchParams: Promise<{ q?: string; ano?: string; status?: string; tipo?: string }>
+}) {
+  const params = await searchParams
   const currentYear = new Date().getFullYear()
   const [convenios, stats] = await Promise.all([
-    getConvenios(currentYear),
+    getConvenios({ ano: currentYear, search: params.q || undefined, status: params.status || undefined }),
     getConveniosStats(currentYear)
   ])
 
@@ -104,9 +131,15 @@ async function ConveniosContent() {
   )
 }
 
-export default function Convenios() {
+export default function Convenios({
+  searchParams
+}: {
+  searchParams: Promise<{ q?: string; ano?: string; status?: string; tipo?: string }>
+}) {
   return (
     <div className="container mx-auto px-4 py-8">
+      <Breadcrumbs items={breadcrumbs} />
+      
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
         <div>
           <h1 className="text-2xl font-bold text-slate-800 flex items-center gap-3">
@@ -117,9 +150,13 @@ export default function Convenios() {
         </div>
       </div>
 
+      <FilterBar page="convenios" statuses={statuses} searchPlaceholder="Buscar convênios..." />
+
       <Suspense fallback={<PageSkeleton />}>
-        <ConveniosContent />
+        <ConveniosContent searchParams={searchParams} />
       </Suspense>
+
+      <StructuredData type="webpage" data={{ title: "Convênios e Transferências", description: "Consulta de convênios, termos de colaboração e transferências de recursos do governo." }} />
     </div>
   )
 }
