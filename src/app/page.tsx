@@ -106,135 +106,133 @@ export default async function Home() {
       <section className="py-12 bg-white border-b">
         <div className="container mx-auto px-4">
           <h2 className="text-xl font-bold text-slate-800 mb-6 text-center">Acesso Rápido</h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
             {quickLinks.map((link) => (
               <Link
                 key={link.title}
                 href={link.href}
-                className="group flex flex-col items-center p-6 bg-slate-50 rounded-xl hover:bg-emerald-50 hover:shadow-md transition-all duration-300"
+                className="group flex flex-col items-center p-4 sm:p-5 bg-slate-50 rounded-xl hover:bg-emerald-50 hover:shadow-md transition-all duration-300"
               >
-                <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${colorClasses[link.color]} flex items-center justify-center mb-3 shadow-lg group-hover:scale-110 transition-transform`} aria-hidden="true">
-                  <link.icon className="h-7 w-7 text-white" />
+                <div className={`w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-gradient-to-br ${colorClasses[link.color]} flex items-center justify-center mb-3 shadow-lg group-hover:scale-110 transition-transform`} aria-hidden="true">
+                  <link.icon className="h-6 w-6 sm:h-7 sm:w-7 text-white" />
                 </div>
-                <span className="font-medium text-slate-800 text-center">{link.title}</span>
-                <span className="text-xs text-slate-600 text-center mt-1">{link.description}</span>
+                <span className="font-medium text-slate-800 text-center text-sm sm:text-base">{link.title}</span>
+                <span className="text-xs text-slate-600 text-center mt-1 hidden sm:block">{link.description}</span>
               </Link>
             ))}
           </div>
         </div>
       </section>
 
-      <section className="py-12">
+      <section className="py-8">
         <div className="container mx-auto px-4">
-          <div className="grid lg:grid-cols-3 gap-8">
-            <div className="lg:col-span-2 space-y-8">
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between pb-4">
-                  <CardTitle className="text-lg font-bold flex items-center gap-2">
-                    <DollarSign className="h-5 w-5 text-emerald-800" />
-                    Últimas Despesas
-                  </CardTitle>
-                  <Link href="/despesas">
-                    <Button variant="ghost" size="sm" className="gap-1" aria-label="Ver todas as últimas despesas">
-                      Ver todas <ChevronRight className="h-4 w-4" aria-hidden="true" />
-                    </Button>
-                  </Link>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    {latestDespesas.length > 0 ? latestDespesas.map((despesa) => (
-                      <div key={despesa.id} className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-4 p-4 rounded-lg bg-slate-50 hover:bg-slate-100 transition-colors">
-                        <div className="flex-1 min-w-0">
-                          <p className="font-medium text-slate-800 truncate">{despesa.credorNome || 'Sem credor'}</p>
-                          <p className="text-sm text-slate-600 truncate">{despesa.objeto || 'Sem objeto'}</p>
-                          <p className="text-xs text-slate-600 mt-1">{despesa.orgaoNome || 'Sem órgão'} • {despesa.numeroEmpenho}</p>
-                        </div>
-                        <div className="text-left sm:text-right mt-1 sm:mt-0">
-                          <p className="font-bold text-emerald-800 text-lg sm:text-base">{formatCurrency(despesa.valorEmpenhado || 0)}</p>
-                          <span className="text-xs text-slate-600 inline-block px-2 py-0.5 bg-emerald-100 text-emerald-800 rounded-full mt-1 sm:mt-0">{despesa.tipoMovimento}</span>
-                        </div>
+          <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-6">
+            <Card className="md:col-span-2 xl:col-span-2">
+              <CardHeader className="flex flex-row items-center justify-between pb-4">
+                <CardTitle className="text-lg font-bold flex items-center gap-2">
+                  <DollarSign className="h-5 w-5 text-emerald-800" />
+                  Últimas Despesas
+                </CardTitle>
+                <Link href="/despesas">
+                  <Button variant="ghost" size="sm" className="gap-1" aria-label="Ver todas as últimas despesas">
+                    Ver todas <ChevronRight className="h-4 w-4" aria-hidden="true" />
+                  </Button>
+                </Link>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  {latestDespesas.length > 0 ? latestDespesas.map((despesa) => (
+                    <div key={despesa.id} className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-4 p-3 sm:p-4 rounded-lg bg-slate-50 hover:bg-slate-100 transition-colors">
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium text-slate-800 truncate text-sm sm:text-base">{despesa.credorNome || 'Sem credor'}</p>
+                        <p className="text-xs sm:text-sm text-slate-600 truncate">{despesa.objeto || 'Sem objeto'}</p>
+                        <p className="text-xs text-slate-600 mt-1">{despesa.orgaoNome || 'Sem órgão'} • {despesa.numeroEmpenho}</p>
                       </div>
-                    )) : (
-                      <p className="text-slate-600 text-center py-4">Nenhuma despesa encontrada</p>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between pb-4">
-                  <CardTitle className="text-lg font-bold flex items-center gap-2">
-                    <DollarSign className="h-5 w-5 text-blue-600" />
-                    Últimas Receitas
-                  </CardTitle>
-                  <Link href="/receitas">
-                    <Button variant="ghost" size="sm" className="gap-1" aria-label="Ver todas as últimas receitas">
-                      Ver todas <ChevronRight className="h-4 w-4" aria-hidden="true" />
-                    </Button>
-                  </Link>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    {latestReceitas.length > 0 ? latestReceitas.map((receita) => (
-                      <div key={receita.id} className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-4 p-4 rounded-lg bg-slate-50 hover:bg-slate-100 transition-colors">
-                        <div className="flex-1 min-w-0">
-                          <p className="font-medium text-slate-800 truncate">{receita.naturezaReceita || 'Sem descrição'}</p>
-                          <p className="text-xs text-slate-600 mt-1">{receita.categoriaEconomica}</p>
-                        </div>
-                        <div className="text-left sm:text-right mt-1 sm:mt-0">
-                          <p className="font-bold text-blue-700 text-lg sm:text-base">{formatCurrency(receita.valorArrecadado || 0)}</p>
-                          <span className="text-xs text-slate-600 inline-block px-2 py-0.5 bg-blue-100 text-blue-800 rounded-full mt-1 sm:mt-0">Arrecadado</span>
-                        </div>
+                      <div className="text-left sm:text-right mt-1 sm:mt-0 flex-shrink-0">
+                        <p className="font-bold text-emerald-800">{formatCurrency(despesa.valorEmpenhado || 0)}</p>
+                        <span className="text-xs text-slate-600 inline-block px-2 py-0.5 bg-emerald-100 text-emerald-800 rounded-full">{despesa.tipoMovimento}</span>
                       </div>
-                    )) : (
-                      <p className="text-slate-600 text-center py-4">Nenhuma receita encontrada</p>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
+                    </div>
+                  )) : (
+                    <p className="text-slate-600 text-center py-4">Nenhuma despesa encontrada</p>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
 
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between pb-4">
-                  <CardTitle className="text-lg font-bold flex items-center gap-2">
-                    <Scale className="h-5 w-5 text-purple-600" />
-                    Últimas Licitações
-                  </CardTitle>
-                  <Link href="/licitacoes">
-                    <Button variant="ghost" size="sm" className="gap-1" aria-label="Ver todas as últimas licitações">
-                      Ver todas <ChevronRight className="h-4 w-4" aria-hidden="true" />
-                    </Button>
-                  </Link>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    {latestLicitacoes.length > 0 ? latestLicitacoes.map((licitacao) => (
-                      <div key={licitacao.id} className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-4 p-4 rounded-lg bg-slate-50 hover:bg-slate-100 transition-colors">
-                        <div className="flex-1 min-w-0">
-                          <p className="font-medium text-slate-800 truncate">{licitacao.objeto || 'Sem objeto'}</p>
-                          <p className="text-xs text-slate-600 mt-1">{licitacao.modalidade} • N° {licitacao.numero}/{licitacao.ano}</p>
-                        </div>
-                        <div className="text-left sm:text-right mt-1 sm:mt-0">
-                          <p className="font-bold text-purple-700 text-lg sm:text-base">{formatCurrency(licitacao.valorEstimado || 0)}</p>
-                          <span className="text-xs text-slate-600 inline-block px-2 py-0.5 bg-purple-100 text-purple-800 rounded-full mt-1 sm:mt-0 uppercase">{licitacao.status}</span>
-                        </div>
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between pb-4">
+                <CardTitle className="text-lg font-bold flex items-center gap-2">
+                  <DollarSign className="h-5 w-5 text-blue-600" />
+                  Últimas Receitas
+                </CardTitle>
+                <Link href="/receitas">
+                  <Button variant="ghost" size="sm" className="gap-1" aria-label="Ver todas as últimas receitas">
+                    Ver todas <ChevronRight className="h-4 w-4" aria-hidden="true" />
+                  </Button>
+                </Link>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  {latestReceitas.length > 0 ? latestReceitas.map((receita) => (
+                    <div key={receita.id} className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-4 p-3 sm:p-4 rounded-lg bg-slate-50 hover:bg-slate-100 transition-colors">
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium text-slate-800 truncate text-sm sm:text-base">{receita.naturezaReceita || 'Sem descrição'}</p>
+                        <p className="text-xs text-slate-600 mt-1">{receita.categoriaEconomica}</p>
                       </div>
-                    )) : (
-                      <p className="text-slate-600 text-center py-4">Nenhuma licitação encontrada</p>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
+                      <div className="text-left sm:text-right mt-1 sm:mt-0 flex-shrink-0">
+                        <p className="font-bold text-blue-700">{formatCurrency(receita.valorArrecadado || 0)}</p>
+                        <span className="text-xs text-slate-600 inline-block px-2 py-0.5 bg-blue-100 text-blue-800 rounded-full">Arrecadado</span>
+                      </div>
+                    </div>
+                  )) : (
+                    <p className="text-slate-600 text-center py-4">Nenhuma receita encontrada</p>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
 
-            <div className="space-y-6">
+            <Card className="md:col-span-2 xl:col-span-2">
+              <CardHeader className="flex flex-row items-center justify-between pb-4">
+                <CardTitle className="text-lg font-bold flex items-center gap-2">
+                  <Scale className="h-5 w-5 text-purple-600" />
+                  Últimas Licitações
+                </CardTitle>
+                <Link href="/licitacoes">
+                  <Button variant="ghost" size="sm" className="gap-1" aria-label="Ver todas as últimas licitações">
+                    Ver todas <ChevronRight className="h-4 w-4" aria-hidden="true" />
+                  </Button>
+                </Link>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  {latestLicitacoes.length > 0 ? latestLicitacoes.map((licitacao) => (
+                    <div key={licitacao.id} className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-4 p-3 sm:p-4 rounded-lg bg-slate-50 hover:bg-slate-100 transition-colors">
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium text-slate-800 truncate text-sm sm:text-base">{licitacao.objeto || 'Sem objeto'}</p>
+                        <p className="text-xs text-slate-600 mt-1">{licitacao.modalidade} • N° {licitacao.numero}/{licitacao.ano}</p>
+                      </div>
+                      <div className="text-left sm:text-right mt-1 sm:mt-0 flex-shrink-0">
+                        <p className="font-bold text-purple-700">{formatCurrency(licitacao.valorEstimado || 0)}</p>
+                        <span className="text-xs text-slate-600 inline-block px-2 py-0.5 bg-purple-100 text-purple-800 rounded-full uppercase">{licitacao.status}</span>
+                      </div>
+                    </div>
+                  )) : (
+                    <p className="text-slate-600 text-center py-4">Nenhuma licitação encontrada</p>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+
+            <div className="space-y-4">
               <Card className="bg-gradient-to-br from-teal-500 to-emerald-600 text-white border-0">
-                <CardContent className="p-6">
+                <CardContent className="p-5">
                   <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0" aria-hidden="true">
-                      <MessageSquare className="h-6 w-6" />
+                    <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0" aria-hidden="true">
+                      <MessageSquare className="h-5 w-5" />
                     </div>
                     <div>
-                      <h3 className="font-bold text-lg mb-2">Acesso à Informação</h3>
+                      <h3 className="font-bold text-base mb-2">Acesso à Informação</h3>
                       <p className="text-emerald-100 text-sm mb-4">
                         Solicite informações públicas através do e-SIC.
                       </p>
