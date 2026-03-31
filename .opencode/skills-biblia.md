@@ -288,3 +288,4 @@ Tokens válidos:
 5. **API usa Bearer Token** em todas as rotas autenticadas
 6. **Dynamic = force-dynamic** em todas API routes para Vercel
 7. **SEMPRE** Checar segurança do app
+9. **Após finalizar o pedido** Suba para o repositório no github comitando em pt-br

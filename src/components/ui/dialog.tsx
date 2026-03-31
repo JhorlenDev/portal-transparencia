@@ -20,7 +20,7 @@ export function Dialog({ open, onOpenChange, children }: DialogProps) {
         onClick={() => onOpenChange(false)}
       />
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none">
-        <div className="pointer-events-auto w-full max-w-lg">
+        <div className="pointer-events-auto w-full flex justify-center">
           {React.Children.map(children, (child) => 
             React.isValidElement(child) ? React.cloneElement(child as React.ReactElement<any>, { onClose: () => onOpenChange(false) }) : child
           )}
@@ -38,7 +38,7 @@ interface DialogContentProps {
 
 export function DialogContent({ children, className, onClose }: DialogContentProps) {
   return (
-    <div className={cn("bg-white rounded-xl shadow-xl border border-slate-200", className)}>
+    <div className={cn("bg-white rounded-xl shadow-xl border border-slate-200 w-full max-w-lg", className)}>
       <div className="flex items-center justify-between p-4 border-b border-slate-200">
         <div />
         {onClose && (
