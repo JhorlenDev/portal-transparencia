@@ -56,7 +56,7 @@ export async function setSiteConfigValue(key: string, value: string, tipo = 'tex
   await prisma.configuracaoSite.upsert({
     where: { chave: key },
     update: { valor: value, updatedAt: new Date() },
-    create: { chave: key, valor, tipo }
+    create: { chave: key, valor: value, tipo: tipo }
   })
 }
 
