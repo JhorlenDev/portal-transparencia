@@ -2,40 +2,31 @@
 
 ## Stack Principal
 | Tecnologia | Versão | Uso |
-|------------|---------|-----|
+|------------|--------|-----|
 | Next.js | 16.2.1 | Framework React full-stack |
-| TypeScript | 5.9.3 | Tipagem estática |
-| Tailwind CSS | 4.2.2 | Estilização |
-| Prisma | 7.6.0 | ORM para banco de dados |
-| PostgreSQL | - | Banco de dados relacional |
+| TypeScript | 5.x | Tipagem estática |
+| Tailwind CSS | 4.x | Estilização |
+| Prisma | 5.22.0 | ORM para banco de dados |
+| MariaDB Cloud | - | Banco de dados MySQL (produção) |
+| Vercel | - | Hospedagem/deploy |
 
 ## Dependências Instaladas
 
 ### UI Components
 - @radix-ui/react-slot
+- @radix-ui/react-alert-dialog
 - class-variance-authority
 - clsx
 - tailwind-merge
-- tailwindcss-animate
+- tailwindcss-animate (pendente)
 
 ### Icons & Utils
 - lucide-react
-- moment
-- recharts
+- recharts (pendente)
 
-### Forms & Validation
-- (pendente de instalar)
-
-### Authentication
+### API & Auth
 - next-auth (pendente)
-
-### API
-- @trpc/server
-- @trpc/client  
-- @trpc/react-query
-- @tanstack/react-query
 - zod
-- superjson
 
 ---
 
@@ -43,60 +34,93 @@
 
 ```
 src/
-├── app/                    # Next.js App Router
-│   ├── page.tsx           # Home
-│   ├── layout.tsx        # Layout principal
-│   ├── despesas/         # Módulo Despesas
-│   ├── receitas/         # Módulo Receitas
-│   ├── licitacoes/      # Módulo Licitações
-│   ├── contratos/       # Módulo Contratos
-│   ├── servidores/      # Módulo Servidores
-│   ├── convenios/      # Módulo Convênios
-│   ├── esic/          # Módulo e-SIC
-│   ├── dados-abertos/ # Módulo Dados Abertos
-│   └── busca/        # Busca Global
-│
+├── app/
+│   ├── page.tsx                    # Home (dados dinâmicos)
+│   ├── layout.tsx                  # Layout com header/footer dinâmicos
+│   ├── api/                        # API Routes
+│   │   ├── orgaos/
+│   │   ├── receitas/
+│   │   ├── despesas/
+│   │   ├── licitacoes/
+│   │   ├── contratos/
+│   │   ├── servidores/
+│   │   ├── convenios/
+│   │   ├── datasets/
+│   │   └── configuracao-site/
+│   ├── despesas/
+│   ├── receitas/
+│   ├── licitacoes/
+│   ├── contratos/
+│   ├── servidores/
+│   ├── convenios/
+│   ├── dados-abertos/
+│   ├── esic/
+│   └── busca/
 ├── components/
-│   ├── ui/            # Componentes base (Button, Card, Input)
-│   └── portal/        # Componentes específicos do portal
-│
-└── lib/
-    ├── prisma.ts      # Cliente Prisma (pendente)
-    ├── utils.ts       # Funções utilitárias
-    └── ...
+│   ├── ui/                         # Componentes base (Button, Card, Input)
+│   └── portal/                     # Header, Footer
+├── lib/
+│   ├── prisma.ts                   # Cliente Prisma
+│   ├── auth.ts                     # Autenticação Bearer Token
+│   ├── site-data.ts                # Funções helper (getSiteConfig, getSiteStats, etc)
+│   └── utils.ts
+prisma/
+├── schema.prisma                   # Schema do banco
+├── seed.ts                        # Seed de dados
+└── migrations/
+scripts/
+├── seed-config.ts                 # Seed de configurações do site
+document-api/
+├── document-api.md                 # Documentação geral
+├── licitacoes.md
+├── contratos.md
+├── convenios.md
+├── servidores.md
+├── despesas.md
+├── receitas.md
+├── orgaos.md
+├── datasets.md
+└── configuracao-site.md           # API WordPress Options
 ```
 
 ---
 
 ## Variáveis de Ambiente (.env)
 
-```env
-# Database
-DATABASE_URL="postgresql://usuario:senha@localhost:5432/transparencia360?schema=public"
-
-# NextAuth
-NEXTAUTH_SECRET="sua-chave-secreta"
-NEXTAUTH_URL="http://localhost:3000"
 ```
+DATABASE_URL="mysql://user:pass@host:3306/database"
+NEXTAUTH_SECRET="..."
+NEXTAUTH_URL="https://..."
+API_BEARER_TOKEN="..."
+```
+
+**IMPORTANTE:** `.env` NÃO está no git
 
 ---
 
 ## Comandos Úteis
 
 ```bash
-# Desenvolvimento
+# desenvolvimento local
 npm run dev
 
-# Build
+# Build produção
 npm run build
 
-# Lint
-npm run lint
+# Sincronizar schema com banco
+npx prisma db push
 
-# Prisma
-npx prisma generate      # Gerar cliente
-npx prisma migrate dev   # Criar migrações
-npx prisma studio        # Visualizar banco
+# Gerar Prisma Client
+npx prisma generate
+
+# Seed de configurações
+npx tsx scripts/seed-config.ts
+
+# Seed de dados
+npm run db:seed
+
+# Abrir Prisma Studio
+npm run db:studio
 ```
 
 ---

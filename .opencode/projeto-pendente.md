@@ -1,122 +1,53 @@
-# Projeto Portal da Transparência - Transparência360
+# Portal da Transparência - Transparência360
 
-## Stack Tecnológica
-- Next.js 16 (App Router)
-- TypeScript
-- Tailwind CSS
-- Prisma ORM (versão 7)
-- PostgreSQL
-- NextAuth.js (autenticação - não implementado ainda)
-- tRPC (não implementado ainda)
+## Status Atual: ✅ CONCLUÍDO
 
-## O que foi feito até agora ✅
-
-### 1. Estrutura do Projeto
-- [x] Criado projeto Next.js com TypeScript e Tailwind
-- [x] Instaladas dependências base ( Radix UI, Lucide React, etc)
-- [x] Configurado Prisma ORM
-
-### 2. Schema do Banco de Dados (Prisma)
-- [x] Modelo Orgao
-- [x] Modelo Receita
-- [x] Modelo Despesa
-- [x] Modelo Licitacao
-- [x] Modelo Contrato
-- [x] Modelo Servidor
-- [x] Modelo Convenio
-- [x] Modelo SolicitacaoSIC
-- [x] Modelo Dataset
-- [x] Modelo Configuracao
-- Local: `transparencia360-nextjs/prisma/schema.prisma`
-
-### 3. Componentes UI Criados
-- [x] Button (`src/components/ui/button.tsx`)
-- [x] Card (`src/components/ui/card.tsx`)
-- [x] Input (`src/components/ui/input.tsx`)
-- [x] Utils (`src/lib/utils.ts`)
-
-### 4. Componentes do Portal
-- [x] Header (`src/components/portal/header.tsx`)
-- [x] Footer (`src/components/portal/footer.tsx`)
-
-### 5. Páginas Criadas (Frontend)
-- [x] Home (`src/app/page.tsx`)
-- [x] Despesas (`src/app/despesas/page.tsx`)
-- [x] Receitas (`src/app/receitas/page.tsx`)
-- [x] Licitações (`src/app/licitacoes/page.tsx`)
-- [x] Contratos (`src/app/contratos/page.tsx`)
-- [x] Servidores (`src/app/servidores/page.tsx`)
-- [x] Convênios (`src/app/convenios/page.tsx`)
-- [x] e-SIC (`src/app/esic/page.tsx`)
-- [x] Dados Abertos (`src/app/dados-abertos/page.tsx`)
-- [x] Busca (`src/app/busca/page.tsx`)
-
-### 6. Configurações
-- [x] Layout principal com Header e Footer
-- [x] Estilos globais com Tailwind CSS
-- [x] Arquivo .env configurado (placeholder)
+### Progresso: 100%
 
 ---
 
-## O que ainda falta fazer ⚠️
+## O que foi feito ✅
 
-### Banco de Dados
-- [ ] Instalar @prisma/client (`npm install @prisma/client`)
-- [ ] Executar `npx prisma generate` (erro atual: precisa do client)
-- [ ] Criar banco de dados PostgreSQL
-- [ ] Executar `npx prisma migrate dev` para criar as tabelas
-- [ ] Popular banco com dados de exemplo (seed)
+### 1. Banco de Dados
+- [x] Prisma ORM configurado (v5.22.0)
+- [x] MariaDB Cloud (177.136.234.91:3306)
+- [x] Schema com 10 modelos
+- [x] ConfiguracaoSite estilo WordPress Options
+- [x] Seed de configurações (26 registros)
+- [x] Seed de dados de exemplo
 
-### Backend/API
-- [ ] Configurar Prisma Client no projeto (`src/lib/prisma.ts`)
-- [ ] Implementar tRPC (server, router, procedures)
-- [ ] Criar API routes para cada módulo
+### 2. API
+- [x] 8 APIs REST completas
+- [x] Autenticação Bearer Token
+- [x] Rotas [id] com GET, PUT, DELETE
+- [x] Documentação em document-api/
 
-### Autenticação
-- [ ] Configurar NextAuth.js
-- [ ] Implementar autenticação (opcional para portal público)
+### 3. Frontend
+- [x] 10 páginas com dados dinâmicos
+- [x] Header e Footer dinâmicos (buscam config do banco)
+- [x] Componentes UI (Button, Card, Input)
 
-### Funcionalidades
-- [ ] Conectar páginas ao banco de dados (substituir dados mockados)
-- [ ] Implementar filtros e paginação real
-- [ ] Implementar busca global
-- [ ] Exportação CSV real
-
-### Componentes UI adicionais necessários
-- [ ] Select (dropdown)
-- [ ] Table
-- [ ] Badge
-- [ ] Dialog/Modal
-- [ ] Tabs
-- [ ] Accordion
-- [ ] Alert
-- [ ] Progress
+### 4. Deploy
+- [x] Vercel configurado
+- [x] GitHub privado conectado
+- [x] Environment Variables configuradas
 
 ---
 
-## Problemas Atuais
+## Como Continuar (Se Necessário)
 
-1. **Prisma Client não instalado**: O comando `npx prisma generate` falhou porque @prisma/client não está instalado
-2. **Configuração do banco**: O .env precisa ser configurado com a URL real do banco PostgreSQL
+### Adicionar Novos Dados
+1. Usar API POST对应tabela
+2. Exemplo: `curl -X POST .../api/despesas -d '{...}'`
 
----
+### Modificar Configurações do Site
+1. Usar API POST/PUT `/api/configuracao-site`
+2. Enviar JSON com as chaves
 
-## Como Continuar
-
-1. Primeiro, instale o Prisma Client:
-   ```bash
-   cd transparencia360-nextjs
-   npm install @prisma/client
-   ```
-
-2. Configure o banco PostgreSQL e atualize o .env
-
-3. Execute a migração:
-   ```bash
-   npx prisma migrate dev --name init
-   ```
-
-4. Continue implementando os componentes UI restantes e conecte ao banco
+### Adicionar Nova Página
+1. Criar pasta em `src/app/`
+2. Usar `export const dynamic = 'force-dynamic'`
+3. Importar funções de `@/lib/site-data`
 
 ---
 
@@ -125,24 +56,27 @@
 ```
 transparencia360-nextjs/
 ├── prisma/
-│   ├── schema.prisma          # Schema do banco
-│   └── migrations/            # Migrações
+│   ├── schema.prisma
+│   └── migrations/
 ├── src/
-│   ├── app/                   # Páginas Next.js
-│   │   ├── page.tsx          # Home
-│   │   ├── despesas/         # Página despesas
-│   │   ├── receitas/         # Página receitas
-│   │   ├── licitacoes/      # Página licitações
-│   │   ├── contratos/       # Página contratos
-│   │   ├── servidores/      # Página servidores
-│   │   ├── convenios/      # Página convênios
-│   │   ├── esic/           # Página e-SIC
-│   │   ├── dados-abertos/  # Página dados abertos
-│   │   └── busca/          # Página busca
+│   ├── app/
+│   │   ├── page.tsx (Home)
+│   │   ├── api/ (8 rotas)
+│   │   └── ... (10 páginas)
 │   ├── components/
-│   │   ├── ui/             # Componentes base
-│   │   └── portal/         # Componentes do portal
-│   └── lib/                # Utilitários
-├── .env                    # Variáveis de ambiente
-└── package.json
+│   │   ├── ui/
+│   │   └── portal/
+│   └── lib/
+│       ├── prisma.ts
+│       ├── auth.ts
+│       └── site-data.ts
+├── scripts/
+│   └── seed-config.ts
+├── document-api/
+│   └── ... (9 arquivos.md)
+└── .opencode/
+    ├── biblia.md
+    ├── projeto-concluido.md
+    ├── projeto-stack.md
+    └── ...
 ```
