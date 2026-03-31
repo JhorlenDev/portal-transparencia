@@ -67,7 +67,14 @@ export default function Header() {
   const subtitulo = siteConfig?.subtitulo_site || 'Prefeitura Municipal'
 
   return (
-    <header className="bg-white shadow-sm border-b">
+    <>
+      <a 
+        href="#conteudo" 
+        className="sr-only focus:not-sr-only focus:fixed focus:top-0 focus:left-0 focus:z-[100] focus:p-4 focus:bg-emerald-700 focus:text-white focus:font-bold shadow-lg"
+      >
+        Pular para o conteúdo principal
+      </a>
+      <header className="bg-white shadow-sm border-b">
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between gap-4">
           <Link href="/" className="flex items-center gap-3 flex-shrink-0">
@@ -82,7 +89,7 @@ export default function Header() {
             </div>
           </Link>
 
-          <form onSubmit={handleSearch} className="flex-1 max-w-xl hidden md:flex">
+          <form onSubmit={handleSearch} className="flex-1 max-w-xl hidden md:flex" role="search">
             <div className="relative w-full">
               <Input
                 type="search"
@@ -108,13 +115,16 @@ export default function Header() {
             size="icon"
             className="lg:hidden"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            aria-expanded={mobileMenuOpen}
+            aria-label={mobileMenuOpen ? "Fechar menu principal" : "Abrir menu principal"}
+            aria-controls="mobile-menu"
           >
-            <Menu className="h-5 w-5" />
+            <Menu className="h-5 w-5" aria-hidden="true" />
           </Button>
         </div>
       </div>
 
-      <nav className="bg-emerald-700 hidden lg:block">
+      <nav className="bg-emerald-700 hidden lg:block" aria-label="Menu Principal">
         <div className="container mx-auto px-4">
           <ul className="flex">
             {menuItems.map((item) => (
@@ -125,8 +135,8 @@ export default function Header() {
       </nav>
 
       {mobileMenuOpen && (
-        <div className="lg:hidden border-t p-4 bg-white">
-          <form onSubmit={handleSearch} className="mb-4">
+        <div id="mobile-menu" className="lg:hidden border-t p-4 bg-white">
+          <form onSubmit={handleSearch} className="mb-4" role="search">
             <div className="relative">
               <Input
                 type="search"
@@ -139,12 +149,13 @@ export default function Header() {
                 type="submit"
                 size="sm"
                 className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7 p-0 bg-emerald-600"
+                aria-label="Buscar versão mobile"
               >
-                <Search className="h-4 w-4" />
+                <Search className="h-4 w-4" aria-hidden="true" />
               </Button>
             </div>
           </form>
-          <nav className="space-y-1">
+          <nav className="space-y-1" aria-label="Menu Mobile">
             {menuItems.map((item) => (
               <Link
                 key={item.title}
@@ -159,5 +170,7 @@ export default function Header() {
         </div>
       )}
     </header>
+    </>
   )
 }
+

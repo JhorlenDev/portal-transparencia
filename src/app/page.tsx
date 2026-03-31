@@ -59,19 +59,21 @@ export default async function Home() {
               {siteConfig.descricao || "Acesso à informação pública municipal. Transparência é um direito de todos os cidadãos."}
             </p>
             
-            <form action="/busca" method="GET" className="max-w-xl mx-auto">
+            <form action="/busca" method="GET" className="max-w-xl mx-auto" role="search">
               <div className="relative">
                 <Input
                   type="search"
                   name="q"
                   placeholder="Buscar despesas, licitações, contratos, servidores..."
                   className="h-14 pl-5 pr-14 text-slate-800 bg-white/95 backdrop-blur border-0 shadow-xl text-base rounded-xl"
+                  aria-label="Digite o que deseja buscar no portal"
                 />
                 <Button
                   type="submit"
                   className="absolute right-2 top-1/2 -translate-y-1/2 h-10 w-10 p-0 bg-emerald-600 hover:bg-emerald-700 rounded-lg"
+                  aria-label="Realizar busca"
                 >
-                  <Search className="h-5 w-5" />
+                  <Search className="h-5 w-5" aria-hidden="true" />
                 </Button>
               </div>
             </form>
@@ -108,7 +110,7 @@ export default async function Home() {
                 href={link.href}
                 className="group flex flex-col items-center p-6 bg-slate-50 rounded-xl hover:bg-emerald-50 hover:shadow-md transition-all duration-300"
               >
-                <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${colorClasses[link.color]} flex items-center justify-center mb-3 shadow-lg group-hover:scale-110 transition-transform`}>
+                <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${colorClasses[link.color]} flex items-center justify-center mb-3 shadow-lg group-hover:scale-110 transition-transform`} aria-hidden="true">
                   <link.icon className="h-7 w-7 text-white" />
                 </div>
                 <span className="font-medium text-slate-800 text-center">{link.title}</span>
@@ -129,8 +131,8 @@ export default async function Home() {
                   Últimas Despesas
                 </CardTitle>
                 <Link href="/despesas">
-                  <Button variant="ghost" size="sm" className="gap-1">
-                    Ver todas <ChevronRight className="h-4 w-4" />
+                  <Button variant="ghost" size="sm" className="gap-1" aria-label="Ver todas as últimas despesas">
+                    Ver todas <ChevronRight className="h-4 w-4" aria-hidden="true" />
                   </Button>
                 </Link>
               </CardHeader>
@@ -159,7 +161,7 @@ export default async function Home() {
               <Card className="bg-gradient-to-br from-teal-500 to-emerald-600 text-white border-0">
                 <CardContent className="p-6">
                   <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0">
+                    <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0" aria-hidden="true">
                       <MessageSquare className="h-6 w-6" />
                     </div>
                     <div>
@@ -189,9 +191,10 @@ export default async function Home() {
                       target="_blank"
                       rel="noopener noreferrer"
                       className="flex items-center justify-between p-3 rounded-lg bg-slate-50 hover:bg-slate-100 transition-colors text-sm"
+                      aria-label="Portal Nacional de Contratações (abre em nova aba)"
                     >
                       <span>Portal Nacional de Contratações</span>
-                      <svg className="h-4 w-4 text-slate-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <svg className="h-4 w-4 text-slate-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                         <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
                         <polyline points="15 3 21 3 21 9" />
                         <line x1="10" y1="14" x2="21" y2="3" />
@@ -204,9 +207,10 @@ export default async function Home() {
                       target="_blank"
                       rel="noopener noreferrer"
                       className="flex items-center justify-between p-3 rounded-lg bg-slate-50 hover:bg-slate-100 transition-colors text-sm"
+                      aria-label="Fala.BR da CGU (abre em nova aba)"
                     >
                       <span>Fala.BR (CGU)</span>
-                      <svg className="h-4 w-4 text-slate-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <svg className="h-4 w-4 text-slate-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                         <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
                         <polyline points="15 3 21 3 21 9" />
                         <line x1="10" y1="14" x2="21" y2="3" />

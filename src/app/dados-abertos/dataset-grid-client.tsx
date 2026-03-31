@@ -209,46 +209,59 @@ export default function DatasetGridClient({ databases }: { databases: Dataset[] 
                 )}
 
                 {activeTab === "api" && (
-                  <div className="p-6">
-                    <div className="flex items-center gap-3 mb-4">
-                      <div className="p-3 bg-indigo-50 text-indigo-600 rounded-lg">
+                  <div className="grid lg:grid-cols-2 gap-0 h-full min-h-[400px]">
+                    <div className="p-6 lg:p-8 flex flex-col justify-center bg-slate-50 border-r border-slate-200">
+                      <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-indigo-100 text-indigo-600 mb-6 shadow-sm border border-indigo-200">
                         <Code className="h-6 w-6" />
                       </div>
-                      <div>
-                        <h3 className="text-lg font-semibold text-slate-800">API Pública (REST)</h3>
-                        <p className="text-sm text-slate-500">
-                          Acesse os dados desta coleção dinamicamente com filtros de busca e paginação.
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="bg-slate-50 border border-slate-200 rounded-lg p-4 mb-4">
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="text-xs font-semibold uppercase text-slate-500">Endpoint GET</span>
-                        <Link href="/document-api" className="text-xs text-indigo-600 hover:underline">Ver Documentação Completa</Link>
-                      </div>
-                      <div className="bg-slate-900 rounded p-3 font-mono text-sm overflow-x-auto text-green-400">
-                        {`GET https://portal-transparencia-360.vercel.app/api/${selectedDb.slug}?ano=2024&q=termo_de_busca`}
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <div>
-                        <h4 className="font-medium text-slate-800 text-sm mb-2 border-b border-slate-200 pb-1">Filtros Suportados (Querystrings)</h4>
-                        <ul className="text-sm text-slate-600 space-y-2 mb-4">
-                          <li><code className="bg-slate-100 px-1 py-0.5 rounded text-indigo-600 font-mono text-xs">ano=2024</code> ou <code className="bg-slate-100 px-1 py-0.5 rounded text-indigo-600 font-mono text-xs">exercicio=2024</code> - Filtrar pelo ano</li>
-                          <li><code className="bg-slate-100 px-1 py-0.5 rounded text-indigo-600 font-mono text-xs">q=busca</code> - Busca textual em credores, objetos, nomes, etc.</li>
-                          <li><code className="bg-slate-100 px-1 py-0.5 rounded text-indigo-600 font-mono text-xs">status=ativo</code> - Filtrar pelo status atual do registro</li>
-                          <li><code className="bg-slate-100 px-1 py-0.5 rounded text-indigo-600 font-mono text-xs">format=json|csv</code> - Forçar o formato do retorno de exportações</li>
+                      <h3 className="text-2xl font-bold text-slate-800 mb-3 tracking-tight">API REST Pública</h3>
+                      <p className="text-sm text-slate-600 mb-8 leading-relaxed">
+                        Acesse programaticamente o catálogo de <strong>{selectedDb.nome}</strong> usando a nossa API REST integrada. Personalize seus resultados utilizando os filtros nativos via querystring para buscar, paginar ou especificar o formato dos dados de saída de forma simples e rápida.
+                      </p>
+                      
+                      <div className="space-y-4">
+                        <h4 className="text-xs font-bold uppercase text-slate-500 tracking-wider">Filtros Nativos (Query)</h4>
+                        <ul className="text-sm text-slate-600 space-y-3">
+                          <li className="flex gap-2">
+                            <code className="bg-white border border-slate-200 px-1.5 py-0.5 rounded text-indigo-600 font-mono text-[11px] shadow-sm">ano=2024</code>
+                            <span className="pt-0.5">Filtra os registros por um ano/exercício específico.</span>
+                          </li>
+                          <li className="flex gap-2">
+                            <code className="bg-white border border-slate-200 px-1.5 py-0.5 rounded text-indigo-600 font-mono text-[11px] shadow-sm">q=termo</code>
+                            <span className="pt-0.5">Executa uma busca textual inteligente nas colunas principais (credor, nomes, objetos, etc).</span>
+                          </li>
+                          <li className="flex gap-2">
+                            <code className="bg-white border border-slate-200 px-1.5 py-0.5 rounded text-indigo-600 font-mono text-[11px] shadow-sm">format=json</code>
+                            <span className="pt-0.5">Altera estruturalmente a saída direta em lotes para fluxos de processamento em massa.</span>
+                          </li>
                         </ul>
-                        <p className="text-xs text-slate-500 bg-slate-50 p-2 border border-slate-200 rounded">
-                          Mais detalhes sobre cada rota específica se encontram em nosso portal para desenvolvedores (<Link href="/document-api" className="text-indigo-600 hover:underline">/document-api</Link>).
-                        </p>
                       </div>
-                      <div>
-                        <h4 className="font-medium text-slate-800 text-sm mb-2 border-b border-slate-200 pb-1">Retorno JSON Esperado (Exemplo)</h4>
-                        <pre className="bg-slate-50 border border-slate-200 rounded p-3 font-mono text-[10px] text-slate-700 overflow-x-auto h-36">
-                          {`[\n  {\n    "${selectedDb.colunas[0]?.campo}": "${selectedDb.colunas[0]?.exemplo}",\n    "${selectedDb.colunas[1]?.campo}": "${selectedDb.colunas[1]?.exemplo}",\n    ...\n  }\n]`}
+                    </div>
+
+                    <div className="bg-slate-900 p-6 lg:p-8 text-slate-300 font-mono text-sm flex flex-col relative w-full overflow-hidden">
+                      {/* Fake window controls */}
+                      <div className="absolute top-0 left-0 right-0 h-10 bg-slate-950 flex items-center px-4 gap-2 border-b border-slate-800">
+                        <div className="w-3 h-3 rounded-full bg-rose-500/80"></div>
+                        <div className="w-3 h-3 rounded-full bg-amber-500/80"></div>
+                        <div className="w-3 h-3 rounded-full bg-emerald-500/80"></div>
+                        <div className="ml-2 text-xs text-slate-500 font-sans tracking-wide">Terminal — Exemplo Prático</div>
+                      </div>
+                      
+                      <div className="mt-8 flex-1 overflow-x-auto py-2">
+                        <div className="mb-6">
+                          <span className="text-emerald-400 font-bold">GET</span> 
+                          <span className="text-slate-300 ml-2">https://portal-transparencia.vercel.app/api/{selectedDb.slug}?ano=2024&q=busca</span>
+                        </div>
+                        
+                        <div className="text-slate-500 mb-2"># Resposta Esperada (200 OK)</div>
+                        <pre className="text-[11px] md:text-xs leading-relaxed overflow-x-auto text-sky-300">
+<span className="text-slate-400">[</span>
+  <span className="text-slate-400">{`{`}</span>
+    <span className="text-indigo-300">"{selectedDb.colunas[0]?.campo}"</span><span className="text-slate-400">:</span> <span className="text-emerald-300">"{selectedDb.colunas[0]?.exemplo}"</span><span className="text-slate-400">,</span>
+    <span className="text-indigo-300">"{selectedDb.colunas[1]?.campo}"</span><span className="text-slate-400">:</span> <span className="text-emerald-300">"{selectedDb.colunas[1]?.exemplo}"</span><span className="text-slate-400">,</span>
+    <span className="text-slate-500">...</span>
+  <span className="text-slate-400">{`}`}</span>
+<span className="text-slate-400">]</span>
                         </pre>
                       </div>
                     </div>

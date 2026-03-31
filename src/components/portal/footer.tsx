@@ -86,21 +86,21 @@ export default function Footer() {
             <h4 className="font-semibold mb-4 text-emerald-400">Contato</h4>
             <ul className="space-y-3 text-sm">
               <li className="flex items-start gap-2">
-                <MapPin className="h-4 w-4 mt-0.5 text-emerald-500 flex-shrink-0" />
+                <MapPin className="h-4 w-4 mt-0.5 text-emerald-500 flex-shrink-0" aria-hidden="true" />
                 <span className="text-slate-400 whitespace-pre-line">{endereco}</span>
               </li>
               <li className="flex items-center gap-2">
-                <Phone className="h-4 w-4 text-emerald-500" />
+                <Phone className="h-4 w-4 text-emerald-500" aria-hidden="true" />
                 <span className="text-slate-400">{telefone}</span>
               </li>
               <li className="flex items-center gap-2">
-                <Mail className="h-4 w-4 text-emerald-500" />
-                <a href={`mailto:${email}`} className="text-slate-400 hover:text-white">
+                <Mail className="h-4 w-4 text-emerald-500" aria-hidden="true" />
+                <a href={`mailto:${email}`} className="text-slate-400 hover:text-white" aria-label={`Enviar e-mail para ${email}`}>
                   {email}
                 </a>
               </li>
               <li className="flex items-center gap-2">
-                <Clock className="h-4 w-4 text-emerald-500" />
+                <Clock className="h-4 w-4 text-emerald-500" aria-hidden="true" />
                 <span className="text-slate-400">{horario}</span>
               </li>
             </ul>
@@ -115,8 +115,9 @@ export default function Footer() {
                   target="_blank" 
                   rel="noopener noreferrer"
                   className="text-slate-400 hover:text-white transition-colors flex items-center gap-1"
+                  aria-label="Site Oficial (abre em nova aba)"
                 >
-                  Site Oficial <ExternalLink className="h-3 w-3" />
+                  Site Oficial <ExternalLink className="h-3 w-3" aria-hidden="true" />
                 </a>
               </li>
               <li>
@@ -125,8 +126,9 @@ export default function Footer() {
                   target="_blank" 
                   rel="noopener noreferrer"
                   className="text-slate-400 hover:text-white transition-colors flex items-center gap-1"
+                  aria-label="Fala.BR Ouvidoria (abre em nova aba)"
                 >
-                  Fala.BR (Ouvidoria) <ExternalLink className="h-3 w-3" />
+                  Fala.BR (Ouvidoria) <ExternalLink className="h-3 w-3" aria-hidden="true" />
                 </a>
               </li>
               <li>
@@ -135,8 +137,9 @@ export default function Footer() {
                   target="_blank" 
                   rel="noopener noreferrer"
                   className="text-slate-400 hover:text-white transition-colors flex items-center gap-1"
+                  aria-label="Portal Nacional de Contratações (abre em nova aba)"
                 >
-                  PNCP <ExternalLink className="h-3 w-3" />
+                  PNCP <ExternalLink className="h-3 w-3" aria-hidden="true" />
                 </a>
               </li>
             </ul>
