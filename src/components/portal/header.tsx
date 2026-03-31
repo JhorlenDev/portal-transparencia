@@ -1,45 +1,21 @@
 "use client"
 
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 import Link from "next/link"
 import { useRouter, usePathname } from "next/navigation"
-import { Search, Menu, ChevronDown } from "lucide-react"
+import { Search, Menu } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 
 const menuItems = [
-  {
-    title: "Receitas",
-    href: "/receitas",
-  },
-  {
-    title: "Despesas",
-    href: "/despesas",
-  },
-  {
-    title: "Licitações",
-    href: "/licitacoes",
-  },
-  {
-    title: "Contratos",
-    href: "/contratos",
-  },
-  {
-    title: "Servidores",
-    href: "/servidores",
-  },
-  {
-    title: "Convênios",
-    href: "/convenios",
-  },
-  {
-    title: "e-SIC",
-    href: "/esic",
-  },
-  {
-    title: "Dados Abertos",
-    href: "/dados-abertos",
-  },
+  { title: "Receitas", href: "/receitas" },
+  { title: "Despesas", href: "/despesas" },
+  { title: "Licitações", href: "/licitacoes" },
+  { title: "Contratos", href: "/contratos" },
+  { title: "Servidores", href: "/servidores" },
+  { title: "Convênios", href: "/convenios" },
+  { title: "e-SIC", href: "/esic" },
+  { title: "Dados Abertos", href: "/dados-abertos" },
 ]
 
 function DesktopMenuItem({ item, pathname }: { item: typeof menuItems[0]; pathname: string }) {
@@ -66,6 +42,19 @@ export default function Header() {
   const pathname = usePathname()
   const [searchQuery, setSearchQuery] = useState("")
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [siteConfig, setSiteConfig] = useState<Record<string, string>>({
+    nome_site: 'Portal da Transparência',
+    subtitulo_site: 'Prefeitura Municipal'
+  })
+
+  useEffect(() => {
+    fetch('/api/configuracao-site')
+      .then(res => res.json())
+      .then(data => {
+        if (data.nome_site) setSiteConfig(data)
+      })
+      .catch(() => {})
+  }, [])
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
@@ -73,6 +62,9 @@ export default function Header() {
       router.push(`/busca?q=${encodeURIComponent(searchQuery)}`)
     }
   }
+
+  const nomeSite = siteConfig?.nome_site || 'Portal da Transparência'
+  const subtitulo = siteConfig?.subtitulo_site || 'Prefeitura Municipal'
 
   return (
     <header className="bg-white shadow-sm border-b">
@@ -84,9 +76,9 @@ export default function Header() {
             </div>
             <div className="hidden sm:block">
               <h1 className="text-lg font-bold text-slate-800 leading-tight">
-                Portal da Transparência
+                {nomeSite}
               </h1>
-              <p className="text-xs text-slate-500">Prefeitura Municipal</p>
+              <p className="text-xs text-slate-500">{subtitulo}</p>
             </div>
           </Link>
 
@@ -155,7 +147,7 @@ export default function Header() {
           <nav className="space-y-1">
             {menuItems.map((item) => (
               <Link
-                key={item.href}
+                key={item.title}
                 href={item.href}
                 className="block px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 rounded-md"
                 onClick={() => setMobileMenuOpen(false)}

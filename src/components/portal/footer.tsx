@@ -1,9 +1,32 @@
+"use client"
+
 import Link from "next/link"
 import { MapPin, Phone, Mail, Clock, ExternalLink } from "lucide-react"
+import { useEffect, useState } from "react"
 
 export default function Footer() {
   const currentYear = new Date().getFullYear()
-  
+  const [siteConfig, setSiteConfig] = useState<Record<string, string>>({})
+
+  useEffect(() => {
+    fetch('/api/configuracao-site')
+      .then(res => res.json())
+      .then(data => setSiteConfig(data))
+      .catch(() => {})
+  }, [])
+
+  const nomeSite = siteConfig.nome_site || 'Portal da Transparência'
+  const subtitulo = siteConfig.subtitulo_site || 'Prefeitura Municipal'
+  const descricao = siteConfig.descricao || 'Portal de transparência pública da Prefeitura Municipal.'
+  const endereco = siteConfig.endereco || 'Rua Olavo Bilac, S/N - Centro\nTefé - AM, CEP 69470-000'
+  const telefone = siteConfig.telefone_contato || '(97) 3343-2527'
+  const email = siteConfig.email_contato || 'transparencia@prefeitura.gov.br'
+  const horario = siteConfig.horario_funcionamento || 'Seg. a Sex., 08h às 14h'
+  const linkFalaBr = siteConfig.link_fala_br || 'https://falabr.cgu.gov.br'
+  const linkPncp = siteConfig.link_pncp || 'https://pncp.gov.br'
+  const linkSiteOficial = siteConfig.link_site_oficial || 'https://www.gov.br'
+  const textoRodape = (siteConfig.texto_rodape || '© {ano} Prefeitura Municipal. Todos os direitos reservados.').replace('{ano}', String(currentYear))
+
   return (
     <footer className="bg-slate-800 text-white">
       <div className="container mx-auto px-4 py-12">
@@ -14,13 +37,12 @@ export default function Footer() {
                 <span className="text-white font-bold">PT</span>
               </div>
               <div>
-                <h3 className="font-bold">Portal da Transparência</h3>
-                <p className="text-xs text-slate-400">Prefeitura Municipal</p>
+                <h3 className="font-bold">{nomeSite}</h3>
+                <p className="text-xs text-slate-400">{subtitulo}</p>
               </div>
             </div>
             <p className="text-sm text-slate-400 leading-relaxed">
-              Portal de transparência pública da Prefeitura Municipal. 
-              Acesso a informações públicas conforme Lei de Acesso à Informação (Lei 12.527/2011).
+              {descricao}
             </p>
           </div>
 
@@ -65,24 +87,21 @@ export default function Footer() {
             <ul className="space-y-3 text-sm">
               <li className="flex items-start gap-2">
                 <MapPin className="h-4 w-4 mt-0.5 text-emerald-500 flex-shrink-0" />
-                <span className="text-slate-400">
-                  Rua Olavo Bilac, S/N - Centro<br />
-                  Tefé - AM, CEP 69470-000
-                </span>
+                <span className="text-slate-400 whitespace-pre-line">{endereco}</span>
               </li>
               <li className="flex items-center gap-2">
                 <Phone className="h-4 w-4 text-emerald-500" />
-                <span className="text-slate-400">(97) 3343-2527</span>
+                <span className="text-slate-400">{telefone}</span>
               </li>
               <li className="flex items-center gap-2">
                 <Mail className="h-4 w-4 text-emerald-500" />
-                <a href="mailto:transparencia@prefeitura.gov.br" className="text-slate-400 hover:text-white">
-                  transparencia@prefeitura.gov.br
+                <a href={`mailto:${email}`} className="text-slate-400 hover:text-white">
+                  {email}
                 </a>
               </li>
               <li className="flex items-center gap-2">
                 <Clock className="h-4 w-4 text-emerald-500" />
-                <span className="text-slate-400">Seg. a Sex., 08h às 14h</span>
+                <span className="text-slate-400">{horario}</span>
               </li>
             </ul>
           </div>
@@ -92,7 +111,7 @@ export default function Footer() {
             <ul className="space-y-2 text-sm">
               <li>
                 <a 
-                  href="https://www.gov.br" 
+                  href={linkSiteOficial} 
                   target="_blank" 
                   rel="noopener noreferrer"
                   className="text-slate-400 hover:text-white transition-colors flex items-center gap-1"
@@ -102,7 +121,7 @@ export default function Footer() {
               </li>
               <li>
                 <a 
-                  href="https://falabr.cgu.gov.br" 
+                  href={linkFalaBr} 
                   target="_blank" 
                   rel="noopener noreferrer"
                   className="text-slate-400 hover:text-white transition-colors flex items-center gap-1"
@@ -112,7 +131,7 @@ export default function Footer() {
               </li>
               <li>
                 <a 
-                  href="https://pncp.gov.br" 
+                  href={linkPncp} 
                   target="_blank" 
                   rel="noopener noreferrer"
                   className="text-slate-400 hover:text-white transition-colors flex items-center gap-1"
@@ -129,7 +148,7 @@ export default function Footer() {
         <div className="container mx-auto px-4 py-4">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-slate-500">
             <p>
-              © {currentYear} Prefeitura Municipal. Todos os direitos reservados.
+              {textoRodape}
             </p>
             <div className="flex items-center gap-4">
               <Link href="/privacidade" className="hover:text-white">
