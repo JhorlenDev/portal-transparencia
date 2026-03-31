@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef } from "react"
 import Link from "next/link"
+import Image from "next/image"
 import { useRouter, usePathname } from "next/navigation"
 import { Search, Menu, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -106,9 +107,14 @@ export default function Header({ config }: { config?: Record<string, string | nu
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between gap-4">
           <Link href="/" className="flex items-center gap-3 flex-shrink-0">
-            <div className="w-12 h-12 bg-gradient-to-br from-emerald-600 to-emerald-800 rounded-lg flex items-center justify-center shadow-md">
-              <span className="text-white font-bold text-lg">PT</span>
-            </div>
+            <Image
+              src="/logo.webp"
+              alt="Logotipo do Portal da Transparência de Tefé"
+              width={200}
+              height={48}
+              className="h-12 w-auto object-contain"
+              priority
+            />
             <div className="hidden sm:block">
               <h1 className="text-lg font-bold text-slate-800 leading-tight">
                 {nomeSite}

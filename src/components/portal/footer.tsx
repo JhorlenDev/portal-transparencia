@@ -1,6 +1,7 @@
 "use client"
 
 import Link from "next/link"
+import Image from "next/image"
 import { MapPin, Phone, Mail, Clock, ExternalLink } from "lucide-react"
 
 export default function Footer({ config }: { config?: Record<string, string | null> }) {
@@ -25,14 +26,14 @@ export default function Footer({ config }: { config?: Record<string, string | nu
       <div className="container mx-auto px-4 py-12">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           <div>
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 bg-emerald-800 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold">PT</span>
-              </div>
-              <div>
-                <h3 className="font-bold">{nomeSite}</h3>
-                <p className="text-xs text-slate-300">{subtitulo}</p>
-              </div>
+            <div className="mb-4 bg-white p-2 rounded-xl w-fit">
+              <Image
+                src="/logo.webp"
+                alt="Logotipo do Portal da Transparência de Tefé"
+                width={200}
+                height={48}
+                className="h-10 w-auto object-contain"
+              />
             </div>
             <p className="text-sm text-slate-300 leading-relaxed">
               {descricao}

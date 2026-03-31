@@ -3,11 +3,11 @@ import { PrismaClient } from '@prisma/client'
 const prisma = new PrismaClient()
 
 const siteConfigs = [
-  { chave: 'nome_site', valor: 'Portal da Transparência', tipo: 'text', descricao: 'Nome do site', ordem: 1 },
-  { chave: 'subtitulo_site', valor: 'Prefeitura Municipal', tipo: 'text', descricao: 'Subtítulo do site', ordem: 2 },
-  { chave: 'descricao', valor: 'Portal de transparência pública da Prefeitura Municipal. Acesso a informações públicas conforme Lei de Acesso à Informação (Lei 12.527/2011).', tipo: 'text', descricao: 'Descrição do portal', ordem: 3 },
-  { chave: 'logo_url', valor: '', tipo: 'url', descricao: 'URL do logo', ordem: 4 },
-  { chave: 'favicon_url', valor: '', tipo: 'url', descricao: 'URL do favicon', ordem: 5 },
+  { chave: 'nome_site', valor: 'Portal da Transparência de Tefé', tipo: 'text', descricao: 'Nome do site', ordem: 1 },
+  { chave: 'subtitulo_site', valor: 'Prefeitura de Tefé', tipo: 'text', descricao: 'Subtítulo do site', ordem: 2 },
+  { chave: 'descricao', valor: 'Portal de Transparência Pública da Prefeitura de Tefé - AM. Acesso a informações públicas conforme Lei de Acesso à Informação (Lei 12.527/2011).', tipo: 'text', descricao: 'Descrição do portal', ordem: 3 },
+  { chave: 'logo_url', valor: '/logo.webp', tipo: 'url', descricao: 'URL do logo', ordem: 4 },
+  { chave: 'favicon_url', valor: '/favicon.webp', tipo: 'url', descricao: 'URL do favicon', ordem: 5 },
   
   // Contato
   { chave: 'endereco', valor: 'Rua Olavo Bilac, S/N - Centro\nTefé - AM, CEP 69470-000', tipo: 'text', descricao: 'Endereço da prefeitura', ordem: 10 },
