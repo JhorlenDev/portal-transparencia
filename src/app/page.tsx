@@ -124,32 +124,32 @@ export default async function Home() {
         </div>
       </section>
 
-      <section className="py-8">
+      <section className="py-8 overflow-hidden">
         <div className="container mx-auto px-4">
           <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-6">
-            <Card className="md:col-span-2 xl:col-span-2">
-              <CardHeader className="flex flex-row items-center justify-between pb-4">
+            <Card className="w-full md:col-span-2 xl:col-span-2">
+              <CardHeader className="flex flex-row items-center justify-between pb-2">
                 <CardTitle className="text-lg font-bold flex items-center gap-2">
                   <DollarSign className="h-5 w-5 text-emerald-800" />
                   Últimas Despesas
                 </CardTitle>
                 <Link href="/despesas">
-                  <Button variant="ghost" size="sm" className="gap-1" aria-label="Ver todas as últimas despesas">
+                  <Button variant="ghost" size="sm" className="gap-1 text-xs" aria-label="Ver todas as últimas despesas">
                     Ver todas <ChevronRight className="h-4 w-4" aria-hidden="true" />
                   </Button>
                 </Link>
               </CardHeader>
               <CardContent>
-                <div className="space-y-3">
+                <div className="space-y-2">
                   {latestDespesas.length > 0 ? latestDespesas.map((despesa) => (
-                    <div key={despesa.id} className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-4 p-3 sm:p-4 rounded-lg bg-slate-50 hover:bg-slate-100 transition-colors">
+                    <div key={despesa.id} className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-3 rounded-lg bg-slate-50 hover:bg-slate-100 transition-colors">
                       <div className="flex-1 min-w-0">
-                        <p className="font-medium text-slate-800 truncate text-sm sm:text-base">{despesa.credorNome || 'Sem credor'}</p>
-                        <p className="text-xs sm:text-sm text-slate-600 truncate">{despesa.objeto || 'Sem objeto'}</p>
-                        <p className="text-xs text-slate-600 mt-1">{despesa.orgaoNome || 'Sem órgão'} • {despesa.numeroEmpenho}</p>
+                        <p className="font-medium text-slate-800 truncate text-sm">{despesa.credorNome || 'Sem credor'}</p>
+                        <p className="text-xs text-slate-600 truncate">{despesa.objeto || 'Sem objeto'}</p>
+                        <p className="text-xs text-slate-500 mt-0.5">{despesa.orgaoNome || 'Sem órgão'} • {despesa.numeroEmpenho}</p>
                       </div>
-                      <div className="text-left sm:text-right mt-1 sm:mt-0 flex-shrink-0">
-                        <p className="font-bold text-emerald-800">{formatCurrency(despesa.valorEmpenhado || 0)}</p>
+                      <div className="text-left sm:text-right flex-shrink-0">
+                        <p className="font-bold text-emerald-800 text-sm">{formatCurrency(despesa.valorEmpenhado || 0)}</p>
                         <span className="text-xs text-slate-600 inline-block px-2 py-0.5 bg-emerald-100 text-emerald-800 rounded-full">{despesa.tipoMovimento}</span>
                       </div>
                     </div>
@@ -160,28 +160,28 @@ export default async function Home() {
               </CardContent>
             </Card>
 
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between pb-4">
+            <Card className="w-full">
+              <CardHeader className="flex flex-row items-center justify-between pb-2">
                 <CardTitle className="text-lg font-bold flex items-center gap-2">
                   <DollarSign className="h-5 w-5 text-blue-600" />
                   Últimas Receitas
                 </CardTitle>
                 <Link href="/receitas">
-                  <Button variant="ghost" size="sm" className="gap-1" aria-label="Ver todas as últimas receitas">
+                  <Button variant="ghost" size="sm" className="gap-1 text-xs" aria-label="Ver todas as últimas receitas">
                     Ver todas <ChevronRight className="h-4 w-4" aria-hidden="true" />
                   </Button>
                 </Link>
               </CardHeader>
               <CardContent>
-                <div className="space-y-3">
+                <div className="space-y-2">
                   {latestReceitas.length > 0 ? latestReceitas.map((receita) => (
-                    <div key={receita.id} className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-4 p-3 sm:p-4 rounded-lg bg-slate-50 hover:bg-slate-100 transition-colors">
+                    <div key={receita.id} className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-3 rounded-lg bg-slate-50 hover:bg-slate-100 transition-colors">
                       <div className="flex-1 min-w-0">
-                        <p className="font-medium text-slate-800 truncate text-sm sm:text-base">{receita.naturezaReceita || 'Sem descrição'}</p>
-                        <p className="text-xs text-slate-600 mt-1">{receita.categoriaEconomica}</p>
+                        <p className="font-medium text-slate-800 truncate text-sm">{receita.naturezaReceita || 'Sem descrição'}</p>
+                        <p className="text-xs text-slate-500 mt-0.5">{receita.categoriaEconomica}</p>
                       </div>
-                      <div className="text-left sm:text-right mt-1 sm:mt-0 flex-shrink-0">
-                        <p className="font-bold text-blue-700">{formatCurrency(receita.valorArrecadado || 0)}</p>
+                      <div className="text-left sm:text-right flex-shrink-0">
+                        <p className="font-bold text-blue-700 text-sm">{formatCurrency(receita.valorArrecadado || 0)}</p>
                         <span className="text-xs text-slate-600 inline-block px-2 py-0.5 bg-blue-100 text-blue-800 rounded-full">Arrecadado</span>
                       </div>
                     </div>
@@ -192,28 +192,28 @@ export default async function Home() {
               </CardContent>
             </Card>
 
-            <Card className="md:col-span-2 xl:col-span-2">
-              <CardHeader className="flex flex-row items-center justify-between pb-4">
+            <Card className="w-full md:col-span-2 xl:col-span-2">
+              <CardHeader className="flex flex-row items-center justify-between pb-2">
                 <CardTitle className="text-lg font-bold flex items-center gap-2">
                   <Scale className="h-5 w-5 text-purple-600" />
                   Últimas Licitações
                 </CardTitle>
                 <Link href="/licitacoes">
-                  <Button variant="ghost" size="sm" className="gap-1" aria-label="Ver todas as últimas licitações">
+                  <Button variant="ghost" size="sm" className="gap-1 text-xs" aria-label="Ver todas as últimas licitações">
                     Ver todas <ChevronRight className="h-4 w-4" aria-hidden="true" />
                   </Button>
                 </Link>
               </CardHeader>
               <CardContent>
-                <div className="space-y-3">
+                <div className="space-y-2">
                   {latestLicitacoes.length > 0 ? latestLicitacoes.map((licitacao) => (
-                    <div key={licitacao.id} className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-4 p-3 sm:p-4 rounded-lg bg-slate-50 hover:bg-slate-100 transition-colors">
+                    <div key={licitacao.id} className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-3 rounded-lg bg-slate-50 hover:bg-slate-100 transition-colors">
                       <div className="flex-1 min-w-0">
-                        <p className="font-medium text-slate-800 truncate text-sm sm:text-base">{licitacao.objeto || 'Sem objeto'}</p>
-                        <p className="text-xs text-slate-600 mt-1">{licitacao.modalidade} • N° {licitacao.numero}/{licitacao.ano}</p>
+                        <p className="font-medium text-slate-800 truncate text-sm">{licitacao.objeto || 'Sem objeto'}</p>
+                        <p className="text-xs text-slate-500 mt-0.5">{licitacao.modalidade} • N° {licitacao.numero}/{licitacao.ano}</p>
                       </div>
-                      <div className="text-left sm:text-right mt-1 sm:mt-0 flex-shrink-0">
-                        <p className="font-bold text-purple-700">{formatCurrency(licitacao.valorEstimado || 0)}</p>
+                      <div className="text-left sm:text-right flex-shrink-0">
+                        <p className="font-bold text-purple-700 text-sm">{formatCurrency(licitacao.valorEstimado || 0)}</p>
                         <span className="text-xs text-slate-600 inline-block px-2 py-0.5 bg-purple-100 text-purple-800 rounded-full uppercase">{licitacao.status}</span>
                       </div>
                     </div>
@@ -224,7 +224,7 @@ export default async function Home() {
               </CardContent>
             </Card>
 
-            <div className="space-y-4">
+            <div className="space-y-4 w-full">
               <Card className="bg-gradient-to-br from-teal-500 to-emerald-600 text-white border-0">
                 <CardContent className="p-5">
                   <div className="flex items-start gap-4">
