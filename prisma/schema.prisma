@@ -240,12 +240,15 @@ model Dataset {
   @@map("datasets")
 }
 
-model Configuracao {
-  id        String   @id @default(cuid())
-  chave     String   @unique
-  valor     String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+model ConfiguracaoSite {
+  id          String   @id @default(cuid())
+  chave       String   @unique @map("chave")
+  valor       String   @db.Text @map("valor")
+  tipo        String?  @map("tipo")
+  descricao   String?  @map("descricao")
+  ordem       Int?     @map("ordem")
+  createdAt   DateTime @default(now()) @map("created_date")
+  updatedAt   DateTime @updatedAt @map("updated_date")
 
-  @@map("configuracoes")
+  @@map("configuracao_site")
 }

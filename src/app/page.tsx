@@ -3,6 +3,7 @@ import { Search, DollarSign, Scale, FileText, Users, HandCoins, MessageSquare, D
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { getSiteConfig, getSiteStats, getLatestDespesas } from "@/lib/site-data"
 
 const quickLinks = [
   { title: 'Despesas', icon: DollarSign, href: '/despesas', color: 'emerald', description: 'Empenhos, liquidações e pagamentos' },
@@ -26,18 +27,36 @@ const colorClasses: Record<string, string> = {
   indigo: 'from-indigo-500 to-indigo-600',
 }
 
-export default function Home() {
+function formatCurrency(value: number): string {
+  return new Intl.NumberFormat('pt-BR', {
+    style: 'currency',
+    currency: 'BRL',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(value)
+}
+
+export const dynamic = 'force-dynamic'
+
+export default async function Home() {
+  const [siteConfig, stats, latestDespesas] = await Promise.all([
+    getSiteConfig(),
+    getSiteStats(),
+    getLatestDespesas(3)
+  ])
+
+  const currentYear = new Date().getFullYear()
+
   return (
     <div>
       <section className="bg-gradient-to-br from-emerald-700 via-emerald-600 to-teal-700 text-white">
         <div className="container mx-auto px-4 py-12 lg:py-16">
           <div className="max-w-4xl mx-auto text-center">
             <h1 className="text-3xl lg:text-4xl font-bold mb-4">
-              Portal da Transparência
+              {siteConfig.nomeSite}
             </h1>
             <p className="text-lg text-emerald-100 mb-8 max-w-2xl mx-auto">
-              Acesse informações públicas sobre a gestão municipal.
-              Transparência é um direito de todos os cidadãos.
+              {siteConfig.descricao || "Acesso à informação pública municipal. Transparência é um direito de todos os cidadãos."}
             </p>
             
             <form action="/busca" method="GET" className="max-w-xl mx-auto">
@@ -59,20 +78,20 @@ export default function Home() {
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-10">
               <div className="bg-white/10 backdrop-blur rounded-xl p-4">
-                <p className="text-emerald-200 text-xs mb-1">Receitas {new Date().getFullYear()}</p>
-                <p className="text-xl font-bold">R$ 45.678.901</p>
+                <p className="text-emerald-200 text-xs mb-1">Receitas {currentYear}</p>
+                <p className="text-xl font-bold">{formatCurrency(stats.totalReceitas)}</p>
               </div>
               <div className="bg-white/10 backdrop-blur rounded-xl p-4">
-                <p className="text-emerald-200 text-xs mb-1">Despesas {new Date().getFullYear()}</p>
-                <p className="text-xl font-bold">R$ 42.345.678</p>
+                <p className="text-emerald-200 text-xs mb-1">Despesas {currentYear}</p>
+                <p className="text-xl font-bold">{formatCurrency(stats.totalDespesas)}</p>
               </div>
               <div className="bg-white/10 backdrop-blur rounded-xl p-4">
-                <p className="text-emerald-200 text-xs mb-1">Licitações {new Date().getFullYear()}</p>
-                <p className="text-xl font-bold">24</p>
+                <p className="text-emerald-200 text-xs mb-1">Licitações {currentYear}</p>
+                <p className="text-xl font-bold">{stats.totalLicitacoes}</p>
               </div>
               <div className="bg-white/10 backdrop-blur rounded-xl p-4">
                 <p className="text-emerald-200 text-xs mb-1">Contratos Ativos</p>
-                <p className="text-xl font-bold">156</p>
+                <p className="text-xl font-bold">{stats.totalContratos}</p>
               </div>
             </div>
           </div>
@@ -117,39 +136,21 @@ export default function Home() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
-                  <div className="flex items-center justify-between p-4 rounded-lg bg-slate-50 hover:bg-slate-100 transition-colors">
-                    <div className="flex-1 min-w-0">
-                      <p className="font-medium text-slate-800 truncate">Empresa ABC Ltda</p>
-                      <p className="text-sm text-slate-500 truncate">Fornecimento de materiais de escritório</p>
-                      <p className="text-xs text-slate-400 mt-1">Secretaria de Educação • 2024NE00123</p>
+                  {latestDespesas.length > 0 ? latestDespesas.map((despesa) => (
+                    <div key={despesa.id} className="flex items-center justify-between p-4 rounded-lg bg-slate-50 hover:bg-slate-100 transition-colors">
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium text-slate-800 truncate">{despesa.credorNome || 'Sem credor'}</p>
+                        <p className="text-sm text-slate-500 truncate">{despesa.objeto || 'Sem objeto'}</p>
+                        <p className="text-xs text-slate-400 mt-1">{despesa.orgaoNome || 'Sem órgão'} • {despesa.numeroEmpenho}</p>
+                      </div>
+                      <div className="text-right ml-4">
+                        <p className="font-bold text-emerald-600">{formatCurrency(despesa.valorEmpenhado || 0)}</p>
+                        <span className="text-xs text-slate-500">{despesa.tipoMovimento}</span>
+                      </div>
                     </div>
-                    <div className="text-right ml-4">
-                      <p className="font-bold text-emerald-600">R$ 15.000,00</p>
-                      <span className="text-xs text-slate-500">Empenho</span>
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between p-4 rounded-lg bg-slate-50 hover:bg-slate-100 transition-colors">
-                    <div className="flex-1 min-w-0">
-                      <p className="font-medium text-slate-800 truncate">Construção e Engenharia S/A</p>
-                      <p className="text-sm text-slate-500 truncate">Obra de pavimentação</p>
-                      <p className="text-xs text-slate-400 mt-1">Secretaria de Obras • 2024NE00122</p>
-                    </div>
-                    <div className="text-right ml-4">
-                      <p className="font-bold text-emerald-600">R$ 250.000,00</p>
-                      <span className="text-xs text-slate-500">Empenho</span>
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between p-4 rounded-lg bg-slate-50 hover:bg-slate-100 transition-colors">
-                    <div className="flex-1 min-w-0">
-                      <p className="font-medium text-slate-800 truncate">Posto de Combustível XX</p>
-                      <p className="text-sm text-slate-500 truncate">Combustível para veículos</p>
-                      <p className="text-xs text-slate-400 mt-1">Secretaria de Saúde • 2024NE00121</p>
-                    </div>
-                    <div className="text-right ml-4">
-                      <p className="font-bold text-emerald-600">R$ 8.500,00</p>
-                      <span className="text-xs text-slate-500">Empenho</span>
-                    </div>
-                  </div>
+                  )) : (
+                    <p className="text-slate-500 text-center py-4">Nenhuma despesa encontrada</p>
+                  )}
                 </div>
               </CardContent>
             </Card>
@@ -182,32 +183,36 @@ export default function Home() {
                   <CardTitle className="text-base font-bold">Links Úteis</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-2">
-                  <a
-                    href="https://pncp.gov.br"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center justify-between p-3 rounded-lg bg-slate-50 hover:bg-slate-100 transition-colors text-sm"
-                  >
-                    <span>Portal Nacional de Contratações</span>
-                    <svg className="h-4 w-4 text-slate-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
-                      <polyline points="15 3 21 3 21 9" />
-                      <line x1="10" y1="14" x2="21" y2="3" />
-                    </svg>
-                  </a>
-                  <a
-                    href="https://falabr.cgu.gov.br"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center justify-between p-3 rounded-lg bg-slate-50 hover:bg-slate-100 transition-colors text-sm"
-                  >
-                    <span>Fala.BR (CGU)</span>
-                    <svg className="h-4 w-4 text-slate-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
-                      <polyline points="15 3 21 3 21 9" />
-                      <line x1="10" y1="14" x2="21" y2="3" />
-                    </svg>
-                  </a>
+                  {siteConfig.linkPncp && (
+                    <a
+                      href={siteConfig.linkPncp}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center justify-between p-3 rounded-lg bg-slate-50 hover:bg-slate-100 transition-colors text-sm"
+                    >
+                      <span>Portal Nacional de Contratações</span>
+                      <svg className="h-4 w-4 text-slate-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                        <polyline points="15 3 21 3 21 9" />
+                        <line x1="10" y1="14" x2="21" y2="3" />
+                      </svg>
+                    </a>
+                  )}
+                  {siteConfig.linkFalaBr && (
+                    <a
+                      href={siteConfig.linkFalaBr}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center justify-between p-3 rounded-lg bg-slate-50 hover:bg-slate-100 transition-colors text-sm"
+                    >
+                      <span>Fala.BR (CGU)</span>
+                      <svg className="h-4 w-4 text-slate-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                        <polyline points="15 3 21 3 21 9" />
+                        <line x1="10" y1="14" x2="21" y2="3" />
+                      </svg>
+                    </a>
+                  )}
                 </CardContent>
               </Card>
             </div>

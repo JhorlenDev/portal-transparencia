@@ -3,13 +3,19 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/portal/header";
 import Footer from "@/components/portal/footer";
+import { getSiteConfig } from "@/lib/site-data";
 
 const inter = Inter({ subsets: ["latin"] });
 
-export const metadata: Metadata = {
-  title: "Portal da Transparência",
-  description: "Portal de Transparência Pública - Acesso à Informação",
-};
+export const dynamic = 'force-dynamic'
+
+export async function generateMetadata(): Promise<Metadata> {
+  const config = await getSiteConfig()
+  return {
+    title: config.nomeSite,
+    description: config.descricao || "Portal de Transparência Pública",
+  }
+}
 
 export default function RootLayout({
   children,
