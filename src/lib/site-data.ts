@@ -398,3 +398,164 @@ export async function getDatasets() {
     orderBy: { nome: 'asc' }
   })
 }
+
+// Dynamic filter options - anos disponíveis com dados
+export async function getAvailableYears(table: 'receitas' | 'despesas' | 'licitacoes' | 'contratos' | 'servidores' | 'convenios') {
+  const currentYear = new Date().getFullYear()
+  
+  switch (table) {
+    case 'receitas':
+      const receitasYears = await prisma.receita.groupBy({
+        by: ['exercicio'],
+        orderBy: { exercicio: 'desc' },
+        take: 10
+      })
+      return receitasYears.map(r => r.exercicio)
+    
+    case 'despesas':
+      const despesasYears = await prisma.despesa.groupBy({
+        by: ['exercicio'],
+        orderBy: { exercicio: 'desc' },
+        take: 10
+      })
+      return despesasYears.map(d => d.exercicio)
+    
+    case 'licitacoes':
+      const licitacoesYears = await prisma.licitacao.groupBy({
+        by: ['ano'],
+        orderBy: { ano: 'desc' },
+        take: 10
+      })
+      return licitacoesYears.map(l => l.ano)
+    
+    case 'contratos':
+      const contratosYears = await prisma.contrato.groupBy({
+        by: ['ano'],
+        orderBy: { ano: 'desc' },
+        take: 10
+      })
+      return contratosYears.map(c => c.ano)
+    
+    case 'servidores':
+      const servidoresYears = await prisma.servidor.groupBy({
+        by: ['anoReferencia'],
+        orderBy: { anoReferencia: 'desc' },
+        take: 10
+      })
+      return servidoresYears.map(s => s.anoReferencia)
+    
+    case 'convenios':
+      const conveniosYears = await prisma.convenio.groupBy({
+        by: ['ano'],
+        orderBy: { ano: 'desc' },
+        take: 10
+      })
+      return conveniosYears.map(c => c.ano)
+    
+    default:
+      return [currentYear]
+  }
+}
+
+// Dynamic filter options - categorias/status/modalidades disponíveis
+export async function getDynamicOptions(
+  table: 'receitas' | 'despesas' | 'licitacoes' | 'contratos' | 'servidores' | 'convenios',
+  type: 'categoria' | 'status' | 'modalidade' | 'tipo' | 'vinculo',
+  ano?: number
+) {
+  const currentYear = new Date().getFullYear()
+  const year = ano || currentYear
+  
+  switch (table) {
+    case 'receitas': {
+      if (type === 'categoria') {
+        const cats = await prisma.receita.groupBy({
+          by: ['categoriaEconomica'],
+          where: { exercicio: year },
+          orderBy: { categoriaEconomica: 'asc' }
+        })
+        return cats.filter(c => c.categoriaEconomica).map(c => ({ value: c.categoriaEconomica!, label: c.categoriaEconomica! }))
+      }
+      break
+    }
+    
+    case 'despesas': {
+      // Despesas don't have categoria in schema - return empty
+      return []
+    }
+    
+    case 'licitacoes': {
+      if (type === 'modalidade') {
+        const mods = await prisma.licitacao.groupBy({
+          by: ['modalidade'],
+          where: { ano: year },
+          orderBy: { modalidade: 'asc' }
+        })
+        return mods.filter(m => m.modalidade).map(m => ({ value: m.modalidade!, label: m.modalidade! }))
+      }
+      if (type === 'status') {
+        const stats = await prisma.licitacao.groupBy({
+          by: ['status'],
+          where: { ano: year },
+          orderBy: { status: 'asc' }
+        })
+        return stats.filter(s => s.status).map(s => ({ value: s.status!, label: s.status!.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) }))
+      }
+      break
+    }
+    
+    case 'contratos': {
+      if (type === 'tipo') {
+        const tipos = await prisma.contrato.groupBy({
+          by: ['tipoContrato'],
+          where: { ano: year },
+          orderBy: { tipoContrato: 'asc' }
+        })
+        return tipos.filter(t => t.tipoContrato).map(t => ({ value: t.tipoContrato!, label: t.tipoContrato! }))
+      }
+      if (type === 'status') {
+        const stats = await prisma.contrato.groupBy({
+          by: ['status'],
+          where: { ano: year },
+          orderBy: { status: 'asc' }
+        })
+        return stats.filter(s => s.status).map(s => ({ value: s.status!, label: s.status!.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) }))
+      }
+      break
+    }
+    
+    case 'servidores': {
+      if (type === 'vinculo') {
+        const vinculos = await prisma.servidor.groupBy({
+          by: ['vinculo'],
+          where: { anoReferencia: year },
+          orderBy: { vinculo: 'asc' }
+        })
+        return vinculos.filter(v => v.vinculo).map(v => ({ value: v.vinculo!, label: v.vinculo!.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) }))
+      }
+      break
+    }
+    
+    case 'convenios': {
+      if (type === 'tipo') {
+        const tipos = await prisma.convenio.groupBy({
+          by: ['tipo'],
+          where: { ano: year },
+          orderBy: { tipo: 'asc' }
+        })
+        return tipos.filter(t => t.tipo).map(t => ({ value: t.tipo!, label: t.tipo! }))
+      }
+      if (type === 'status') {
+        const stats = await prisma.convenio.groupBy({
+          by: ['status'],
+          where: { ano: year },
+          orderBy: { status: 'asc' }
+        })
+        return stats.filter(s => s.status).map(s => ({ value: s.status!, label: s.status!.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) }))
+      }
+      break
+    }
+  }
+  
+  return []
+}

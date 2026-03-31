@@ -22,6 +22,7 @@ function arrayToCSV(data: any[], columns: string[], headers: string[]): string {
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url)
   const type = searchParams.get('type')
+  const format = searchParams.get('format') || 'csv'
   const ano = searchParams.get('ano')
   const search = searchParams.get('q')
   const status = searchParams.get('status')
@@ -43,6 +44,15 @@ export async function GET(request: NextRequest) {
         if (categoria) where.categoriaDespesa = categoria
 
         const data = await prisma.despesa.findMany({ where, orderBy: { dataEmpenho: 'desc' } })
+        
+        if (format === 'json') {
+          return NextResponse.json(data, {
+            headers: {
+              'Content-Disposition': `attachment; filename="despesas-${year}.json"`
+            }
+          })
+        }
+        
         const columns = ['numeroEmpenho', 'dataEmpenho', 'credorNome', 'credorCpfCnpj', 'objeto', 'orgaoNome', 'valorEmpenhado', 'valorLiquidado', 'valorPago']
         const headers = ['Nº Empenho', 'Data', 'Credor', 'CPF/CNPJ', 'Objeto', 'Órgão', 'Empenhado', 'Liquidado', 'Pago']
         
@@ -66,6 +76,15 @@ export async function GET(request: NextRequest) {
         if (categoria) where.categoriaEconomica = categoria
 
         const data = await prisma.receita.findMany({ where, orderBy: { exercicio: 'desc' } })
+        
+        if (format === 'json') {
+          return NextResponse.json(data, {
+            headers: {
+              'Content-Disposition': `attachment; filename="receitas-${year}.json"`
+            }
+          })
+        }
+        
         const columns = ['codigoNatureza', 'naturezaReceita', 'categoriaEconomica', 'valorPrevisto', 'valorArrecadado']
         const headers = ['Código', 'Natureza da Receita', 'Categoria', 'Valor Previsto', 'Valor Arrecadado']
         
@@ -89,6 +108,15 @@ export async function GET(request: NextRequest) {
         if (status) where.status = status
 
         const data = await prisma.licitacao.findMany({ where, orderBy: { dataAbertura: 'desc' } })
+        
+        if (format === 'json') {
+          return NextResponse.json(data, {
+            headers: {
+              'Content-Disposition': `attachment; filename="licitacoes-${year}.json"`
+            }
+          })
+        }
+        
         const columns = ['numero', 'ano', 'modalidade', 'objeto', 'status', 'dataAbertura', 'valorEstimado']
         const headers = ['Nº', 'Ano', 'Modalidade', 'Objeto', 'Status', 'Data Abertura', 'Valor Estimado']
         
@@ -113,6 +141,15 @@ export async function GET(request: NextRequest) {
         if (status) where.status = status
 
         const data = await prisma.contrato.findMany({ where, orderBy: { dataInicioVigencia: 'desc' } })
+        
+        if (format === 'json') {
+          return NextResponse.json(data, {
+            headers: {
+              'Content-Disposition': `attachment; filename="contratos-${year}.json"`
+            }
+          })
+        }
+        
         const columns = ['numero', 'ano', 'tipoContrato', 'contratadoNome', 'contratadoCnpj', 'objeto', 'status', 'valorInicial', 'dataInicioVigencia']
         const headers = ['Nº', 'Ano', 'Tipo', 'Contratado', 'CNPJ', 'Objeto', 'Status', 'Valor', 'Início Vigência']
         
@@ -137,6 +174,15 @@ export async function GET(request: NextRequest) {
         if (status) where.vinculo = status
 
         const data = await prisma.servidor.findMany({ where, orderBy: { nome: 'asc' } })
+        
+        if (format === 'json') {
+          return NextResponse.json(data, {
+            headers: {
+              'Content-Disposition': `attachment; filename="servidores-${year}.json"`
+            }
+          })
+        }
+        
         const columns = ['matricula', 'nome', 'cargo', 'funcao', 'lotacao', 'vinculo', 'remuneracaoBruta', 'remuneracaoLiquida']
         const headers = ['Matrícula', 'Nome', 'Cargo', 'Função', 'Lotação', 'Vínculo', 'Rem. Bruta', 'Rem. Líquida']
         
@@ -161,6 +207,15 @@ export async function GET(request: NextRequest) {
         if (status) where.status = status
 
         const data = await prisma.convenio.findMany({ where, orderBy: { dataInicioVigencia: 'desc' } })
+        
+        if (format === 'json') {
+          return NextResponse.json(data, {
+            headers: {
+              'Content-Disposition': `attachment; filename="convenios-${year}.json"`
+            }
+          })
+        }
+        
         const columns = ['numero', 'ano', 'tipo', 'concedente', 'concedenteCnpj', 'objeto', 'status', 'valorTotal', 'dataInicioVigencia']
         const headers = ['Nº', 'Ano', 'Tipo', 'Concedente', 'CNPJ', 'Objeto', 'Status', 'Valor', 'Início Vigência']
         

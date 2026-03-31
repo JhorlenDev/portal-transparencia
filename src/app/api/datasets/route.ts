@@ -5,8 +5,6 @@ import { authenticateRequest } from '@/lib/auth'
 export const dynamic = 'force-dynamic'
 
 export async function GET(request: NextRequest) {
-  const authError = await authenticateRequest(request)
-  if (authError) return authError
   try {
     const { searchParams } = new URL(request.url)
     const categoria = searchParams.get('categoria')

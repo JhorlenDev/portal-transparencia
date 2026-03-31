@@ -287,3 +287,4 @@ Tokens válidos:
 4. **Usar site-data.ts** para buscar dados
 5. **API usa Bearer Token** em todas as rotas autenticadas
 6. **Dynamic = force-dynamic** em todas API routes para Vercel
+7. **SEMPRE** Checar segurança do app
