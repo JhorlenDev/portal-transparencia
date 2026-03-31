@@ -1,7 +1,8 @@
-import { TrendingUp, Download, ArrowUpRight } from "lucide-react"
+import { Suspense } from "react"
+import { TrendingUp, ArrowUpRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
 import { Card, CardContent } from "@/components/ui/card"
+import { PageSkeleton, StatsCardSkeleton, TableSkeleton } from "@/components/ui/skeletons"
 import { getReceitas, getReceitasStats } from "@/lib/site-data"
 
 export const dynamic = 'force-dynamic'
@@ -14,7 +15,7 @@ function formatCurrency(value: number): string {
   }).format(value)
 }
 
-export default async function Receitas() {
+async function ReceitasContent() {
   const currentYear = new Date().getFullYear()
   const [receitas, stats] = await Promise.all([
     getReceitas(currentYear),
@@ -26,19 +27,7 @@ export default async function Receitas() {
     : '0'
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-800 flex items-center gap-3">
-            <TrendingUp className="h-7 w-7 text-blue-600" />
-            Receitas Públicas
-          </h1>
-          <p className="text-slate-600 mt-1">
-            Acompanhe a previsão e arrecadação das receitas municipais.
-          </p>
-        </div>
-      </div>
-
+    <>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
         <Card className="border-l-4 border-l-blue-500">
           <CardContent className="p-5">
@@ -138,6 +127,28 @@ export default async function Receitas() {
           </table>
         </CardContent>
       </Card>
+    </>
+  )
+}
+
+export default function Receitas() {
+  return (
+    <div className="container mx-auto px-4 py-8">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
+        <div>
+          <h1 className="text-2xl font-bold text-slate-800 flex items-center gap-3">
+            <TrendingUp className="h-7 w-7 text-blue-600" />
+            Receitas Públicas
+          </h1>
+          <p className="text-slate-600 mt-1">
+            Acompanhe a previsão e arrecadação das receitas municipais.
+          </p>
+        </div>
+      </div>
+
+      <Suspense fallback={<PageSkeleton />}>
+        <ReceitasContent />
+      </Suspense>
     </div>
   )
 }
