@@ -1,26 +1,17 @@
+import { Suspense } from "react"
 import { Database, Download, FileJson, FileSpreadsheet, Clock, Info } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { PageSkeleton } from "@/components/ui/skeletons"
 import { getDatasets } from "@/lib/site-data"
 
 export const dynamic = 'force-dynamic'
 
-export default async function DadosAbertos() {
+async function DadosAbertosContent() {
   const datasets = await getDatasets()
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-slate-800 flex items-center gap-3">
-          <Database className="h-7 w-7 text-indigo-600" />
-          Dados Abertos
-        </h1>
-        <p className="text-slate-600 mt-2 max-w-3xl">
-          Acesse dados públicos em formatos abertos (CSV e JSON). Os dados podem ser livremente utilizados.
-        </p>
-      </div>
-
+    <>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
         <Card>
           <CardContent className="p-4 flex items-center gap-3">
@@ -114,6 +105,26 @@ export default async function DadosAbertos() {
           </div>
         </CardContent>
       </Card>
+    </>
+  )
+}
+
+export default function DadosAbertos() {
+  return (
+    <div className="container mx-auto px-4 py-8">
+      <div className="mb-8">
+        <h1 className="text-2xl font-bold text-slate-800 flex items-center gap-3">
+          <Database className="h-7 w-7 text-indigo-600" />
+          Dados Abertos
+        </h1>
+        <p className="text-slate-600 mt-2 max-w-3xl">
+          Acesse dados públicos em formatos abertos (CSV e JSON). Os dados podem ser livremente utilizados.
+        </p>
+      </div>
+
+      <Suspense fallback={<PageSkeleton />}>
+        <DadosAbertosContent />
+      </Suspense>
     </div>
   )
 }

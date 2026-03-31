@@ -1,7 +1,7 @@
+import { Suspense } from "react"
 import { DollarSign, TrendingUp } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
 import { Card, CardContent } from "@/components/ui/card"
+import { PageSkeleton } from "@/components/ui/skeletons"
 import { getDespesas, getDespesasStats } from "@/lib/site-data"
 
 export const dynamic = 'force-dynamic'
@@ -14,7 +14,7 @@ function formatCurrency(value: number): string {
   }).format(value)
 }
 
-export default async function Despesas() {
+async function DespesasContent() {
   const currentYear = new Date().getFullYear()
   const [despesas, stats] = await Promise.all([
     getDespesas(currentYear),
@@ -22,19 +22,7 @@ export default async function Despesas() {
   ])
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-800 flex items-center gap-3">
-            <DollarSign className="h-7 w-7 text-emerald-600" />
-            Despesas Públicas
-          </h1>
-          <p className="text-slate-600 mt-1">
-            Consulte empenhos, liquidações e pagamentos realizados pelo município.
-          </p>
-        </div>
-      </div>
-
+    <>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
         <Card className="border-l-4 border-l-blue-500">
           <CardContent className="p-5">
@@ -144,6 +132,28 @@ export default async function Despesas() {
           </div>
         </CardContent>
       </Card>
+    </>
+  )
+}
+
+export default function Despesas() {
+  return (
+    <div className="container mx-auto px-4 py-8">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
+        <div>
+          <h1 className="text-2xl font-bold text-slate-800 flex items-center gap-3">
+            <DollarSign className="h-7 w-7 text-emerald-600" />
+            Despesas Públicas
+          </h1>
+          <p className="text-slate-600 mt-1">
+            Consulte empenhos, liquidações e pagamentos realizados pelo município.
+          </p>
+        </div>
+      </div>
+
+      <Suspense fallback={<PageSkeleton />}>
+        <DespesasContent />
+      </Suspense>
     </div>
   )
 }

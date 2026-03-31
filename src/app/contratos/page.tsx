@@ -1,7 +1,7 @@
+import { Suspense } from "react"
 import { FileText } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
 import { Card, CardContent } from "@/components/ui/card"
+import { PageSkeleton } from "@/components/ui/skeletons"
 import { getContratos, getContratosStats } from "@/lib/site-data"
 
 export const dynamic = 'force-dynamic'
@@ -14,7 +14,7 @@ function formatCurrency(value: number): string {
   }).format(value)
 }
 
-export default async function Contratos() {
+async function ContratosContent() {
   const currentYear = new Date().getFullYear()
   const [contratos, stats] = await Promise.all([
     getContratos(currentYear),
@@ -22,17 +22,7 @@ export default async function Contratos() {
   ])
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-800 flex items-center gap-3">
-            <FileText className="h-7 w-7 text-amber-600" />
-            Contratos Administrativos
-          </h1>
-          <p className="text-slate-600 mt-1">Contratos, atas de registro de preços e aditivos.</p>
-        </div>
-      </div>
-
+    <>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
         <Card>
           <CardContent className="p-4">
@@ -108,6 +98,26 @@ export default async function Contratos() {
           </table>
         </CardContent>
       </Card>
+    </>
+  )
+}
+
+export default function Contratos() {
+  return (
+    <div className="container mx-auto px-4 py-8">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
+        <div>
+          <h1 className="text-2xl font-bold text-slate-800 flex items-center gap-3">
+            <FileText className="h-7 w-7 text-amber-600" />
+            Contratos Administrativos
+          </h1>
+          <p className="text-slate-600 mt-1">Contratos, atas de registro de preços e aditivos.</p>
+        </div>
+      </div>
+
+      <Suspense fallback={<PageSkeleton />}>
+        <ContratosContent />
+      </Suspense>
     </div>
   )
 }

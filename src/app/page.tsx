@@ -1,8 +1,10 @@
+import { Suspense } from "react"
 import Link from "next/link"
 import { Search, DollarSign, Scale, FileText, Users, HandCoins, MessageSquare, Database, ChevronRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Skeleton } from "@/components/ui/skeleton"
 import { getSiteConfig, getSiteStats, getLatestDespesas } from "@/lib/site-data"
 
 const quickLinks = [
@@ -38,7 +40,30 @@ function formatCurrency(value: number): string {
 
 export const dynamic = 'force-dynamic'
 
-export default async function Home() {
+function HomeStatsSkeleton() {
+  return (
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-10">
+      <div className="bg-white/10 backdrop-blur rounded-xl p-4">
+        <Skeleton className="h-3 w-24 mb-2 bg-white/20" />
+        <Skeleton className="h-6 w-32 bg-white/20" />
+      </div>
+      <div className="bg-white/10 backdrop-blur rounded-xl p-4">
+        <Skeleton className="h-3 w-24 mb-2 bg-white/20" />
+        <Skeleton className="h-6 w-32 bg-white/20" />
+      </div>
+      <div className="bg-white/10 backdrop-blur rounded-xl p-4">
+        <Skeleton className="h-3 w-24 mb-2 bg-white/20" />
+        <Skeleton className="h-6 w-20 bg-white/20" />
+      </div>
+      <div className="bg-white/10 backdrop-blur rounded-xl p-4">
+        <Skeleton className="h-3 w-24 mb-2 bg-white/20" />
+        <Skeleton className="h-6 w-20 bg-white/20" />
+      </div>
+    </div>
+  )
+}
+
+async function HomeContent() {
   const [siteConfig, stats, latestDespesas] = await Promise.all([
     getSiteConfig(),
     getSiteStats(),
@@ -48,55 +73,25 @@ export default async function Home() {
   const currentYear = new Date().getFullYear()
 
   return (
-    <div>
-      <section className="bg-gradient-to-br from-emerald-700 via-emerald-600 to-teal-700 text-white">
-        <div className="container mx-auto px-4 py-12 lg:py-16">
-          <div className="max-w-4xl mx-auto text-center">
-            <h1 className="text-3xl lg:text-4xl font-bold mb-4">
-              {siteConfig.nomeSite}
-            </h1>
-            <p className="text-lg text-emerald-100 mb-8 max-w-2xl mx-auto">
-              {siteConfig.descricao || "Acesso à informação pública municipal. Transparência é um direito de todos os cidadãos."}
-            </p>
-            
-            <form action="/busca" method="GET" className="max-w-xl mx-auto">
-              <div className="relative">
-                <Input
-                  type="search"
-                  name="q"
-                  placeholder="Buscar despesas, licitações, contratos, servidores..."
-                  className="h-14 pl-5 pr-14 text-slate-800 bg-white/95 backdrop-blur border-0 shadow-xl text-base rounded-xl"
-                />
-                <Button
-                  type="submit"
-                  className="absolute right-2 top-1/2 -translate-y-1/2 h-10 w-10 p-0 bg-emerald-600 hover:bg-emerald-700 rounded-lg"
-                >
-                  <Search className="h-5 w-5" />
-                </Button>
-              </div>
-            </form>
-
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-10">
-              <div className="bg-white/10 backdrop-blur rounded-xl p-4">
-                <p className="text-emerald-200 text-xs mb-1">Receitas {currentYear}</p>
-                <p className="text-xl font-bold">{formatCurrency(stats.totalReceitas)}</p>
-              </div>
-              <div className="bg-white/10 backdrop-blur rounded-xl p-4">
-                <p className="text-emerald-200 text-xs mb-1">Despesas {currentYear}</p>
-                <p className="text-xl font-bold">{formatCurrency(stats.totalDespesas)}</p>
-              </div>
-              <div className="bg-white/10 backdrop-blur rounded-xl p-4">
-                <p className="text-emerald-200 text-xs mb-1">Licitações {currentYear}</p>
-                <p className="text-xl font-bold">{stats.totalLicitacoes}</p>
-              </div>
-              <div className="bg-white/10 backdrop-blur rounded-xl p-4">
-                <p className="text-emerald-200 text-xs mb-1">Contratos Ativos</p>
-                <p className="text-xl font-bold">{stats.totalContratos}</p>
-              </div>
-            </div>
-          </div>
+    <>
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-10">
+        <div className="bg-white/10 backdrop-blur rounded-xl p-4">
+          <p className="text-emerald-200 text-xs mb-1">Receitas {currentYear}</p>
+          <p className="text-xl font-bold">{formatCurrency(stats.totalReceitas)}</p>
         </div>
-      </section>
+        <div className="bg-white/10 backdrop-blur rounded-xl p-4">
+          <p className="text-emerald-200 text-xs mb-1">Despesas {currentYear}</p>
+          <p className="text-xl font-bold">{formatCurrency(stats.totalDespesas)}</p>
+        </div>
+        <div className="bg-white/10 backdrop-blur rounded-xl p-4">
+          <p className="text-emerald-200 text-xs mb-1">Licitações {currentYear}</p>
+          <p className="text-xl font-bold">{stats.totalLicitacoes}</p>
+        </div>
+        <div className="bg-white/10 backdrop-blur rounded-xl p-4">
+          <p className="text-emerald-200 text-xs mb-1">Contratos Ativos</p>
+          <p className="text-xl font-bold">{stats.totalContratos}</p>
+        </div>
+      </div>
 
       <section className="py-12 bg-white border-b">
         <div className="container mx-auto px-4">
@@ -238,6 +233,48 @@ export default async function Home() {
                 Acessar Catálogo
               </Button>
             </Link>
+          </div>
+        </div>
+      </section>
+    </>
+  )
+}
+
+export default async function Home() {
+  const [siteConfig] = await Promise.all([getSiteConfig()])
+
+  return (
+    <div>
+      <section className="bg-gradient-to-br from-emerald-700 via-emerald-600 to-teal-700 text-white">
+        <div className="container mx-auto px-4 py-12 lg:py-16">
+          <div className="max-w-4xl mx-auto text-center">
+            <h1 className="text-3xl lg:text-4xl font-bold mb-4">
+              {siteConfig.nomeSite}
+            </h1>
+            <p className="text-lg text-emerald-100 mb-8 max-w-2xl mx-auto">
+              {siteConfig.descricao || "Acesso à informação pública municipal. Transparência é um direito de todos os cidadãos."}
+            </p>
+            
+            <form action="/busca" method="GET" className="max-w-xl mx-auto">
+              <div className="relative">
+                <Input
+                  type="search"
+                  name="q"
+                  placeholder="Buscar despesas, licitações, contratos, servidores..."
+                  className="h-14 pl-5 pr-14 text-slate-800 bg-white/95 backdrop-blur border-0 shadow-xl text-base rounded-xl"
+                />
+                <Button
+                  type="submit"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 h-10 w-10 p-0 bg-emerald-600 hover:bg-emerald-700 rounded-lg"
+                >
+                  <Search className="h-5 w-5" />
+                </Button>
+              </div>
+            </form>
+
+            <Suspense fallback={<HomeStatsSkeleton />}>
+              <HomeContent />
+            </Suspense>
           </div>
         </div>
       </section>

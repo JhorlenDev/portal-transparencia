@@ -1,7 +1,7 @@
+import { Suspense } from "react"
 import { Users } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
 import { Card, CardContent } from "@/components/ui/card"
+import { PageSkeleton } from "@/components/ui/skeletons"
 import { getServidores, getServidoresStats } from "@/lib/site-data"
 
 export const dynamic = 'force-dynamic'
@@ -14,7 +14,7 @@ function formatCurrency(value: number): string {
   }).format(value)
 }
 
-export default async function Servidores() {
+async function ServidoresContent() {
   const currentYear = new Date().getFullYear()
   const [servidores, stats] = await Promise.all([
     getServidores(currentYear),
@@ -22,17 +22,7 @@ export default async function Servidores() {
   ])
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-800 flex items-center gap-3">
-            <Users className="h-7 w-7 text-rose-600" />
-            Servidores Públicos
-          </h1>
-          <p className="text-slate-600 mt-1">Quadro de pessoal e remuneração dos servidores municipais.</p>
-        </div>
-      </div>
-
+    <>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
         <Card>
           <CardContent className="p-4">
@@ -59,14 +49,6 @@ export default async function Servidores() {
           </CardContent>
         </Card>
       </div>
-
-      <Card className="mb-6 bg-amber-50 border-amber-200">
-        <CardContent className="p-4">
-          <p className="text-sm text-amber-800">
-            <strong>Aviso LGPD:</strong> A divulgação de remuneração de servidores públicos é assegurada pela Lei de Acesso à Informação (Lei nº 12.527/2011).
-          </p>
-        </CardContent>
-      </Card>
 
       <Card>
         <CardContent className="p-0">
@@ -118,6 +100,26 @@ export default async function Servidores() {
           </table>
         </CardContent>
       </Card>
+    </>
+  )
+}
+
+export default function Servidores() {
+  return (
+    <div className="container mx-auto px-4 py-8">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
+        <div>
+          <h1 className="text-2xl font-bold text-slate-800 flex items-center gap-3">
+            <Users className="h-7 w-7 text-rose-600" />
+            Servidores Públicos
+          </h1>
+          <p className="text-slate-600 mt-1">Quadro de pessoal e remuneração dos servidores municipais.</p>
+        </div>
+      </div>
+
+      <Suspense fallback={<PageSkeleton />}>
+        <ServidoresContent />
+      </Suspense>
     </div>
   )
 }
