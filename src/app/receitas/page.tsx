@@ -74,7 +74,7 @@ async function ReceitasContent() {
         <CardContent className="p-0 min-w-0">
           <div className="overflow-x-auto">
             <table className="w-full">
-            <thead className="bg-slate-50 border-b">
+            <thead className="bg-slate-50 border-b border-slate-200">
               <tr>
                 <th className="text-left px-4 py-3 text-sm font-medium text-slate-600">Código</th>
                 <th className="text-left px-4 py-3 text-sm font-medium text-slate-600">Natureza da Receita</th>
@@ -90,7 +90,7 @@ async function ReceitasContent() {
                   ? ((receita.valorArrecadado || 0) / receita.valorPrevisto) * 100 
                   : 0
                 return (
-                  <tr key={receita.id} className="border-b hover:bg-slate-50">
+                  <tr key={receita.id} className="border-b border-slate-200 hover:bg-slate-50">
                     <td className="px-4 py-3 font-mono text-sm">{receita.codigoNatureza}</td>
                     <td className="px-4 py-3 font-medium">{receita.naturezaReceita}</td>
                     <td className="px-4 py-3">

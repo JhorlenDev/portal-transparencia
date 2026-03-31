@@ -54,7 +54,7 @@ async function ServidoresContent() {
         <CardContent className="p-0 min-w-0">
           <div className="overflow-x-auto">
             <table className="w-full">
-            <thead className="bg-slate-50 border-b">
+            <thead className="bg-slate-50 border-b border-slate-200">
               <tr>
                 <th className="text-left px-4 py-3 text-sm font-medium text-slate-600">Nome</th>
                 <th className="text-left px-4 py-3 text-sm font-medium text-slate-600">Cargo/Função</th>
@@ -66,7 +66,7 @@ async function ServidoresContent() {
             </thead>
             <tbody>
               {servidores.length > 0 ? servidores.map((servidor) => (
-                <tr key={servidor.id} className="border-b hover:bg-slate-50">
+                <tr key={servidor.id} className="border-b border-slate-200 hover:bg-slate-50">
                   <td className="px-4 py-3">
                     <p className="font-medium">{servidor.nome}</p>
                     <p className="text-xs text-slate-500">{servidor.matricula}</p>

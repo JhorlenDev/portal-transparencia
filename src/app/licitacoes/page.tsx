@@ -68,7 +68,7 @@ async function LicitacoesContent() {
         <CardContent className="p-0 min-w-0">
           <div className="overflow-x-auto">
             <table className="w-full">
-            <thead className="bg-slate-50 border-b">
+            <thead className="bg-slate-50 border-b border-slate-200">
               <tr>
                 <th className="text-left px-4 py-3 text-sm font-medium text-slate-600">Nº/Ano</th>
                 <th className="text-left px-4 py-3 text-sm font-medium text-slate-600">Objeto</th>
@@ -79,7 +79,7 @@ async function LicitacoesContent() {
             </thead>
             <tbody>
               {licitacoes.length > 0 ? licitacoes.map((licitacao) => (
-                <tr key={licitacao.id} className="border-b hover:bg-slate-50">
+                <tr key={licitacao.id} className="border-b border-slate-200 hover:bg-slate-50">
                   <td className="px-4 py-3">
                     <span className="font-bold text-purple-600">{licitacao.numero}/{licitacao.ano}</span>
                     <p className="text-xs text-slate-500">{licitacao.modalidade}</p>

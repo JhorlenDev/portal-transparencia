@@ -54,7 +54,7 @@ async function ConveniosContent() {
         <CardContent className="p-0 min-w-0">
           <div className="overflow-x-auto">
             <table className="w-full">
-            <thead className="bg-slate-50 border-b">
+            <thead className="bg-slate-50 border-b border-slate-200">
               <tr>
                 <th className="text-left px-4 py-3 text-sm font-medium text-slate-600">Nº/Ano</th>
                 <th className="text-left px-4 py-3 text-sm font-medium text-slate-600">Concedente</th>
@@ -65,7 +65,7 @@ async function ConveniosContent() {
             </thead>
             <tbody>
               {convenios.length > 0 ? convenios.map((conv) => (
-                <tr key={conv.id} className="border-b hover:bg-slate-50">
+                <tr key={conv.id} className="border-b border-slate-200 hover:bg-slate-50">
                   <td className="px-4 py-3">
                     <span className="font-bold text-cyan-600">{conv.numero}/{conv.ano}</span>
                     <p className="text-xs text-slate-500">{conv.tipo}</p>
