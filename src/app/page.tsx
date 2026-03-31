@@ -126,8 +126,8 @@ export default async function Home() {
 
       <section className="py-8 overflow-hidden">
         <div className="container mx-auto px-4">
-          <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-6">
-            <Card className="w-full md:col-span-2 xl:col-span-2">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+            <Card className="md:col-span-2 xl:col-span-2">
               <CardHeader className="flex flex-row items-center justify-between pb-2">
                 <CardTitle className="text-lg font-bold flex items-center gap-2">
                   <DollarSign className="h-5 w-5 text-emerald-800" />
@@ -160,7 +160,7 @@ export default async function Home() {
               </CardContent>
             </Card>
 
-            <Card className="w-full">
+            <Card>
               <CardHeader className="flex flex-row items-center justify-between pb-2">
                 <CardTitle className="text-lg font-bold flex items-center gap-2">
                   <DollarSign className="h-5 w-5 text-blue-600" />
@@ -192,7 +192,7 @@ export default async function Home() {
               </CardContent>
             </Card>
 
-            <Card className="w-full md:col-span-2 xl:col-span-2">
+            <Card className="md:col-span-2 xl:col-span-2">
               <CardHeader className="flex flex-row items-center justify-between pb-2">
                 <CardTitle className="text-lg font-bold flex items-center gap-2">
                   <Scale className="h-5 w-5 text-purple-600" />
@@ -224,7 +224,7 @@ export default async function Home() {
               </CardContent>
             </Card>
 
-            <div className="space-y-4 w-full">
+            <div className="space-y-4">
               <Card className="bg-gradient-to-br from-teal-500 to-emerald-600 text-white border-0">
                 <CardContent className="p-5">
                   <div className="flex items-start gap-4">
