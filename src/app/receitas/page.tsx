@@ -55,7 +55,7 @@ async function ReceitasContent({ searchParams }: PageProps) {
           <CardContent className="p-5">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-slate-500">Previsão Total ({currentYear})</p>
+                <p className="text-sm text-slate-600">Previsão Total ({currentYear})</p>
                 <p className="text-2xl font-bold text-slate-800">{formatCurrency(stats.previsto)}</p>
               </div>
               <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
@@ -68,11 +68,11 @@ async function ReceitasContent({ searchParams }: PageProps) {
           <CardContent className="p-5">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-slate-500">Total Arrecadado</p>
-                <p className="text-2xl font-bold text-emerald-700">{formatCurrency(stats.arrecadado)}</p>
+                <p className="text-sm text-slate-600">Total Arrecadado</p>
+                <p className="text-2xl font-bold text-emerald-800">{formatCurrency(stats.arrecadado)}</p>
               </div>
               <div className="w-12 h-12 bg-emerald-100 rounded-xl flex items-center justify-center">
-                <ArrowUpRight className="h-6 w-6 text-emerald-700" />
+                <ArrowUpRight className="h-6 w-6 text-emerald-800" />
               </div>
             </div>
           </CardContent>
@@ -81,11 +81,11 @@ async function ReceitasContent({ searchParams }: PageProps) {
           <CardContent className="p-5">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-slate-500">Realização</p>
-                <p className="text-2xl font-bold text-amber-600">{realizacao}%</p>
+                <p className="text-sm text-slate-600">Realização</p>
+                <p className="text-2xl font-bold text-amber-800">{realizacao}%</p>
               </div>
               <div className="w-12 h-12 bg-amber-100 rounded-xl flex items-center justify-center">
-                <TrendingUp className="h-6 w-6 text-amber-600" />
+                <TrendingUp className="h-6 w-6 text-amber-800" />
               </div>
             </div>
           </CardContent>
@@ -116,14 +116,14 @@ async function ReceitasContent({ searchParams }: PageProps) {
                     <td className="px-4 py-3 font-mono text-sm">{receita.codigoNatureza}</td>
                     <td className="px-4 py-3 font-medium">{receita.naturezaReceita}</td>
                     <td className="px-4 py-3">
-                      <span className="px-2 py-1 bg-emerald-100 text-emerald-700 rounded text-xs">
+                      <span className="px-2 py-1 bg-emerald-100 text-emerald-800 rounded text-xs">
                         {receita.categoriaEconomica}
                       </span>
                     </td>
                     <td className="px-4 py-3 text-right font-medium text-slate-600">
                       {formatCurrency(receita.valorPrevisto)}
                     </td>
-                    <td className="px-4 py-3 text-right font-bold text-emerald-700">
+                    <td className="px-4 py-3 text-right font-bold text-emerald-800">
                       {formatCurrency(receita.valorArrecadado || 0)}
                     </td>
                     <td className="px-4 py-3 text-right">
@@ -141,7 +141,7 @@ async function ReceitasContent({ searchParams }: PageProps) {
                 )
               }) : (
                 <tr>
-                  <td colSpan={6} className="px-4 py-8 text-center text-slate-500">
+                  <td colSpan={6} className="px-4 py-8 text-center text-slate-600">
                     Nenhuma receita encontrada para {currentYear}
                   </td>
                 </tr>

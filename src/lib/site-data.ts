@@ -117,6 +117,13 @@ export async function getLatestDespesas(limit = 5) {
   })
 }
 
+export async function getLatestReceitas(limit = 5) {
+  return prisma.receita.findMany({
+    take: limit,
+    orderBy: { createdAt: 'desc' }
+  })
+}
+
 export async function getLatestLicitacoes(limit = 5) {
   return prisma.licitacao.findMany({
     orderBy: { dataAbertura: 'desc' },

@@ -136,7 +136,7 @@ export function FilterBar({
         <div className="flex flex-col md:flex-row gap-4">
           <div className="flex-1 flex gap-2 flex-wrap">
             <div className="relative flex-1 min-w-[200px]">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
               <Input
                 type="search"
                 placeholder={searchPlaceholder}
@@ -145,13 +145,14 @@ export function FilterBar({
                 className="pl-10"
               />
               {isFiltering && (
-                <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-emerald-700 animate-spin" />
+                <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-emerald-800 animate-spin" />
               )}
             </div>
 
             <select
               value={ano}
               onChange={handleAnoChange}
+              aria-label="Selecionar ano"
               className="px-3 py-2 border border-slate-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500 min-w-[100px]"
             >
               {years.map((year) => (
@@ -165,6 +166,7 @@ export function FilterBar({
               <select
                 value={categoria}
                 onChange={handleCategoriaChange}
+                aria-label="Selecionar categoria"
                 className="px-3 py-2 border border-slate-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500 min-w-[150px]"
               >
                 <option value="">Categoria</option>
@@ -180,6 +182,7 @@ export function FilterBar({
               <select
                 value={status}
                 onChange={handleStatusChange}
+                aria-label="Selecionar status"
                 className="px-3 py-2 border border-slate-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500 min-w-[150px]"
               >
                 <option value="">Status</option>
@@ -228,7 +231,7 @@ export function FilterBar({
             <Button variant="outline" onClick={() => setShowClearConfirm(false)}>
               Cancelar
             </Button>
-            <Button onClick={clearFilters} className="bg-emerald-600 hover:bg-emerald-700">
+            <Button onClick={clearFilters} className="bg-emerald-600 hover:bg-emerald-800">
               Confirmar
             </Button>
           </div>
@@ -342,10 +345,10 @@ export function DetailsModal({
                 <tbody>
                   {columns.map((col, i) => (
                     <tr key={i} className="border-b border-slate-100">
-                      <td className="px-3 py-2 font-mono text-xs text-emerald-700">{col.campo}</td>
-                      <td className="px-3 py-2 text-slate-500">{col.tipo}</td>
+                      <td className="px-3 py-2 font-mono text-xs text-emerald-800">{col.campo}</td>
+                      <td className="px-3 py-2 text-slate-600">{col.tipo}</td>
                       <td className="px-3 py-2 text-slate-700">{col.descricao}</td>
-                      <td className="px-3 py-2 font-mono text-xs text-slate-500">{col.exemplo}</td>
+                      <td className="px-3 py-2 font-mono text-xs text-slate-600">{col.exemplo}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -361,12 +364,12 @@ export function DetailsModal({
                 className="flex flex-col items-center justify-center p-6 border-2 border-slate-200 rounded-xl hover:border-emerald-500 hover:bg-emerald-50 transition-colors disabled:opacity-50"
               >
                 {isDownloading ? (
-                  <Loader2 className="h-10 w-10 text-emerald-700 animate-spin mb-2" />
+                  <Loader2 className="h-10 w-10 text-emerald-800 animate-spin mb-2" />
                 ) : (
-                  <FileSpreadsheet className="h-10 w-10 text-emerald-700 mb-2" />
+                  <FileSpreadsheet className="h-10 w-10 text-emerald-800 mb-2" />
                 )}
                 <span className="font-medium text-slate-700">Download CSV</span>
-                <span className="text-xs text-slate-500 mt-1">Planilha editável</span>
+                <span className="text-xs text-slate-600 mt-1">Planilha editável</span>
               </button>
               <button
                 onClick={() => handleDownload('json')}
@@ -374,12 +377,12 @@ export function DetailsModal({
                 className="flex flex-col items-center justify-center p-6 border-2 border-slate-200 rounded-xl hover:border-amber-500 hover:bg-amber-50 transition-colors disabled:opacity-50"
               >
                 {isDownloading ? (
-                  <Loader2 className="h-10 w-10 text-amber-600 animate-spin mb-2" />
+                  <Loader2 className="h-10 w-10 text-amber-800 animate-spin mb-2" />
                 ) : (
-                  <FileJson className="h-10 w-10 text-amber-600 mb-2" />
+                  <FileJson className="h-10 w-10 text-amber-800 mb-2" />
                 )}
                 <span className="font-medium text-slate-700">Download JSON</span>
-                <span className="text-xs text-slate-500 mt-1">Formato estruturado</span>
+                <span className="text-xs text-slate-600 mt-1">Formato estruturado</span>
               </button>
             </div>
           )}
@@ -387,7 +390,7 @@ export function DetailsModal({
           {activeTab === "api" && (
             <div className="space-y-4">
               <div className="bg-slate-900 rounded-lg p-4">
-                <p className="text-slate-400 text-xs mb-2">Endpoint</p>
+                <p className="text-slate-500 text-xs mb-2">Endpoint</p>
                 <code className="text-emerald-400 text-sm font-mono">
                   GET {getApiEndpoint()}
                 </code>
@@ -395,7 +398,7 @@ export function DetailsModal({
 
               <div>
                 <p className="text-slate-600 text-sm font-medium mb-2">Parâmetros Supported</p>
-                <ul className="text-sm text-slate-500 space-y-1">
+                <ul className="text-sm text-slate-600 space-y-1">
                   <li><code className="bg-slate-100 px-1 rounded">ano</code> - Filtrar por ano</li>
                   <li><code className="bg-slate-100 px-1 rounded">limit</code> - Limite de registros</li>
                   <li><code className="bg-slate-100 px-1 rounded">offset</code> - Offset de paginação</li>

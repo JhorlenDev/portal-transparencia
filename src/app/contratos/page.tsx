@@ -60,25 +60,25 @@ async function ContratosContent({ searchParams }: PageProps) {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
         <Card>
           <CardContent className="p-4">
-            <p className="text-sm text-slate-500">Total</p>
+            <p className="text-sm text-slate-600">Total</p>
             <p className="text-2xl font-bold">{stats.total}</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="p-4">
-            <p className="text-sm text-slate-500">Vigentes</p>
+            <p className="text-sm text-slate-600">Vigentes</p>
             <p className="text-2xl font-bold text-green-600">{stats.vigentes}</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="p-4">
-            <p className="text-sm text-slate-500">Valor Total</p>
+            <p className="text-sm text-slate-600">Valor Total</p>
             <p className="text-lg font-bold">{formatCurrency(stats.valorTotal)}</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="p-4">
-            <p className="text-sm text-slate-500">Encerrados</p>
+            <p className="text-sm text-slate-600">Encerrados</p>
             <p className="text-lg font-bold">{stats.encerrados}</p>
           </CardContent>
         </Card>
@@ -101,12 +101,12 @@ async function ContratosContent({ searchParams }: PageProps) {
               {contratos.length > 0 ? contratos.map((contrato) => (
                 <tr key={contrato.id} className="border-b border-slate-200 hover:bg-slate-50">
                   <td className="px-4 py-3">
-                    <span className="font-bold text-amber-600">{contrato.numero}/{contrato.ano}</span>
-                    <p className="text-xs text-slate-500">{contrato.tipoContrato || '-'}</p>
+                    <span className="font-bold text-amber-800">{contrato.numero}/{contrato.ano}</span>
+                    <p className="text-xs text-slate-600">{contrato.tipoContrato || '-'}</p>
                   </td>
                   <td className="px-4 py-3">
                     <p className="font-medium">{contrato.contratadoNome}</p>
-                    <p className="text-xs text-slate-500">{contrato.contratadoCnpj || '-'}</p>
+                    <p className="text-xs text-slate-600">{contrato.contratadoCnpj || '-'}</p>
                   </td>
                   <td className="px-4 py-3 text-sm text-slate-600 max-w-xs truncate">
                     {contrato.objeto}
@@ -118,13 +118,13 @@ async function ContratosContent({ searchParams }: PageProps) {
                       {contrato.status}
                     </span>
                   </td>
-                  <td className="px-4 py-3 text-right font-bold text-emerald-700">
+                  <td className="px-4 py-3 text-right font-bold text-emerald-800">
                     {formatCurrency(contrato.valorInicial)}
                   </td>
                 </tr>
               )) : (
                 <tr>
-                  <td colSpan={5} className="px-4 py-8 text-center text-slate-500">
+                  <td colSpan={5} className="px-4 py-8 text-center text-slate-600">
                     Nenhum contrato encontrado
                   </td>
                 </tr>
@@ -157,7 +157,7 @@ export default async function Contratos({ searchParams }: PageProps) {
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
         <div>
           <h1 className="text-2xl font-bold text-slate-800 flex items-center gap-3">
-            <FileText className="h-7 w-7 text-amber-600" />
+            <FileText className="h-7 w-7 text-amber-800" />
             Contratos Administrativos
           </h1>
           <p className="text-slate-600 mt-1">Contratos, atas de registro de preços e aditivos.</p>

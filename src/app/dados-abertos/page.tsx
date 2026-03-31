@@ -207,7 +207,7 @@ export default async function DadosAbertos() {
               <Database className="h-8 w-8 text-indigo-500" />
               <div>
                 <p className="text-2xl font-bold">{PUBLIC_DATABASES.length}</p>
-                <p className="text-xs text-slate-500">Bases disponíveis</p>
+                <p className="text-xs text-slate-600">Bases disponíveis</p>
               </div>
             </CardContent>
           </Card>
@@ -216,7 +216,7 @@ export default async function DadosAbertos() {
               <FileSpreadsheet className="h-8 w-8 text-green-500" />
               <div>
                 <p className="text-2xl font-bold">CSV</p>
-                <p className="text-xs text-slate-500">Formato disponível</p>
+                <p className="text-xs text-slate-600">Formato disponível</p>
               </div>
             </CardContent>
           </Card>
@@ -225,7 +225,7 @@ export default async function DadosAbertos() {
               <FileJson className="h-8 w-8 text-amber-500" />
               <div>
                 <p className="text-2xl font-bold">JSON</p>
-                <p className="text-xs text-slate-500">Formato disponível</p>
+                <p className="text-xs text-slate-600">Formato disponível</p>
               </div>
             </CardContent>
           </Card>
@@ -234,7 +234,7 @@ export default async function DadosAbertos() {
               <Database className="h-8 w-8 text-purple-500" />
               <div>
                 <p className="text-2xl font-bold">API</p>
-                <p className="text-xs text-slate-500">GET livre</p>
+                <p className="text-xs text-slate-600">GET livre</p>
               </div>
             </CardContent>
           </Card>

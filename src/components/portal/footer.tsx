@@ -26,7 +26,7 @@ export default function Footer({ config }: { config?: Record<string, string | nu
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           <div>
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 bg-emerald-700 rounded-lg flex items-center justify-center">
+              <div className="w-10 h-10 bg-emerald-800 rounded-lg flex items-center justify-center">
                 <span className="text-white font-bold">PT</span>
               </div>
               <div>

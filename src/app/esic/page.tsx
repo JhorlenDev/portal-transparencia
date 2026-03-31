@@ -97,11 +97,11 @@ export default function ESIC() {
             <CardContent className="space-y-3 text-sm">
               <div>
                 <p className="font-medium">O que é a LAI?</p>
-                <p className="text-slate-500">Lei de Acesso à Informação (Lei 12.527/2011).</p>
+                <p className="text-slate-600">Lei de Acesso à Informação (Lei 12.527/2011).</p>
               </div>
               <div>
                 <p className="font-medium">Quem pode fazer pedidos?</p>
-                <p className="text-slate-500">Qualquer pessoa, física ou jurídica.</p>
+                <p className="text-slate-600">Qualquer pessoa, física ou jurídica.</p>
               </div>
             </CardContent>
           </Card>

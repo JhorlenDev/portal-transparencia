@@ -57,7 +57,7 @@ export default function Header({ config }: { config?: Record<string, string | nu
     <>
       <a 
         href="#conteudo" 
-        className="sr-only focus:not-sr-only focus:fixed focus:top-0 focus:left-0 focus:z-[100] focus:p-4 focus:bg-emerald-700 focus:text-white focus:font-bold shadow-lg"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-0 focus:left-0 focus:z-[100] focus:p-4 focus:bg-emerald-800 focus:text-white focus:font-bold shadow-lg"
       >
         Pular para o conteúdo principal
       </a>
@@ -72,7 +72,7 @@ export default function Header({ config }: { config?: Record<string, string | nu
               <h1 className="text-lg font-bold text-slate-800 leading-tight">
                 {nomeSite}
               </h1>
-              <p className="text-xs text-slate-500">{subtitulo}</p>
+              <p className="text-xs text-slate-600">{subtitulo}</p>
             </div>
           </Link>
 
@@ -89,7 +89,7 @@ export default function Header({ config }: { config?: Record<string, string | nu
               <Button
                 type="submit"
                 size="sm"
-                className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7 p-0 bg-emerald-600 hover:bg-emerald-700"
+                className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7 p-0 bg-emerald-600 hover:bg-emerald-800"
                 aria-label="Buscar"
               >
                 <Search className="h-4 w-4" />
@@ -111,7 +111,7 @@ export default function Header({ config }: { config?: Record<string, string | nu
         </div>
       </div>
 
-      <nav className="bg-emerald-700 hidden lg:block" aria-label="Menu Principal">
+      <nav className="bg-emerald-800 hidden lg:block" aria-label="Menu Principal">
         <div className="container mx-auto px-4">
           <ul className="flex">
             {menuItems.map((item) => (

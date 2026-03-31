@@ -46,7 +46,7 @@ export function DialogContent({ children, className, onClose }: DialogContentPro
             onClick={onClose}
             className="p-1 rounded-lg hover:bg-slate-100 transition-colors"
           >
-            <X className="h-5 w-5 text-slate-500" />
+            <X className="h-5 w-5 text-slate-600" />
           </button>
         )}
       </div>
@@ -90,7 +90,7 @@ interface DialogDescriptionProps {
 
 export function DialogDescription({ children, className }: DialogDescriptionProps) {
   return (
-    <p className={cn("text-sm text-slate-500 mt-1", className)}>
+    <p className={cn("text-sm text-slate-600 mt-1", className)}>
       {children}
     </p>
   )

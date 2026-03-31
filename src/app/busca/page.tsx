@@ -23,7 +23,7 @@ export default function Busca({ searchParams }: { searchParams: { q?: string } }
             />
             <Button
               type="submit"
-              className="absolute right-2 top-1/2 -translate-y-1/2 h-10 w-10 p-0 bg-emerald-600 hover:bg-emerald-700 rounded-lg"
+              className="absolute right-2 top-1/2 -translate-y-1/2 h-10 w-10 p-0 bg-emerald-600 hover:bg-emerald-800 rounded-lg"
             >
               <Search className="h-5 w-5" />
             </Button>
@@ -38,7 +38,7 @@ export default function Busca({ searchParams }: { searchParams: { q?: string } }
               <Card>
                 <CardContent className="p-4">
                   <Link href="/despesas" className="block">
-                    <h3 className="font-medium text-emerald-700 hover:underline">Despesas</h3>
+                    <h3 className="font-medium text-emerald-800 hover:underline">Despesas</h3>
                     <p className="text-sm text-slate-600 mt-1">
                       Encontramos <strong>15</strong> despesas relacionadas a "{query}"
                     </p>
@@ -60,7 +60,7 @@ export default function Busca({ searchParams }: { searchParams: { q?: string } }
               <Card>
                 <CardContent className="p-4">
                   <Link href="/contratos" className="block">
-                    <h3 className="font-medium text-amber-600 hover:underline">Contratos</h3>
+                    <h3 className="font-medium text-amber-800 hover:underline">Contratos</h3>
                     <p className="text-sm text-slate-600 mt-1">
                       Encontramos <strong>8</strong> contratos relacionados a "{query}"
                     </p>
@@ -83,7 +83,7 @@ export default function Busca({ searchParams }: { searchParams: { q?: string } }
         )}
 
         {!query && (
-          <div className="text-center text-slate-500">
+          <div className="text-center text-slate-600">
             <p>Digite um termo para buscar no portal da transparência.</p>
           </div>
         )}

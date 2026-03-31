@@ -75,7 +75,7 @@ async function DespesasContent({ searchParams }: PageProps) {
           <CardContent className="p-5">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-slate-500">Total Empenhado</p>
+                <p className="text-sm text-slate-600">Total Empenhado</p>
                 <p className="text-2xl font-bold text-slate-800">{formatCurrency(stats.empenhado)}</p>
               </div>
               <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
@@ -88,11 +88,11 @@ async function DespesasContent({ searchParams }: PageProps) {
           <CardContent className="p-5">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-slate-500">Total Liquidado</p>
+                <p className="text-sm text-slate-600">Total Liquidado</p>
                 <p className="text-2xl font-bold text-slate-800">{formatCurrency(stats.liquidado)}</p>
               </div>
               <div className="w-12 h-12 bg-amber-100 rounded-xl flex items-center justify-center">
-                <TrendingUp className="h-6 w-6 text-amber-600" />
+                <TrendingUp className="h-6 w-6 text-amber-800" />
               </div>
             </div>
           </CardContent>
@@ -101,11 +101,11 @@ async function DespesasContent({ searchParams }: PageProps) {
           <CardContent className="p-5">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-slate-500">Total Pago</p>
+                <p className="text-sm text-slate-600">Total Pago</p>
                 <p className="text-2xl font-bold text-slate-800">{formatCurrency(stats.pago)}</p>
               </div>
               <div className="w-12 h-12 bg-emerald-100 rounded-xl flex items-center justify-center">
-                <DollarSign className="h-6 w-6 text-emerald-700" />
+                <DollarSign className="h-6 w-6 text-emerald-800" />
               </div>
             </div>
           </CardContent>
@@ -132,13 +132,13 @@ async function DespesasContent({ searchParams }: PageProps) {
                   <tr key={despesa.id} className="border-b border-slate-200 hover:bg-slate-50">
                     <td className="px-4 py-3">
                       <span className="font-medium">{despesa.numeroEmpenho}</span>
-                      <p className="text-xs text-slate-500">
+                      <p className="text-xs text-slate-600">
                         {despesa.dataEmpenho ? new Date(despesa.dataEmpenho).toLocaleDateString('pt-BR') : '-'}
                       </p>
                     </td>
                     <td className="px-4 py-3">
                       <span className="font-medium text-slate-800">{despesa.credorNome || '-'}</span>
-                      <p className="text-xs text-slate-500">{despesa.credorCpfCnpj || '-'}</p>
+                      <p className="text-xs text-slate-600">{despesa.credorCpfCnpj || '-'}</p>
                     </td>
                     <td className="px-4 py-3 text-sm text-slate-600 max-w-xs truncate">
                       {despesa.objeto || '-'}
@@ -149,16 +149,16 @@ async function DespesasContent({ searchParams }: PageProps) {
                     <td className="px-4 py-3 text-right font-medium">
                       {formatCurrency(despesa.valorEmpenhado || 0)}
                     </td>
-                    <td className="px-4 py-3 text-right font-medium text-amber-600">
+                    <td className="px-4 py-3 text-right font-medium text-amber-800">
                       {formatCurrency(despesa.valorLiquidado || 0)}
                     </td>
-                    <td className="px-4 py-3 text-right font-bold text-emerald-700">
+                    <td className="px-4 py-3 text-right font-bold text-emerald-800">
                       {formatCurrency(despesa.valorPago || 0)}
                     </td>
                   </tr>
                 )) : (
                   <tr>
-                    <td colSpan={7} className="px-4 py-8 text-center text-slate-500">
+                    <td colSpan={7} className="px-4 py-8 text-center text-slate-600">
                       Nenhuma despesa encontrada para {currentYear}
                     </td>
                   </tr>
@@ -171,7 +171,7 @@ async function DespesasContent({ searchParams }: PageProps) {
 
       <Card className="mt-8 bg-slate-50 border-dashed">
         <CardContent className="p-6">
-          <h3 className="font-semibold text-slate-800 mb-2">Sobre os dados de despesas</h3>
+          <h2 className="font-semibold text-slate-800 mb-2">Sobre os dados de despesas</h2>
           <div className="text-sm text-slate-600 space-y-2">
             <p><strong>Empenho:</strong> Ato que cria a obrigação de pagamento, reservando o crédito orçamentário.</p>
             <p><strong>Liquidação:</strong> Verificação do direito do credor após a prestação do serviço ou entrega do bem.</p>
@@ -198,7 +198,7 @@ export default async function Despesas({ searchParams }: PageProps) {
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
         <div>
           <h1 className="text-2xl font-bold text-slate-800 flex items-center gap-3">
-            <DollarSign className="h-7 w-7 text-emerald-700" />
+            <DollarSign className="h-7 w-7 text-emerald-800" />
             Despesas Públicas
           </h1>
           <p className="text-slate-600 mt-1">

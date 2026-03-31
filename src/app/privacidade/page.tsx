@@ -8,7 +8,7 @@ export default function Privacidade() {
     <div className="container mx-auto px-4 py-8 max-w-4xl">
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-slate-800 flex items-center gap-3">
-          <Shield className="h-8 w-8 text-emerald-700" />
+          <Shield className="h-8 w-8 text-emerald-800" />
           Política de Privacidade
         </h1>
         <p className="text-slate-600 mt-2">
@@ -20,7 +20,7 @@ export default function Privacidade() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Eye className="h-5 w-5 text-emerald-700" />
+              <Eye className="h-5 w-5 text-emerald-800" />
               Coleta de Informações
             </CardTitle>
           </CardHeader>
@@ -41,7 +41,7 @@ export default function Privacidade() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Lock className="h-5 w-5 text-emerald-700" />
+              <Lock className="h-5 w-5 text-emerald-800" />
               Proteção de Dados
             </CardTitle>
           </CardHeader>
@@ -60,7 +60,7 @@ export default function Privacidade() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Mail className="h-5 w-5 text-emerald-700" />
+              <Mail className="h-5 w-5 text-emerald-800" />
               Contato
             </CardTitle>
           </CardHeader>
@@ -72,7 +72,7 @@ export default function Privacidade() {
           </CardContent>
         </Card>
 
-        <p className="text-sm text-slate-500 text-center">
+        <p className="text-sm text-slate-600 text-center">
           Última atualização: {new Date().toLocaleDateString('pt-BR')}
         </p>
       </div>

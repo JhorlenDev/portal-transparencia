@@ -51,10 +51,10 @@ export default function DatasetGridClient({ databases }: { databases: Dataset[] 
                   </div>
                 </div>
                 <CardTitle className="text-lg mt-2">{db.nome}</CardTitle>
-                <p className="text-sm text-slate-500 line-clamp-2">{db.descricao}</p>
+                <p className="text-sm text-slate-600 line-clamp-2">{db.descricao}</p>
               </CardHeader>
               <CardContent>
-                <div className="flex items-center justify-between text-xs text-slate-500">
+                <div className="flex items-center justify-between text-xs text-slate-600">
                   <div className="flex items-center gap-1">
                     <Clock className="h-3 w-3" />
                     {db.periodicidade}
@@ -102,7 +102,7 @@ export default function DatasetGridClient({ databases }: { databases: Dataset[] 
               <button
                 onClick={() => setActiveTab("dicionario")}
                 className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
-                  activeTab === "dicionario" ? "bg-slate-100 text-slate-900" : "text-slate-500 hover:text-slate-700"
+                  activeTab === "dicionario" ? "bg-slate-100 text-slate-900" : "text-slate-600 hover:text-slate-700"
                 }`}
               >
                 Dicionário de Dados
@@ -110,7 +110,7 @@ export default function DatasetGridClient({ databases }: { databases: Dataset[] 
               <button
                 onClick={() => setActiveTab("downloads")}
                 className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
-                  activeTab === "downloads" ? "bg-slate-100 text-slate-900" : "text-slate-500 hover:text-slate-700"
+                  activeTab === "downloads" ? "bg-slate-100 text-slate-900" : "text-slate-600 hover:text-slate-700"
                 }`}
               >
                 Downloads
@@ -118,7 +118,7 @@ export default function DatasetGridClient({ databases }: { databases: Dataset[] 
               <button
                 onClick={() => setActiveTab("api")}
                 className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
-                  activeTab === "api" ? "bg-slate-100 text-slate-900" : "text-slate-500 hover:text-slate-700"
+                  activeTab === "api" ? "bg-slate-100 text-slate-900" : "text-slate-600 hover:text-slate-700"
                 }`}
               >
                 API
@@ -135,7 +135,7 @@ export default function DatasetGridClient({ databases }: { databases: Dataset[] 
                     </div>
                     <div className="overflow-x-auto">
                       <table className="w-full text-sm text-left">
-                        <thead className="text-xs text-slate-500 border-b border-slate-200">
+                        <thead className="text-xs text-slate-600 border-b border-slate-200">
                           <tr>
                             <th className="px-4 py-3 font-medium">Campo</th>
                             <th className="px-4 py-3 font-medium">Tipo</th>
@@ -166,7 +166,7 @@ export default function DatasetGridClient({ databases }: { databases: Dataset[] 
                   <div className="p-6">
                     <div className="mb-6">
                       <h3 className="text-lg font-semibold text-slate-800 mb-2">Exportação Completa</h3>
-                      <p className="text-sm text-slate-500">
+                      <p className="text-sm text-slate-600">
                         Os botões abaixo permitirão o acesso total aos registros abertos desta base de dados.
                       </p>
                     </div>
@@ -178,7 +178,7 @@ export default function DatasetGridClient({ databases }: { databases: Dataset[] 
                           </div>
                           <div className="flex-1">
                             <h4 className="font-semibold text-slate-800">Arquivo CSV</h4>
-                            <p className="text-xs text-slate-500 mt-1">Planilha de dados separados por vírgula</p>
+                            <p className="text-xs text-slate-600 mt-1">Planilha de dados separados por vírgula</p>
                           </div>
                         </div>
                         <Button asChild className="w-full bg-green-600 hover:bg-green-700 text-white gap-2 cursor-pointer">
@@ -190,12 +190,12 @@ export default function DatasetGridClient({ databases }: { databases: Dataset[] 
                       
                       <div className="border border-slate-200 rounded-xl p-4 flex flex-col items-start gap-4 hover:border-amber-300 transition-colors">
                         <div className="flex items-start gap-3 w-full">
-                          <div className="p-3 bg-amber-50 text-amber-600 rounded-lg">
+                          <div className="p-3 bg-amber-50 text-amber-800 rounded-lg">
                             <FileJson className="h-6 w-6" />
                           </div>
                           <div className="flex-1">
                             <h4 className="font-semibold text-slate-800">Arquivo JSON</h4>
-                            <p className="text-xs text-slate-500 mt-1">Dados estruturados em JSON</p>
+                            <p className="text-xs text-slate-600 mt-1">Dados estruturados em JSON</p>
                           </div>
                         </div>
                         <Button asChild className="w-full bg-amber-500 hover:bg-amber-600 text-white gap-2 cursor-pointer">
@@ -220,7 +220,7 @@ export default function DatasetGridClient({ databases }: { databases: Dataset[] 
                       </p>
                       
                       <div className="space-y-4">
-                        <h4 className="text-xs font-bold uppercase text-slate-500 tracking-wider">Filtros Nativos (Query)</h4>
+                        <h4 className="text-xs font-bold uppercase text-slate-600 tracking-wider">Filtros Nativos (Query)</h4>
                         <ul className="text-sm text-slate-600 space-y-3">
                           <li className="flex gap-2">
                             <code className="bg-white border border-slate-200 px-1.5 py-0.5 rounded text-indigo-600 font-mono text-[11px] shadow-sm">ano=2024</code>
@@ -244,7 +244,7 @@ export default function DatasetGridClient({ databases }: { databases: Dataset[] 
                         <div className="w-3 h-3 rounded-full bg-rose-500/80"></div>
                         <div className="w-3 h-3 rounded-full bg-amber-500/80"></div>
                         <div className="w-3 h-3 rounded-full bg-emerald-500/80"></div>
-                        <div className="ml-2 text-xs text-slate-500 font-sans tracking-wide">Terminal — Exemplo Prático</div>
+                        <div className="ml-2 text-xs text-slate-600 font-sans tracking-wide">Terminal — Exemplo Prático</div>
                       </div>
                       
                       <div className="mt-8 flex-1 overflow-x-auto py-2">
@@ -253,15 +253,15 @@ export default function DatasetGridClient({ databases }: { databases: Dataset[] 
                           <span className="text-slate-300 ml-2">https://portal-transparencia.vercel.app/api/{selectedDb.slug}?ano=2024&q=busca</span>
                         </div>
                         
-                        <div className="text-slate-500 mb-2"># Resposta Esperada (200 OK)</div>
+                        <div className="text-slate-600 mb-2"># Resposta Esperada (200 OK)</div>
                         <pre className="text-[11px] md:text-xs leading-relaxed overflow-x-auto text-sky-300">
-<span className="text-slate-400">[</span>
-  <span className="text-slate-400">{`{`}</span>
-    <span className="text-indigo-300">"{selectedDb.colunas[0]?.campo}"</span><span className="text-slate-400">:</span> <span className="text-emerald-300">"{selectedDb.colunas[0]?.exemplo}"</span><span className="text-slate-400">,</span>
-    <span className="text-indigo-300">"{selectedDb.colunas[1]?.campo}"</span><span className="text-slate-400">:</span> <span className="text-emerald-300">"{selectedDb.colunas[1]?.exemplo}"</span><span className="text-slate-400">,</span>
-    <span className="text-slate-500">...</span>
-  <span className="text-slate-400">{`}`}</span>
-<span className="text-slate-400">]</span>
+<span className="text-slate-500">[</span>
+  <span className="text-slate-500">{`{`}</span>
+    <span className="text-indigo-300">"{selectedDb.colunas[0]?.campo}"</span><span className="text-slate-500">:</span> <span className="text-emerald-300">"{selectedDb.colunas[0]?.exemplo}"</span><span className="text-slate-500">,</span>
+    <span className="text-indigo-300">"{selectedDb.colunas[1]?.campo}"</span><span className="text-slate-500">:</span> <span className="text-emerald-300">"{selectedDb.colunas[1]?.exemplo}"</span><span className="text-slate-500">,</span>
+    <span className="text-slate-600">...</span>
+  <span className="text-slate-500">{`}`}</span>
+<span className="text-slate-500">]</span>
                         </pre>
                       </div>
                     </div>
@@ -269,7 +269,7 @@ export default function DatasetGridClient({ databases }: { databases: Dataset[] 
                 )}
               </div>
 
-              <div className="flex justify-between items-center text-xs text-slate-500 mt-4 border-t border-slate-200 pt-3">
+              <div className="flex justify-between items-center text-xs text-slate-600 mt-4 border-t border-slate-200 pt-3">
                 <span>{selectedDb.totalRegistros?.toLocaleString('pt-BR')} registros &nbsp; Atualização: {selectedDb.periodicidade}</span>
                 <span>Última atualização: {selectedDb.ultimaAtualizacao}</span>
               </div>

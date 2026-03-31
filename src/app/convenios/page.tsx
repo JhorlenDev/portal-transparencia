@@ -53,25 +53,25 @@ async function ConveniosContent({
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
         <Card>
           <CardContent className="p-4">
-            <p className="text-sm text-slate-500">Total em {currentYear}</p>
+            <p className="text-sm text-slate-600">Total em {currentYear}</p>
             <p className="text-2xl font-bold">{stats.total}</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="p-4">
-            <p className="text-sm text-slate-500">Em Execução</p>
+            <p className="text-sm text-slate-600">Em Execução</p>
             <p className="text-2xl font-bold text-blue-600">{stats.total}</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="p-4">
-            <p className="text-sm text-slate-500">Valor Total</p>
+            <p className="text-sm text-slate-600">Valor Total</p>
             <p className="text-lg font-bold">{formatCurrency(stats.valorTotal)}</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="p-4">
-            <p className="text-sm text-slate-500">Convênios</p>
+            <p className="text-sm text-slate-600">Convênios</p>
             <p className="text-xl font-bold">{stats.total}</p>
           </CardContent>
         </Card>
@@ -95,11 +95,11 @@ async function ConveniosContent({
                 <tr key={conv.id} className="border-b border-slate-200 hover:bg-slate-50">
                   <td className="px-4 py-3">
                     <span className="font-bold text-cyan-600">{conv.numero}/{conv.ano}</span>
-                    <p className="text-xs text-slate-500">{conv.tipo}</p>
+                    <p className="text-xs text-slate-600">{conv.tipo}</p>
                   </td>
                   <td className="px-4 py-3">
                     <p className="font-medium">{conv.concedente}</p>
-                    <p className="text-xs text-slate-500">{conv.concedenteCnpj || '-'}</p>
+                    <p className="text-xs text-slate-600">{conv.concedenteCnpj || '-'}</p>
                   </td>
                   <td className="px-4 py-3 text-sm text-slate-600 max-w-xs truncate">
                     {conv.objeto}
@@ -111,13 +111,13 @@ async function ConveniosContent({
                       {conv.status}
                     </span>
                   </td>
-                  <td className="px-4 py-3 text-right font-bold text-emerald-700">
+                  <td className="px-4 py-3 text-right font-bold text-emerald-800">
                     {formatCurrency(conv.valorTotal)}
                   </td>
                 </tr>
               )) : (
                 <tr>
-                  <td colSpan={5} className="px-4 py-8 text-center text-slate-500">
+                  <td colSpan={5} className="px-4 py-8 text-center text-slate-600">
                     Nenhum convênio encontrado para {currentYear}
                   </td>
                 </tr>

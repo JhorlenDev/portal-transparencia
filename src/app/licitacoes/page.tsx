@@ -74,25 +74,25 @@ async function LicitacoesContent({ searchParams }: PageProps) {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
         <Card>
           <CardContent className="p-4">
-            <p className="text-sm text-slate-500">Total em {currentYear}</p>
+            <p className="text-sm text-slate-600">Total em {currentYear}</p>
             <p className="text-2xl font-bold">{stats.total}</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="p-4">
-            <p className="text-sm text-slate-500">Em andamento</p>
+            <p className="text-sm text-slate-600">Em andamento</p>
             <p className="text-2xl font-bold text-blue-600">{emAndamento}</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="p-4">
-            <p className="text-sm text-slate-500">Homologados</p>
+            <p className="text-sm text-slate-600">Homologados</p>
             <p className="text-2xl font-bold text-green-600">{homologados}</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="p-4">
-            <p className="text-sm text-slate-500">Processos</p>
+            <p className="text-sm text-slate-600">Processos</p>
             <p className="text-xl font-bold">{stats.total}</p>
           </CardContent>
         </Card>
@@ -116,7 +116,7 @@ async function LicitacoesContent({ searchParams }: PageProps) {
                 <tr key={licitacao.id} className="border-b border-slate-200 hover:bg-slate-50">
                   <td className="px-4 py-3">
                     <span className="font-bold text-purple-600">{licitacao.numero}/{licitacao.ano}</span>
-                    <p className="text-xs text-slate-500">{licitacao.modalidade}</p>
+                    <p className="text-xs text-slate-600">{licitacao.modalidade}</p>
                   </td>
                   <td className="px-4 py-3 text-sm text-slate-600 max-w-md truncate">
                     {licitacao.objeto}
@@ -137,7 +137,7 @@ async function LicitacoesContent({ searchParams }: PageProps) {
                 </tr>
               )) : (
                 <tr>
-                  <td colSpan={5} className="px-4 py-8 text-center text-slate-500">
+                  <td colSpan={5} className="px-4 py-8 text-center text-slate-600">
                     Nenhuma inúmera encontrada para {currentYear}
                   </td>
                 </tr>

@@ -47,25 +47,25 @@ async function ServidoresContent({
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
         <Card>
           <CardContent className="p-4">
-            <p className="text-sm text-slate-500">Total de Servidores</p>
+            <p className="text-sm text-slate-600">Total de Servidores</p>
             <p className="text-2xl font-bold">{stats.total}</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="p-4">
-            <p className="text-sm text-slate-500">Em {currentYear}</p>
+            <p className="text-sm text-slate-600">Em {currentYear}</p>
             <p className="text-2xl font-bold">{stats.total}</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="p-4">
-            <p className="text-sm text-slate-500">Folha Bruta</p>
+            <p className="text-sm text-slate-600">Folha Bruta</p>
             <p className="text-lg font-bold">{formatCurrency(stats.totalRemuneracao)}</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="p-4">
-            <p className="text-sm text-slate-500">Ano Referência</p>
+            <p className="text-sm text-slate-600">Ano Referência</p>
             <p className="text-xl font-bold">{currentYear}</p>
           </CardContent>
         </Card>
@@ -90,11 +90,11 @@ async function ServidoresContent({
                 <tr key={servidor.id} className="border-b border-slate-200 hover:bg-slate-50">
                   <td className="px-4 py-3">
                     <p className="font-medium">{servidor.nome}</p>
-                    <p className="text-xs text-slate-500">{servidor.matricula}</p>
+                    <p className="text-xs text-slate-600">{servidor.matricula}</p>
                   </td>
                   <td className="px-4 py-3">
                     <p className="text-sm">{servidor.cargo}</p>
-                    {servidor.funcao && <p className="text-xs text-slate-500">{servidor.funcao}</p>}
+                    {servidor.funcao && <p className="text-xs text-slate-600">{servidor.funcao}</p>}
                   </td>
                   <td className="px-4 py-3 text-sm">{servidor.lotacao || '-'}</td>
                   <td className="px-4 py-3">
@@ -107,13 +107,13 @@ async function ServidoresContent({
                   <td className="px-4 py-3 text-right font-medium">
                     {formatCurrency(servidor.remuneracaoBruta || 0)}
                   </td>
-                  <td className="px-4 py-3 text-right font-bold text-emerald-700">
+                  <td className="px-4 py-3 text-right font-bold text-emerald-800">
                     {formatCurrency(servidor.remuneracaoLiquida || 0)}
                   </td>
                 </tr>
               )) : (
                 <tr>
-                  <td colSpan={6} className="px-4 py-8 text-center text-slate-500">
+                  <td colSpan={6} className="px-4 py-8 text-center text-slate-600">
                     Nenhum servidor encontrado para {currentYear}
                   </td>
                 </tr>
