@@ -1,0 +1,251 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Orgao {
+  id        String   @id @default(cuid())
+  nome      String
+  sigla     String?
+  cnpj      String?
+  ativo     Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  despesas   Despesa[]
+  licitacoes Licitacao[]
+  contratos  Contrato[]
+  servidores Servidor[]
+}
+
+model Receita {
+  id                String   @id @default(cuid())
+  exercicio         Int
+  mes               Int?
+  codigoNatureza    String   @map("codigo_natureza")
+  naturezaReceita   String   @map("natureza_receita")
+  categoriaEconomica String  @map("categoria_economica")
+  fonteRecurso      String?  @map("fonte_recurso")
+  fonteRecursoNome  String?  @map("fonte_recurso_nome")
+  valorPrevisto     Float    @map("valor_previsto")
+  valorArrecadado   Float    @map("valor_arrecadado")
+  createdAt         DateTime @default(now()) @map("created_date")
+  updatedAt         DateTime @updatedAt @map("updated_date")
+
+  @@map("receitas")
+}
+
+model Despesa {
+  id                String   @id @default(cuid())
+  exercicio         Int
+  numeroEmpenho     String   @map("numero_empenho")
+  dataEmpenho       DateTime? @map("data_empenho")
+  tipoMovimento     String   @map("tipo_movimento")
+  credorNome        String?  @map("credor_nome")
+  credorCpfCnpj     String?  @map("credor_cpf_cnpj")
+  objeto            String?
+  historico         String?
+  orgaoId           String?  @map("orgao_id")
+  orgaoNome         String?  @map("orgao_nome")
+  elementoDespesa   String?  @map("elemento_despesa")
+  elementoDespesaNome String? @map("elemento_despesa_nome")
+  valorEmpenhado    Float?   @map("valor_empenhado")
+  valorLiquidado    Float?   @map("valor_liquidado")
+  valorPago         Float?   @map("valor_pago")
+  createdAt         DateTime @default(now()) @map("created_date")
+  updatedAt         DateTime @updatedAt @map("updated_date")
+
+  orgao             Orgao?   @relation(fields: [orgaoId], references: [id])
+
+  @@map("despesas")
+}
+
+model Licitacao {
+  id                         String   @id @default(cuid())
+  autoridade                 String?  @map("autoridade")
+  numero                     String
+  ano                        Int
+  modalidade                 String
+  regulamento                String?  @map("regulamento")
+  criterioJulgamento         String?  @map("criterio_julgamento")
+  objeto                     String
+  objetoResumido             String?  @map("objeto_resumido")
+  status                     String   @default("planejamento")
+  dataAbertura               DateTime? @map("data_abertura")
+  valorEstimado              Float?   @map("valor_estimado")
+  numeroProcesso             String?  @map("numero_processo")
+  orgaoId                    String?  @map("orgao_id")
+  orgaoNome                  String?  @map("orgao_nome")
+  justificativa               String?
+  linkPncp                   String?  @map("link_pncp")
+  createdAt                  DateTime @default(now()) @map("created_date")
+  updatedAt                  DateTime @updatedAt @map("updated_date")
+
+  numeroEdital               String?  @map("numero_edital")
+  numeroProcAdministrativo  String?  @map("numero_proc_administrativo")
+  fundamentoLegal            String?  @map("fundamento_legal")
+  anoReferencia              Int?     @map("ano_referencia")
+  referenciaProcesso         String?  @map("referencia_processo")
+  reeditacao                 Boolean  @default(false) @map("reeditacao")
+  convenioTransfergov        String?  @map("convenio_transfergov")
+  anoConvenio                 Int?     @map("ano_convenio")
+  enviarTransfergov          Boolean  @default(false) @map("enviar_transfergov")
+  tipoObjeto                 String?  @map("tipo_objeto")
+  fonteOrcamentaria          String?  @map("fonte_orcamentaria")
+  observacao                 String?  @map("observacao")
+  tipoContrato               String?  @map("tipo_contrato")
+  validadeMeses              Int?     @map("validade_meses")
+  prazoPagamento             String?  @map("prazo_pagamento")
+
+  orgao             Orgao?   @relation(fields: [orgaoId], references: [id])
+  contratos         Contrato[]
+
+  @@map("licitacoes")
+}
+
+model Contrato {
+  id                String   @id @default(cuid())
+  numero            String
+  ano               Int
+  tipoContrato      String?  @map("tipo_contrato")
+  objeto            String
+  objetoResumido    String?  @map("objeto_resumido")
+  status            String   @default("vigente")
+  dataInicioVigencia DateTime @map("data_inicio_vigencia")
+  dataFimVigencia   DateTime? @map("data_fim_vigencia")
+  valorInicial      Float    @map("valor_inicial")
+  valorAtual        Float?   @map("valor_atual")
+  valorPago         Float?   @map("valor_pago")
+  contratadoNome    String   @map("contratado_nome")
+  contratadoCnpj    String   @map("contratado_cnpj")
+  orgaoId           String?  @map("orgao_id")
+  orgaoNome         String?  @map("orgao_nome")
+  licitacaoId       String?  @map("licitacao_id")
+  licitacaoNumero   String?  @map("licitacao_numero")
+  gestorNome        String?  @map("gestor_nome")
+  gestorCargo       String?  @map("gestor_cargo")
+  fiscalNome        String?  @map("fiscal_nome")
+  fiscalCargo       String?  @map("fiscal_cargo")
+  linkPncp          String?  @map("link_pncp")
+  createdAt         DateTime @default(now()) @map("created_date")
+  updatedAt         DateTime @updatedAt @map("updated_date")
+
+  orgao             Orgao?   @relation(fields: [orgaoId], references: [id])
+  licitacao         Licitacao? @relation(fields: [licitacaoId], references: [id])
+
+  @@map("contratos")
+}
+
+model Servidor {
+  id                String   @id @default(cuid())
+  nome              String
+  matricula         String
+  cargo             String
+  funcao            String?
+  orgaoId           String?  @map("orgao_id")
+  orgaoNome         String?  @map("orgao_nome")
+  lotacao           String?
+  vinculo           String   @default("efetivo")
+  cargaHoraria      Int?     @map("carga_horaria")
+  dataAdmissao      DateTime? @map("data_admissao")
+  anoReferencia     Int?     @map("ano_referencia")
+  mesReferencia     Int?     @map("mes_referencia")
+  remuneracaoBase   Float?   @map("remuneracao_base")
+  gratificacoes     Float?   @default(0)
+  adicionais        Float?   @default(0)
+  indenizacoes      Float?   @default(0)
+  remuneracaoBruta  Float?   @map("remuneracao_bruta")
+  impostoRenda      Float?   @map("imposto_renda")
+  previdencia       Float?   @default(0)
+  outrosDescontos   Float?   @map("outros_descontos")
+  remuneracaoLiquida Float? @map("remuneracao_liquida")
+  createdAt         DateTime @default(now()) @map("created_date")
+  updatedAt         DateTime @updatedAt @map("updated_date")
+
+  orgao             Orgao?   @relation(fields: [orgaoId], references: [id])
+
+  @@map("servidores")
+}
+
+model Convenio {
+  id                String   @id @default(cuid())
+  numero            String
+  ano               Int
+  tipo              String
+  objeto            String
+  objetoResumido    String?  @map("objeto_resumido")
+  status            String   @default("em_execucao")
+  concedente        String
+  concedenteCnpj    String?  @map("concedente_cnpj")
+  convenente        String?
+  dataInicioVigencia DateTime @map("data_inicio_vigencia")
+  dataFimVigencia   DateTime? @map("data_fim_vigencia")
+  valorTotal        Float    @map("valor_total")
+  valorRepasse      Float?   @map("valor_repasse")
+  valorContrapartida Float?  @map("valor_contrapartida")
+  valorExecutado    Float?   @map("valor_executado")
+  numeroProcesso    String?  @map("numero_processo")
+  linkPlataforma    String?  @map("link_plataforma")
+  createdAt         DateTime @default(now()) @map("created_date")
+  updatedAt         DateTime @updatedAt @map("updated_date")
+
+  @@map("convenios")
+}
+
+model SolicitacaoSIC {
+  id                  String   @id @default(cuid())
+  protocolo           String   @unique
+  ano                 Int
+  tipo                String   @default("acesso_informacao")
+  canalEntrada        String   @map("canal_entrada")
+  solicitanteNome     String   @map("solicitante_nome")
+  solicitanteEmail    String   @map("solicitante_email")
+  solicitanteTelefone String?  @map("solicitante_telefone")
+  solicitanteTipo     String?  @map("solicitante_tipo")
+  orgaoDestinatarioId String? @map("orgao_destinatario_id")
+  orgaoDestinatarioNome String? @map("orgao_destinatario_nome")
+  assunto             String
+  descricao           String
+  dataRegistro       DateTime @default(now()) @map("data_registro")
+  dataPrazo          DateTime? @map("data_prazo")
+  dataResposta       DateTime? @map("data_resposta")
+  resposta            String?
+  status              String   @default("aberto")
+  historico           String?
+  createdAt           DateTime @default(now()) @map("created_date")
+  updatedAt           DateTime @updatedAt @map("updated_date")
+
+  @@map("solicitacoes_sic")
+}
+
+model Dataset {
+  id                  String   @id @default(cuid())
+  nome                String
+  slug                String   @unique
+  descricao           String
+  categoria            String
+  periodicidade        String
+  ultimaAtualizacao    DateTime @map("ultima_atualizacao")
+  formatosDisponiveis  String?  @map("formatos_disponiveis")
+  totalRegistros      Int?     @map("total_registros")
+  dicionarioDados     String?  @map("dicionario_dados")
+  ativo               Boolean  @default(true)
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  @@map("datasets")
+}
+
+model Configuracao {
+  id        String   @id @default(cuid())
+  chave     String   @unique
+  valor     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("configuracoes")
+}
