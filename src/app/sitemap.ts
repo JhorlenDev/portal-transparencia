@@ -1,7 +1,7 @@
 import { MetadataRoute } from 'next'
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://portal-transparencia-360.vercel.app'
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://transparencia.tefe.am.gov.br'
 
   const routes = [
     '',
