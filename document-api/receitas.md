@@ -138,18 +138,22 @@ curl -X POST http://localhost:3000/api/receitas \
 **Resposta (201):**
 ```json
 {
+  "message": "Receita criada com sucesso",
   "id": "rec456def",
-  "exercicio": 2026,
-  "mes": 1,
-  "codigoNatureza": "1000.00.00",
-  "naturezaReceita": "Imposto sobre a Renda",
-  "categoriaEconomica": "corrente",
-  "fonteRecurso": "001",
-  "fonteRecursoNome": "Tesouro",
-  "valorPrevisto": 5000000,
-  "valorArrecadado": 1500000,
-  "createdAt": "2026-03-30T20:30:00.000Z",
-  "updatedAt": "2026-03-30T20:30:00.000Z"
+  "data": {
+    "id": "rec456def",
+    "exercicio": 2026,
+    "mes": 1,
+    "codigoNatureza": "1000.00.00",
+    "naturezaReceita": "Imposto sobre a Renda",
+    "categoriaEconomica": "corrente",
+    "fonteRecurso": "001",
+    "fonteRecursoNome": "Tesouro",
+    "valorPrevisto": 5000000,
+    "valorArrecadado": 1500000,
+    "createdAt": "2026-03-30T20:30:00.000Z",
+    "updatedAt": "2026-03-30T20:30:00.000Z"
+  }
 }
 ```
 

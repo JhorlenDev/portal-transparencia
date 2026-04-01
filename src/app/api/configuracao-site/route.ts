@@ -35,14 +35,21 @@ export async function POST(request: NextRequest) {
 
     if (typeof data === 'object' && !Array.isArray(data)) {
       const entries = Object.entries(data)
-      
-      for (const [chave, valor] of entries) {
-        if (valor !== undefined && valor !== null) {
-          await saveConfig(chave, String(valor))
-        }
-      }
 
-      return NextResponse.json({ message: 'Configurações salvas com sucesso' })
+      const savedConfigs = await Promise.all(
+        entries
+          .filter(([, valor]) => valor !== undefined && valor !== null)
+          .map(([chave, valor]) => saveConfig(chave, String(valor)))
+      )
+
+      return NextResponse.json({
+        message: 'Configurações salvas com sucesso',
+        ids: savedConfigs.map((config) => config.id),
+        registros: savedConfigs.map((config) => ({
+          id: config.id,
+          chave: config.chave,
+        })),
+      })
     }
 
     return NextResponse.json({ error: 'Formato inválido' }, { status: 400 })

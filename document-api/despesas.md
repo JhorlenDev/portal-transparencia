@@ -122,6 +122,32 @@ Cria uma nova despesa.
 }
 ```
 
+**Resposta (201):**
+```json
+{
+  "message": "Despesa criada com sucesso",
+  "id": "desp123abc",
+  "data": {
+    "id": "desp123abc",
+    "exercicio": 2026,
+    "numeroEmpenho": "2026NE0001",
+    "dataEmpenho": "2026-01-15T00:00:00.000Z",
+    "tipoMovimento": "empenho",
+    "credorNome": "Empresa ABC Ltda",
+    "credorCpfCnpj": "12.345.678/0001-90",
+    "objeto": "Fornecimento de materiais de escritório",
+    "orgaoNome": "Secretaria Municipal de Educação",
+    "elementoDespesa": "33.90.30",
+    "elementoDespesaNome": "Material de Consumo",
+    "valorEmpenhado": 15000,
+    "valorLiquidado": 12000,
+    "valorPago": 10000,
+    "createdAt": "2026-03-30T20:30:00.000Z",
+    "updatedAt": "2026-03-30T20:30:00.000Z"
+  }
+}
+```
+
 **Campos:**
 | Campo | Tipo | Obrigatório | Descrição |
 |-------|------|--------------|------------|

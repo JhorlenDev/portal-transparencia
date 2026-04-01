@@ -96,6 +96,32 @@ Cria um novo contrato.
 | fiscalCargo | string | Não | Cargo do fiscal |
 | linkPncp | string | Não | Link no PNCP |
 
+**Resposta (201):**
+```json
+{
+  "message": "Contrato criado com sucesso",
+  "id": "cont123abc",
+  "data": {
+    "id": "cont123abc",
+    "numero": "001",
+    "ano": 2026,
+    "tipoContrato": "servico",
+    "objeto": "Prestação de serviços de limpeza",
+    "objetoResumido": "Limpeza predial",
+    "status": "vigente",
+    "dataInicioVigencia": "2026-01-01T00:00:00.000Z",
+    "dataFimVigencia": "2026-12-31T00:00:00.000Z",
+    "valorInicial": 180000,
+    "valorAtual": 180000,
+    "valorPago": 0,
+    "contratadoNome": "Limpeza Total Ltda",
+    "contratadoCnpj": "12.345.678/0001-90",
+    "createdAt": "2026-03-30T20:30:00.000Z",
+    "updatedAt": "2026-03-30T20:30:00.000Z"
+  }
+}
+```
+
 ---
 
 ## Atualizar Contrato

@@ -77,9 +77,40 @@ curl -X POST "http://localhost:3000/api/configuracao-site" \
 **Resposta:**
 ```json
 {
-  "message": "Configurações salvas com sucesso"
+  "message": "Configurações salvas com sucesso",
+  "ids": [
+    "clxconfig001",
+    "clxconfig002",
+    "clxconfig003",
+    "clxconfig004",
+    "clxconfig005"
+  ],
+  "registros": [
+    {
+      "id": "clxconfig001",
+      "chave": "nome_site"
+    },
+    {
+      "id": "clxconfig002",
+      "chave": "descricao"
+    },
+    {
+      "id": "clxconfig003",
+      "chave": "logo_url"
+    },
+    {
+      "id": "clxconfig004",
+      "chave": "email_contato"
+    },
+    {
+      "id": "clxconfig005",
+      "chave": "telefone_contato"
+    }
+  ]
 }
 ```
+
+`ids` retorna os IDs persistidos para cada chave enviada. `registros` facilita relacionar cada `id` com a `chave` correspondente.
 
 ---
 

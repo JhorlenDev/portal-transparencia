@@ -50,7 +50,11 @@ export async function POST(request: NextRequest) {
         linkPlataforma: data.linkPlataforma,
       },
     })
-    return NextResponse.json(convenio, { status: 201 })
+    return NextResponse.json({
+      message: 'Convênio criado com sucesso',
+      id: convenio.id,
+      data: convenio,
+    }, { status: 201 })
   } catch (error) {
     return NextResponse.json({ error: 'Erro ao criar convênio' }, { status: 500 })
   }

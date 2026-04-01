@@ -88,6 +88,36 @@ Cria um novo convênio.
 | numeroProcesso | string | Não | Número do processo |
 | linkPlataforma | string | Não | Link na plataforma |
 
+**Resposta (201):**
+```json
+{
+  "message": "Convênio criado com sucesso",
+  "id": "conv123abc",
+  "data": {
+    "id": "conv123abc",
+    "numero": "001",
+    "ano": 2026,
+    "tipo": "convenio",
+    "objeto": "Aquisição de equipamentos para unidades de saúde",
+    "objetoResumido": "Equipamentos de saúde",
+    "status": "em_execucao",
+    "concedente": "Governo Federal",
+    "concedenteCnpj": "00.394.460/0001-05",
+    "convenente": "Prefeitura Municipal",
+    "dataInicioVigencia": "2026-01-01T00:00:00.000Z",
+    "dataFimVigencia": "2026-12-31T00:00:00.000Z",
+    "valorTotal": 500000,
+    "valorRepasse": 450000,
+    "valorContrapartida": 50000,
+    "valorExecutado": 150000,
+    "numeroProcesso": "12345.678/2025",
+    "linkPlataforma": "https://...",
+    "createdAt": "2026-03-30T20:30:00.000Z",
+    "updatedAt": "2026-03-30T20:30:00.000Z"
+  }
+}
+```
+
 ---
 
 ## Atualizar Convênio

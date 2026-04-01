@@ -28,7 +28,11 @@ export async function POST(request: NextRequest) {
         ativo: data.ativo ?? true,
       },
     })
-    return NextResponse.json(orgao, { status: 201 })
+    return NextResponse.json({
+      message: 'Órgão criado com sucesso',
+      id: orgao.id,
+      data: orgao,
+    }, { status: 201 })
   } catch (error) {
     return NextResponse.json({ error: 'Erro ao criar órgão' }, { status: 500 })
   }

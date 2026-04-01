@@ -117,6 +117,25 @@ Cria uma nova licitação.
 | justificativa | text | Não | Justificativa |
 | link_pncp | varchar(500) | Não | Link no PNCP |
 
+**Resposta (201):**
+```json
+{
+  "message": "Licitação criada com sucesso",
+  "id": "lic123abc",
+  "data": {
+    "id": "lic123abc",
+    "numero": "001",
+    "ano": 2026,
+    "modalidade": "Pregão",
+    "objeto": "Aquisição de materiais de escritório",
+    "status": "planejamento",
+    "valorEstimado": 150000,
+    "createdAt": "2026-03-30T20:30:00.000Z",
+    "updatedAt": "2026-03-30T20:30:00.000Z"
+  }
+}
+```
+
 ---
 
 ## Atualizar Licitação

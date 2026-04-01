@@ -47,7 +47,11 @@ export async function POST(request: NextRequest) {
         linkPncp: data.linkPncp,
       },
     })
-    return NextResponse.json(licitacao, { status: 201 })
+    return NextResponse.json({
+      message: 'Licitação criada com sucesso',
+      id: licitacao.id,
+      data: licitacao,
+    }, { status: 201 })
   } catch (error) {
     return NextResponse.json({ error: 'Erro ao criar licitação' }, { status: 500 })
   }

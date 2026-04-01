@@ -43,7 +43,11 @@ export async function POST(request: NextRequest) {
         ativo: data.ativo ?? true,
       },
     })
-    return NextResponse.json(dataset, { status: 201 })
+    return NextResponse.json({
+      message: 'Dataset criado com sucesso',
+      id: dataset.id,
+      data: dataset,
+    }, { status: 201 })
   } catch (error) {
     return NextResponse.json({ error: 'Erro ao criar dataset' }, { status: 500 })
   }

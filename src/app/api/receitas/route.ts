@@ -39,7 +39,11 @@ export async function POST(request: NextRequest) {
         valorArrecadado: data.valorArrecadado,
       },
     })
-    return NextResponse.json(receita, { status: 201 })
+    return NextResponse.json({
+      message: 'Receita criada com sucesso',
+      id: receita.id,
+      data: receita,
+    }, { status: 201 })
   } catch (error) {
     return NextResponse.json({ error: 'Erro ao criar receita' }, { status: 500 })
   }

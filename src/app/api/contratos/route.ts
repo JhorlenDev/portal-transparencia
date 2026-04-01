@@ -55,7 +55,11 @@ export async function POST(request: NextRequest) {
         linkPncp: data.linkPncp,
       },
     })
-    return NextResponse.json(contrato, { status: 201 })
+    return NextResponse.json({
+      message: 'Contrato criado com sucesso',
+      id: contrato.id,
+      data: contrato,
+    }, { status: 201 })
   } catch (error) {
     return NextResponse.json({ error: 'Erro ao criar contrato' }, { status: 500 })
   }

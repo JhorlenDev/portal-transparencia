@@ -91,6 +91,39 @@ Cria um novo servidor.
 | outrosDescontos | float | Não | Outros descontos |
 | remuneracaoLiquida | float | Não | Remuneração líquida |
 
+**Resposta (201):**
+```json
+{
+  "message": "Servidor criado com sucesso",
+  "id": "serv123abc",
+  "data": {
+    "id": "serv123abc",
+    "nome": "Maria da Silva Santos",
+    "matricula": "1001",
+    "cargo": "Professor",
+    "funcao": "Docência 1º ao 5º ano",
+    "orgaoNome": "Secretaria Municipal de Educação",
+    "lotacao": "Escola Municipal João XXIII",
+    "vinculo": "efetivo",
+    "cargaHoraria": 40,
+    "dataAdmissao": "2015-03-01T00:00:00.000Z",
+    "anoReferencia": 2026,
+    "mesReferencia": 3,
+    "remuneracaoBase": 4500,
+    "gratificacoes": 500,
+    "adicionais": 300,
+    "indenizacoes": 200,
+    "remuneracaoBruta": 5500,
+    "impostoRenda": 450,
+    "previdencia": 605,
+    "outrosDescontos": 100,
+    "remuneracaoLiquida": 4345,
+    "createdAt": "2026-03-30T20:30:00.000Z",
+    "updatedAt": "2026-03-30T20:30:00.000Z"
+  }
+}
+```
+
 ---
 
 ## Atualizar Servidor

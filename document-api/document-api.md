@@ -72,6 +72,8 @@ Cada módulo segue o padrão REST:
 
 - **GET** aceita parâmetros de filtragem específicos de cada módulo
 - **POST** e **PUT** aceitam JSON no body da requisição
+- Nos endpoints de criação unitária, o **POST** retorna o registro criado com seu campo `id`
+- Em `POST /api/configuracao-site`, a resposta retorna os IDs dos registros salvos em `ids`
 
 ---
 

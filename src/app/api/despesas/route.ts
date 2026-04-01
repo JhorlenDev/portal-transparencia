@@ -45,7 +45,11 @@ export async function POST(request: NextRequest) {
         valorPago: data.valorPago,
       },
     })
-    return NextResponse.json(despesa, { status: 201 })
+    return NextResponse.json({
+      message: 'Despesa criada com sucesso',
+      id: despesa.id,
+      data: despesa,
+    }, { status: 201 })
   } catch (error) {
     return NextResponse.json({ error: 'Erro ao criar despesa' }, { status: 500 })
   }

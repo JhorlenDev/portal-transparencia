@@ -126,13 +126,17 @@ curl -X POST http://localhost:3000/api/orgaos \
 **Resposta (201):**
 ```json
 {
+  "message": "Órgão criado com sucesso",
   "id": "clx789ghi",
-  "nome": "Secretaria Municipal de Educação",
-  "sigla": "SME",
-  "cnpj": "12.345.678/0001-90",
-  "ativo": true,
-  "createdAt": "2026-03-30T20:30:00.000Z",
-  "updatedAt": "2026-03-30T20:30:00.000Z"
+  "data": {
+    "id": "clx789ghi",
+    "nome": "Secretaria Municipal de Educação",
+    "sigla": "SME",
+    "cnpj": "12.345.678/0001-90",
+    "ativo": true,
+    "createdAt": "2026-03-30T20:30:00.000Z",
+    "updatedAt": "2026-03-30T20:30:00.000Z"
+  }
 }
 ```
 

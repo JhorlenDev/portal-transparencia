@@ -54,7 +54,11 @@ export async function POST(request: NextRequest) {
         remuneracaoLiquida: data.remuneracaoLiquida,
       },
     })
-    return NextResponse.json(servidor, { status: 201 })
+    return NextResponse.json({
+      message: 'Servidor criado com sucesso',
+      id: servidor.id,
+      data: servidor,
+    }, { status: 201 })
   } catch (error) {
     return NextResponse.json({ error: 'Erro ao criar servidor' }, { status: 500 })
   }

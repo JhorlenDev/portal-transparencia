@@ -71,6 +71,29 @@ Cria um novo dataset.
 | dicionarioDados | string | Não | Dicionário de dados (JSON) |
 | ativo | boolean | Não | Status ativo |
 
+**Resposta (201):**
+```json
+{
+  "message": "Dataset criado com sucesso",
+  "id": "data123abc",
+  "data": {
+    "id": "data123abc",
+    "nome": "Despesas Públicas",
+    "slug": "despesas",
+    "descricao": "Empenhos, liquidações e pagamentos realizados pelo município",
+    "categoria": "despesas",
+    "periodicidade": "diaria",
+    "ultimaAtualizacao": "2026-03-30T00:00:00.000Z",
+    "formatosDisponiveis": "csv,json",
+    "totalRegistros": 15420,
+    "dicionarioDados": "{\"campos\": []}",
+    "ativo": true,
+    "createdAt": "2026-03-30T20:30:00.000Z",
+    "updatedAt": "2026-03-30T20:30:00.000Z"
+  }
+}
+```
+
 ---
 
 ## Atualizar Dataset
