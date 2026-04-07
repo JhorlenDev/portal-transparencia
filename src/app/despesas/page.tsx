@@ -158,30 +158,55 @@ async function DespesasContent({ searchParams }: PageProps) {
                     </td>
                     <td className="px-4 py-3 text-center">
                       {despesa.anexos && despesa.anexos.length > 0 ? (
-                        <div className="relative group inline-block">
-                          <button className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium bg-blue-100 text-blue-700 rounded-md hover:bg-blue-200 transition-colors">
+                        <div className="relative">
+                          <button 
+                            className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium bg-blue-100 text-blue-700 rounded-md hover:bg-blue-200 transition-colors"
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              const btn = e.currentTarget
+                              const dropdown = btn.nextElementSibling
+                              document.querySelectorAll('[data附件-dropdown]').forEach(el => {
+                                if (el !== dropdown) el.classList.add('hidden')
+                              })
+                              dropdown?.classList.toggle('hidden')
+                            }}
+                          >
                             <Paperclip className="h-3 w-3" />
                             {despesa.anexos.length}
                           </button>
-                          <div className="absolute right-0 top-full mt-1 z-50 w-64 bg-white border border-slate-200 rounded-lg shadow-xl hidden group-hover:block">
-                            <div className="p-2 border-b border-slate-100">
-                              <span className="text-xs font-medium text-slate-600">Anexos ({despesa.anexos.length})</span>
+                          <div 
+                            data附件-dropdown
+                            className="hidden fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[100] w-80 bg-white border border-slate-200 rounded-lg shadow-2xl"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            <div className="p-3 border-b border-slate-100 flex items-center justify-between">
+                              <span className="text-sm font-medium text-slate-700">Anexos ({despesa.anexos.length})</span>
+                              <button 
+                                className="text-slate-400 hover:text-slate-600"
+                                onClick={(e) => {
+                                  e.stopPropagation()
+                                  e.currentTarget.closest('[data附件-dropdown]')?.classList.add('hidden')
+                                }}
+                              >
+                                ✕
+                              </button>
                             </div>
-                            <div className="max-h-48 overflow-y-auto">
+                            <div className="max-h-64 overflow-y-auto">
                               {despesa.anexos.map((anexo) => (
-                                <div key={anexo.id} className="p-2 hover:bg-slate-50 flex items-center justify-between gap-2">
+                                <div key={anexo.id} className="p-3 hover:bg-slate-50 flex items-center justify-between gap-3 border-b border-slate-100 last:border-0">
                                   <div className="flex-1 min-w-0">
-                                    <p className="text-xs font-medium text-slate-800 truncate">{anexo.nomeArquivo}</p>
-                                    <p className="text-xs text-slate-500">{anexo.tipoMime}</p>
+                                    <p className="text-sm font-medium text-slate-800 truncate">{anexo.nomeArquivo}</p>
+                                    <p className="text-xs text-slate-500">{anexo.tipoMime} • {anexo.tamanho ? (anexo.tamanho / 1024).toFixed(1) + ' KB' : '-'}</p>
                                   </div>
                                   <a 
                                     href={anexo.urlArquivo} 
                                     target="_blank" 
                                     rel="noopener noreferrer"
-                                    className="p-1 text-blue-600 hover:bg-blue-100 rounded"
+                                    className="p-2 text-blue-600 hover:bg-blue-100 rounded-md flex items-center gap-1 text-xs font-medium"
                                     title="Visualizar"
                                   >
                                     <Eye className="h-4 w-4" />
+                                    Ver
                                   </a>
                                 </div>
                               ))}
