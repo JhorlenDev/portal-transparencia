@@ -161,10 +161,10 @@ export async function getReceitas(filters?: ReceitasFilters) {
     ]
   }
   
-  return prisma.receita.findMany({
+  return getEntityWithAnexos('receita', prisma.receita.findMany({
     where,
     orderBy: { exercicio: 'desc' }
-  })
+  }))
 }
 
 export async function getReceitasStats(exercicio?: number) {
@@ -223,6 +223,24 @@ export async function getDespesas(filters?: DespesasFilters) {
   return despesasWithAnexos
 }
 
+async function getEntityWithAnexos<T extends { id: string }>(
+  entity: 'contrato' | 'convenio' | 'licitacao' | 'receita' | 'servidor',
+  prismaQuery: Promise<T[]>
+): Promise<T[]> {
+  const items = await prismaQuery
+  return Promise.all(
+    items.map(async (item) => {
+      const anexos = await prisma.anexo.findMany({
+        where: {
+          entidadeTipo: entity,
+          entidadeId: item.id
+        }
+      })
+      return { ...item, anexos }
+    })
+  )
+}
+
 export async function getDespesasStats(exercicio?: number) {
   const year = exercicio || new Date().getFullYear()
   const despesas = await prisma.despesa.aggregate({
@@ -263,10 +281,10 @@ export async function getLicitacoes(filters?: LicitacoesFilters) {
     ]
   }
   
-  return prisma.licitacao.findMany({
+  return getEntityWithAnexos('licitacao', prisma.licitacao.findMany({
     where,
     orderBy: { dataAbertura: 'desc' }
-  })
+  }))
 }
 
 export async function getLicitacoesStats(ano?: number) {
@@ -308,10 +326,10 @@ export async function getContratos(filters?: ContratosFilters) {
     ]
   }
   
-  return prisma.contrato.findMany({
+  return getEntityWithAnexos('contrato', prisma.contrato.findMany({
     where,
     orderBy: { dataInicioVigencia: 'desc' }
-  })
+  }))
 }
 
 export async function getContratosStats() {
@@ -352,10 +370,10 @@ export async function getServidores(filters?: ServidoresFilters) {
     ]
   }
   
-  return prisma.servidor.findMany({
+  return getEntityWithAnexos('servidor', prisma.servidor.findMany({
     where,
     orderBy: { nome: 'asc' }
-  })
+  }))
 }
 
 export async function getGlobalSearch(query: string) {
@@ -425,10 +443,10 @@ export async function getConvenios(filters?: ConveniosFilters) {
     ]
   }
   
-  return prisma.convenio.findMany({
+  return getEntityWithAnexos('convenio', prisma.convenio.findMany({
     where,
     orderBy: { dataInicioVigencia: 'desc' }
-  })
+  }))
 }
 
 export async function getConveniosStats(ano?: number) {
