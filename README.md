@@ -1,36 +1,153 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Portal da Transparência 360
 
-## Getting Started
+Portal de transparência pública municipal desenvolvido com Next.js 16, React 19 e Prisma (MySQL). Apresenta dados de receitas, despesas, contratos, licitações, convênios e servidores públicos.
 
-First, run the development server:
+## Tecnologias
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- **Frontend**: Next.js 16 (App Router), React 19, Tailwind CSS 4
+- **Backend**: API Routes do Next.js, Prisma ORM
+- **Database**: MySQL
+- **UI Components**: Radix UI, Lucide Icons
+
+## Funcionalidades
+
+### Páginas de Dados
+
+| Página | Descrição |
+|--------|-----------|
+| `/despesas` | Despesas públicas com filtro por ano, credor e categoria |
+| `/receitas` | Receitas previstas e arrecadadas por exercício |
+| `/contratos` | Contratos administrativos, atas e aditivos |
+| `/licitacoes` | Processos licitatórios, dispensas e inexigibilidades |
+| `/convenios` | Convênios, termos de colaboração e transferências |
+| `/servidores` | Quadro de pessoal e remuneração dos servidores |
+
+### Recursos
+
+- **Busca Global**: `/busca` - Pesquisa unificada em todas as entidades
+- **Anexos**: Modal de download de documentos em todas as tabelas
+- **Filtros**: Barras de filtro por ano, status, categoria e texto
+- **Dados Estruturados**: SEO otimizado com schema.org
+- **Responsivo**: Layout adaptável para mobile e desktop
+
+## Integração com API Externa
+
+### Endpoint de Importação
+
+```
+POST /api/acordar/webhook
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Recebe dados da API externa (Prefeitura360) e sincroniza com o banco local.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+**Entidades suportadas**:
+- `despesas` - Despesas públicas
+- `receitas` - Receitas municipais
+- `contratos` - Contratos administrativos
+- `licitacoes` - Processos licitatórios
+- `convenios` - Convênios e transferências
+- `servidores` - Servidores públicos
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+**Funcionalidades**:
+- Sincronização completa (upsert)
+- Armazenamento do payload original na coluna `payload`
+- Download automático de anexos da API externa
+- Remoção de registros que não existem mais na API (sync deletion)
 
-## Learn More
+### Variáveis de Ambiente
 
-To learn more about Next.js, take a look at the following resources:
+```env
+DATABASE_URL=mysql://user:password@host:3306/database
+ACORDAR_API_URL=https://api.prefeitura360.com.br
+ACORDAR_API_KEY=sua-chave-de-api
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Executando o Projeto
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+# Instalar dependências
+npm install
 
-## Deploy on Vercel
+# Gerar Prisma Client
+npx prisma generate
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+# Executar migrações
+npx prisma migrate dev
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+# Seed de dados iniciais (configurações do site)
+npm run db:seed
+
+# Iniciar servidor de desenvolvimento
+npm run dev
+```
+
+Acesse: http://localhost:3000
+
+## Configurações do Site
+
+O portal possui configurações editáveis via banco de dados (tabela `ConfiguracaoSite`):
+
+- Nome do site, descrição, logo
+- Links para PNCP, Fala.BR, Diário Oficial
+- Redes sociais (Facebook, Instagram, YouTube, Twitter)
+- Cor primária e secundária
+- Informações de contato (endereço, telefone, e-mail)
+
+## Estrutura de Arquivos
+
+```
+src/
+├── app/                    # Next.js App Router
+│   ├── despesas/           # Página de despesas
+│   ├── receitas/          # Página de receitas
+│   ├── contratos/         # Página de contratos
+│   ├── licitacoes/        # Página de licitações
+│   ├── convenios/         # Página de convênios
+│   ├── servidores/        # Página de servidores
+│   ├── busca/             # Busca global
+│   └── api/               # API Routes
+│       └── acordar/       # Webhook de importação
+├── components/            # Componentes React
+│   ├── attachments/       # Modal de anexos
+│   ├── portal/            # Componentes do portal
+│   └── ui/                # Componentes base
+├── lib/                   # Funções utilitárias
+│   ├── prisma.ts         # Cliente Prisma
+│   └── site-data.ts      # Funções de busca de dados
+└── styles/               # Estilos globais
+```
+
+## Schema do Banco
+
+Principais tabelas (via Prisma):
+
+- `Despesa`, `Receita`, `Contrato`, `Licitacao`, `Convenio`, `Servidor`
+- `Anexo` - Arquivos vinculados às entidades
+- `ConfiguracaoSite` - Configurações do portal
+- `Orgao`, `Credor`, `FonteRecurso` - Dados de apoio
+
+## Desenvolvimento
+
+```bash
+# Verificar tipos TypeScript
+npx tsc --noEmit
+
+# Verificar lint
+npm run lint
+
+# Abrir Prisma Studio
+npm run db:studio
+```
+
+## Deploy
+
+O projeto está configurado para deploy no Vercel. Configure as variáveis de ambiente na plataforma.
+
+```bash
+# Build de produção
+npm run build
+```
+
+## Licença
+
+MIT
