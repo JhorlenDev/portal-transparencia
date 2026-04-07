@@ -188,18 +188,14 @@ async function DespesasContent({ searchParams }: PageProps) {
                             </div>
                           </div>
                         </div>
-                ) : (
-                  <tr>
-                    <td colSpan={8} className="px-4 py-8 text-center text-slate-600">
-                      Nenhuma despesa encontrada para {currentYear}
-                    </td>
-                  </tr>
-                )}
+                      ) : (
+                        <span className="text-slate-400">-</span>
+                      )}
                     </td>
                   </tr>
                 )) : (
                   <tr>
-                    <td colSpan={7} className="px-4 py-8 text-center text-slate-600">
+                    <td colSpan={8} className="px-4 py-8 text-center text-slate-600">
                       Nenhuma despesa encontrada para {currentYear}
                     </td>
                   </tr>
