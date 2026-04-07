@@ -246,7 +246,9 @@ function mapExternalToPrisma(entity: string, externalData: ExternalData): Record
     if (value === undefined || value === null) continue
 
     if (externalKey.includes('_date') || externalKey === 'start_date' || externalKey === 'end_date' || externalKey === 'commitment_date' || externalKey === 'opening_date') {
-      result[prismaKey] = new Date(value as string)
+      if (value && typeof value === 'string' && value.trim() !== '') {
+        result[prismaKey] = new Date(value)
+      }
     } else if (externalKey === 'estimated_value' || externalKey === 'value' || externalKey === 'predicted_value' || externalKey === 'collected_value' || externalKey === 'initial_value' || externalKey === 'total_value' || externalKey === 'base_salary' || externalKey === 'benefits' || externalKey === 'allowances' || externalKey === 'deductions' || externalKey === 'net_salary') {
       result[prismaKey] = parseFloat(value as string)
     } else if (externalKey === 'is_reissue' || externalKey === 'send_transferegov') {
