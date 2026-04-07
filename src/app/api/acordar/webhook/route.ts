@@ -25,7 +25,6 @@ interface ExternalData {
 const entityFieldMapping: Record<string, Record<string, string>> = {
   procurements: {
     id: 'idExternalRef',
-    organization_id: 'organizationId',
     procurement_number: 'numero',
     procurement_year: 'ano',
     modality: 'modalidade',
@@ -69,7 +68,6 @@ const entityFieldMapping: Record<string, Record<string, string>> = {
   },
   revenues: {
     id: 'idExternalRef',
-    organization_id: 'organizationId',
     accounting_id: 'accountingId',
     revenue_nature: 'naturezaReceita',
     predicted_value: 'valorPrevisto',
@@ -81,7 +79,6 @@ const entityFieldMapping: Record<string, Record<string, string>> = {
   },
   contracts: {
     id: 'idExternalRef',
-    organization_id: 'organizationId',
     contract_number: 'numero',
     contract_year: 'ano',
     contractor_name: 'contratadoNome',
@@ -96,7 +93,6 @@ const entityFieldMapping: Record<string, Record<string, string>> = {
   },
   server_payroll: {
     id: 'idExternalRef',
-    organization_id: 'organizationId',
     server_name: 'nome',
     position: 'cargo',
     department: 'lotacao',
@@ -111,7 +107,6 @@ const entityFieldMapping: Record<string, Record<string, string>> = {
   },
   agreements: {
     id: 'idExternalRef',
-    organization_id: 'organizationId',
     parties: 'partes',
     object: 'objeto',
     status: 'status',
@@ -244,17 +239,27 @@ function mapExternalToPrisma(entity: string, externalData: ExternalData): Record
 
     const value = externalData[externalKey]
     if (value === undefined || value === null) continue
+    
+    const stringValue = String(value).trim()
+    if (stringValue === '') continue
 
     if (externalKey.includes('_date') || externalKey === 'start_date' || externalKey === 'end_date' || externalKey === 'commitment_date' || externalKey === 'opening_date') {
-      if (value && typeof value === 'string' && value.trim() !== '') {
-        result[prismaKey] = new Date(value)
+      const dateObj = new Date(stringValue)
+      if (!isNaN(dateObj.getTime())) {
+        result[prismaKey] = dateObj
       }
     } else if (externalKey === 'estimated_value' || externalKey === 'value' || externalKey === 'predicted_value' || externalKey === 'collected_value' || externalKey === 'initial_value' || externalKey === 'total_value' || externalKey === 'base_salary' || externalKey === 'benefits' || externalKey === 'allowances' || externalKey === 'deductions' || externalKey === 'net_salary') {
-      result[prismaKey] = parseFloat(value as string)
+      const num = parseFloat(stringValue)
+      if (!isNaN(num)) {
+        result[prismaKey] = num
+      }
     } else if (externalKey === 'is_reissue' || externalKey === 'send_transferegov') {
       result[prismaKey] = Boolean(value)
     } else if (externalKey === 'contract_validity_months' || externalKey === 'fiscal_year' || externalKey === 'reference_year' || externalKey === 'procurement_year' || externalKey === 'contract_year') {
-      result[prismaKey] = parseInt(value as string, 10)
+      const num = parseInt(stringValue, 10)
+      if (!isNaN(num)) {
+        result[prismaKey] = num
+      }
     } else {
       result[prismaKey] = value
     }
