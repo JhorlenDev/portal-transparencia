@@ -46,7 +46,7 @@ model Despesa {
   exercicio         Int
   numeroEmpenho     String   @map("numero_empenho")
   dataEmpenho       DateTime? @map("data_empenho")
-  tipoMovimento     String   @map("tipo_movimento")
+  tipoMovimento     String   @default("Empenho") @map("tipo_movimento")
   credorNome        String?  @map("credor_nome")
   credorCpfCnpj     String?  @map("credor_cpf_cnpj")
   objeto            String?
