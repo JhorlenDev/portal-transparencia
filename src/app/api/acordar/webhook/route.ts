@@ -237,6 +237,8 @@ function mapExternalToPrisma(entity: string, externalData: ExternalData): Record
 
   const result: Record<string, unknown> = {}
 
+  console.log(`Mapping entity: ${entity}, external data keys:`, Object.keys(externalData))
+
   for (const [externalKey, prismaKey] of Object.entries(mapping)) {
     if (externalKey === 'id') {
       result[prismaKey] = externalData.id
@@ -244,6 +246,8 @@ function mapExternalToPrisma(entity: string, externalData: ExternalData): Record
     }
 
     const value = externalData[externalKey]
+    console.log(`  ${externalKey} -> ${prismaKey}:`, value, typeof value)
+    
     if (value === undefined || value === null) continue
 
     if (externalKey.includes('_date') || externalKey === 'start_date' || externalKey === 'end_date' || externalKey === 'commitment_date' || externalKey === 'opening_date') {
@@ -309,6 +313,7 @@ async function importData(entity: string, data: ExternalData[]) {
       }
     } catch (error) {
       console.error(`Error importing item ${item.id}:`, error)
+      console.error(`Stack: ${error instanceof Error ? error.stack : 'No stack'}`)
       importResults.errors++
     }
   }
