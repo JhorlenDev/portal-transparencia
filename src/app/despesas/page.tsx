@@ -1,5 +1,5 @@
 import { Suspense } from "react"
-import { DollarSign, TrendingUp } from "lucide-react"
+import { DollarSign, TrendingUp, Paperclip, Download, Eye } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
 import { PageSkeleton } from "@/components/ui/skeletons"
 import { FilterBar } from "@/components/portal/filter-bar"
@@ -125,6 +125,7 @@ async function DespesasContent({ searchParams }: PageProps) {
                   <th className="text-right px-4 py-3 text-sm font-medium text-slate-600">Empenhado</th>
                   <th className="text-right px-4 py-3 text-sm font-medium text-slate-600">Liquidado</th>
                   <th className="text-right px-4 py-3 text-sm font-medium text-slate-600">Pago</th>
+                  <th className="text-center px-4 py-3 text-sm font-medium text-slate-600">Anexos</th>
                 </tr>
               </thead>
               <tbody>
@@ -154,6 +155,46 @@ async function DespesasContent({ searchParams }: PageProps) {
                     </td>
                     <td className="px-4 py-3 text-right font-bold text-emerald-800">
                       {formatCurrency(despesa.valorPago || 0)}
+                    </td>
+                    <td className="px-4 py-3 text-center">
+                      {despesa.anexos && despesa.anexos.length > 0 ? (
+                        <div className="relative group inline-block">
+                          <button className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium bg-blue-100 text-blue-700 rounded-md hover:bg-blue-200 transition-colors">
+                            <Paperclip className="h-3 w-3" />
+                            {despesa.anexos.length}
+                          </button>
+                          <div className="absolute right-0 top-full mt-1 z-50 w-64 bg-white border border-slate-200 rounded-lg shadow-xl hidden group-hover:block">
+                            <div className="p-2 border-b border-slate-100">
+                              <span className="text-xs font-medium text-slate-600">Anexos ({despesa.anexos.length})</span>
+                            </div>
+                            <div className="max-h-48 overflow-y-auto">
+                              {despesa.anexos.map((anexo) => (
+                                <div key={anexo.id} className="p-2 hover:bg-slate-50 flex items-center justify-between gap-2">
+                                  <div className="flex-1 min-w-0">
+                                    <p className="text-xs font-medium text-slate-800 truncate">{anexo.nomeArquivo}</p>
+                                    <p className="text-xs text-slate-500">{anexo.tipoMime}</p>
+                                  </div>
+                                  <a 
+                                    href={anexo.urlArquivo} 
+                                    target="_blank" 
+                                    rel="noopener noreferrer"
+                                    className="p-1 text-blue-600 hover:bg-blue-100 rounded"
+                                    title="Visualizar"
+                                  >
+                                    <Eye className="h-4 w-4" />
+                                  </a>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                ) : (
+                  <tr>
+                    <td colSpan={8} className="px-4 py-8 text-center text-slate-600">
+                      Nenhuma despesa encontrada para {currentYear}
+                    </td>
+                  </tr>
+                )}
                     </td>
                   </tr>
                 )) : (

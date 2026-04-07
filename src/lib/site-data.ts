@@ -203,10 +203,24 @@ export async function getDespesas(filters?: DespesasFilters) {
     ]
   }
   
-  return prisma.despesa.findMany({
+  const despesas = await prisma.despesa.findMany({
     where,
     orderBy: { dataEmpenho: 'desc' }
   })
+  
+  const despesasWithAnexos = await Promise.all(
+    despesas.map(async (despesa) => {
+      const anexos = await prisma.anexo.findMany({
+        where: {
+          entidadeTipo: 'despesa',
+          entidadeId: despesa.id
+        }
+      })
+      return { ...despesa, anexos }
+    })
+  )
+  
+  return despesasWithAnexos
 }
 
 export async function getDespesasStats(exercicio?: number) {
