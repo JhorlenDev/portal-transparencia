@@ -15,7 +15,20 @@ export async function GET(request: NextRequest) {
       where,
       orderBy: { dataEmpenho: 'desc' },
     })
-    return NextResponse.json(despesas)
+    
+    const despesasWithAnexos = await Promise.all(
+      despesas.map(async (despesa) => {
+        const anexos = await prisma.anexo.findMany({
+          where: {
+            entidadeTipo: 'despesa',
+            entidadeId: despesa.id,
+          },
+        })
+        return { ...despesa, anexos }
+      })
+    )
+    
+    return NextResponse.json(despesasWithAnexos)
   } catch (error) {
     return NextResponse.json({ error: 'Erro ao buscar despesas' }, { status: 500 })
   }

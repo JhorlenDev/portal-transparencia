@@ -24,6 +24,7 @@ model Orgao {
 
 model Receita {
   id                String   @id @default(cuid())
+  idExternalRef     String?  @map("id_external_ref")
   exercicio         Int
   mes               Int?
   codigoNatureza    String   @map("codigo_natureza")
@@ -41,6 +42,7 @@ model Receita {
 
 model Despesa {
   id                String   @id @default(cuid())
+  idExternalRef     String?  @map("id_external_ref")
   exercicio         Int
   numeroEmpenho     String   @map("numero_empenho")
   dataEmpenho       DateTime? @map("data_empenho")
@@ -66,6 +68,7 @@ model Despesa {
 
 model Licitacao {
   id                         String   @id @default(cuid())
+  idExternalRef              String?  @map("id_external_ref")
   autoridade                 String?  @map("autoridade")
   numero                     String
   ano                        Int
@@ -109,6 +112,7 @@ model Licitacao {
 
 model Contrato {
   id                String   @id @default(cuid())
+  idExternalRef     String?  @map("id_external_ref")
   numero            String
   ano               Int
   tipoContrato      String?  @map("tipo_contrato")
@@ -142,6 +146,7 @@ model Contrato {
 
 model Servidor {
   id                String   @id @default(cuid())
+  idExternalRef     String?  @map("id_external_ref")
   nome              String
   matricula         String
   cargo             String
@@ -173,6 +178,7 @@ model Servidor {
 
 model Convenio {
   id                String   @id @default(cuid())
+  idExternalRef     String?  @map("id_external_ref")
   numero            String
   ano               Int
   tipo              String
@@ -251,4 +257,17 @@ model ConfiguracaoSite {
   updatedAt   DateTime @updatedAt @map("updated_date")
 
   @@map("configuracao_site")
+}
+
+model Anexo {
+  id            String   @id @default(cuid())
+  nomeArquivo   String   @map("nome_arquivo")
+  urlArquivo    String   @map("url_arquivo")
+  tamanho       Int?     @map("tamanho")
+  tipoMime      String?  @map("tipo_mime")
+  entidadeTipo  String   @map("entidade_tipo")
+  entidadeId    String   @map("entidade_id")
+  createdAt     DateTime @default(now()) @map("created_date")
+
+  @@map("anexos")
 }
