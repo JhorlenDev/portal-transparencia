@@ -273,7 +273,9 @@ async function importData(entity: string, data: ExternalData[]) {
   }
 
   const entityType = entityAttachmentType[entity]
-  const importResults = { created: 0, updated: 0, errors: 0, attachments: 0 }
+  const importResults = { created: 0, updated: 0, errors: 0, attachments: 0, deleted: 0 }
+
+  const externalIds = data.map(item => item.id)
 
   for (const item of data) {
     try {
@@ -315,6 +317,30 @@ async function importData(entity: string, data: ExternalData[]) {
     }
   }
 
+  if (externalIds.length > 0) {
+    const deletedRecords = await prismaModel.deleteMany({
+      where: {
+        idExternalRef: { notIn: externalIds }
+      }
+    })
+    importResults.deleted = deletedRecords.count
+
+    if (deletedRecords.count > 0) {
+      const deletedRecordsList = await prismaModel.findMany({
+        where: { idExternalRef: { notIn: externalIds } },
+        select: { id: true }
+      })
+      const deletedIds = deletedRecordsList.map((r: { id: string }) => r.id)
+      
+      await prisma.anexo.deleteMany({
+        where: {
+          entidadeId: { in: deletedIds },
+          entidadeTipo: entityType
+        }
+      })
+    }
+  }
+
   return importResults
 }
 
@@ -344,12 +370,25 @@ export async function GET(request: NextRequest) {
     const externalData = await fetchExternalData(entity, org)
 
     if (!externalData || externalData.length === 0) {
+      const prismaModel = (prisma as any)[prismaModelMap[entity]]
+      if (prismaModel) {
+        const deletedAll = await prismaModel.deleteMany({
+          where: { idExternalRef: { not: null } }
+        })
+        return NextResponse.json({
+          success: true,
+          entity,
+          org,
+          message: 'Nenhum dado encontrado - todos os registros foram removidos',
+          imported: { created: 0, updated: 0, errors: 0, attachments: 0, deleted: deletedAll.count },
+        })
+      }
       return NextResponse.json({
         success: true,
         entity,
         org,
         message: 'Nenhum dado encontrado para importação',
-        imported: { created: 0, updated: 0, errors: 0, attachments: 0 },
+        imported: { created: 0, updated: 0, errors: 0, attachments: 0, deleted: 0 },
       })
     }
 
