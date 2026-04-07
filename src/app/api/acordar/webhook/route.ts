@@ -56,7 +56,6 @@ const entityFieldMapping: Record<string, Record<string, string>> = {
   },
   expenses: {
     id: 'idExternalRef',
-    organization_id: 'organizationId',
     commitment_number: 'numeroEmpenho',
     creditor_name: 'credorNome',
     cpf_cnpj: 'credorCpfCnpj',
@@ -281,6 +280,9 @@ async function importData(entity: string, data: ExternalData[]) {
       const mappedData = mapExternalToPrisma(entity, item)
       const externalId = item.id
       const attachments = item.attachments as ExternalAttachment[] | undefined
+      
+      const { attachments: _att, ...cleanPayload } = item
+      mappedData.payload = cleanPayload
 
       const existing = await prismaModel.findFirst({
         where: { idExternalRef: externalId },

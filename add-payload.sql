@@ -1,0 +1,11 @@
+ALTER TABLE `despesas` ADD COLUMN `payload` JSON;
+ALTER TABLE `receitas` ADD COLUMN `payload` JSON;
+ALTER TABLE `licitacoes` ADD COLUMN `payload` JSON;
+ALTER TABLE `contratos` ADD COLUMN `payload` JSON;
+ALTER TABLE `servidores` ADD COLUMN `payload` JSON;
+ALTER TABLE `convenios` ADD COLUMN `payload` JSON;
+ALTER TABLE `orgaos` ADD COLUMN `payload` JSON;
+ALTER TABLE `solicitacoes_sic` ADD COLUMN `payload` JSON;
+ALTER TABLE `datasets` ADD COLUMN `payload` JSON;
+ALTER TABLE `configuracao_site` ADD COLUMN `payload` JSON;
+ALTER TABLE `anexos` ADD COLUMN `payload` JSON;

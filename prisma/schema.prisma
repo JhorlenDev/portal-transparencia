@@ -13,6 +13,7 @@ model Orgao {
   sigla     String?
   cnpj      String?
   ativo     Boolean  @default(true)
+  payload   Json?    @map("payload")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -25,6 +26,7 @@ model Orgao {
 model Receita {
   id                String   @id @default(cuid())
   idExternalRef     String?  @map("id_external_ref")
+  payload           Json?    @map("payload")
   exercicio         Int
   mes               Int?
   codigoNatureza    String   @map("codigo_natureza")
@@ -43,6 +45,7 @@ model Receita {
 model Despesa {
   id                String   @id @default(cuid())
   idExternalRef     String?  @map("id_external_ref")
+  payload           Json?    @map("payload")
   exercicio         Int
   numeroEmpenho     String   @map("numero_empenho")
   dataEmpenho       DateTime? @map("data_empenho")
@@ -69,6 +72,7 @@ model Despesa {
 model Licitacao {
   id                         String   @id @default(cuid())
   idExternalRef              String?  @map("id_external_ref")
+  payload                    Json?    @map("payload")
   autoridade                 String?  @map("autoridade")
   numero                     String
   ano                        Int
@@ -113,6 +117,7 @@ model Licitacao {
 model Contrato {
   id                String   @id @default(cuid())
   idExternalRef     String?  @map("id_external_ref")
+  payload           Json?    @map("payload")
   numero            String
   ano               Int
   tipoContrato      String?  @map("tipo_contrato")
@@ -147,6 +152,7 @@ model Contrato {
 model Servidor {
   id                String   @id @default(cuid())
   idExternalRef     String?  @map("id_external_ref")
+  payload           Json?    @map("payload")
   nome              String
   matricula         String
   cargo             String
@@ -205,6 +211,7 @@ model Convenio {
 model SolicitacaoSIC {
   id                  String   @id @default(cuid())
   protocolo           String   @unique
+  payload             Json?    @map("payload")
   ano                 Int
   tipo                String   @default("acesso_informacao")
   canalEntrada        String   @map("canal_entrada")
@@ -240,6 +247,7 @@ model Dataset {
   totalRegistros      Int?     @map("total_registros")
   dicionarioDados     String?  @map("dicionario_dados")
   ativo               Boolean  @default(true)
+  payload             Json?    @map("payload")
   createdAt           DateTime @default(now())
   updatedAt           DateTime @updatedAt
 
@@ -253,6 +261,7 @@ model ConfiguracaoSite {
   tipo        String?  @map("tipo")
   descricao   String?  @map("descricao")
   ordem       Int?     @map("ordem")
+  payload     Json?    @map("payload")
   createdAt   DateTime @default(now()) @map("created_date")
   updatedAt   DateTime @updatedAt @map("updated_date")
 
@@ -267,6 +276,7 @@ model Anexo {
   tipoMime      String?  @map("tipo_mime")
   entidadeTipo  String   @map("entidade_tipo")
   entidadeId    String   @map("entidade_id")
+  payload       Json?    @map("payload")
   createdAt     DateTime @default(now()) @map("created_date")
 
   @@map("anexos")
