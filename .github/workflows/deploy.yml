@@ -1,0 +1,27 @@
+name: Deploy Portal Transparencia
+
+on:
+  push:
+    branches:
+      - master  # Ou o nome da sua branch principal (ex: master)
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
+
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          port: 22
+          script: |
+            cd /home/tefe-portaltransparencia/htdocs
+            git pull origin main
+            npm install --production
+            pm2 reload transparencia --update-env
