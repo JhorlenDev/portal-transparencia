@@ -190,9 +190,10 @@ async function saveAttachments(
   for (const att of attachments) {
     const localUrl = await downloadAttachment(att.url, att.name, entityId)
     if (localUrl) {
+      const sanitizedNomeArquivo = decodeURIComponent(att.name).replace(/[^\w\s\-.]/g, '_').replace(/\s+/g, '_')
       await prisma.anexo.create({
         data: {
-          nomeArquivo: att.name,
+          nomeArquivo: sanitizedNomeArquivo,
           urlArquivo: localUrl,
           tamanho: att.size,
           tipoMime: att.mimeType,
