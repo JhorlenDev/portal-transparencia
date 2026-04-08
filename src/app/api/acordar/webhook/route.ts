@@ -152,7 +152,8 @@ async function downloadAttachment(url: string, filename: string, entityId: strin
     const arrayBuffer = await response.arrayBuffer()
     const buffer = Buffer.from(arrayBuffer)
 
-    const uniqueFilename = `${Date.now()}-${filename}`
+    const sanitizedFilename = decodeURIComponent(filename).replace(/[^\w\s\-.]/g, '_').replace(/\s+/g, '_')
+    const uniqueFilename = `${Date.now()}-${sanitizedFilename}`
     const filePath = path.join(uploadsDir, uniqueFilename)
     fs.writeFileSync(filePath, buffer)
 
