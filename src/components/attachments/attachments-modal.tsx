@@ -48,7 +48,7 @@ export function AttachmentsModal({ anexos, isOpen, onClose }: AttachmentsModalPr
                 </p>
               </div>
               <a 
-                href={anexo.urlArquivo} 
+                href={`/api/anexos/${anexo.id}`}
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="p-2 text-blue-600 hover:bg-blue-100 rounded-md flex items-center gap-1 text-xs font-medium"
