@@ -8,11 +8,12 @@ import { FilterBar } from "@/components/portal/filter-bar"
 import { Breadcrumbs } from "@/components/portal/breadcrumbs"
 
 function formatCurrency(value: number): string {
+  const safeValue = Number.isFinite(value) ? value : 0
   return new Intl.NumberFormat('pt-BR', {
     style: 'currency',
     currency: 'BRL',
     minimumFractionDigits: 2
-  }).format(value)
+  }).format(safeValue)
 }
 
 interface Attachment {
@@ -76,7 +77,7 @@ function AttachmentsModal({
                 </p>
               </div>
               <a 
-                href={anexo.urlArquivo} 
+                href={`/api/anexos/${anexo.id}`}
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="p-2 text-blue-600 hover:bg-blue-100 rounded-md flex items-center gap-1 text-xs font-medium"
@@ -185,7 +186,7 @@ function DespesasTable({
 }
 
 interface Stats {
-  engajado: number
+  empenhado: number
   liquidado: number
   pago: number
 }
@@ -206,7 +207,7 @@ function DespesasContent({ despesas, stats, currentYear, searchParams }: Despesa
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-slate-600">Total Empenhado</p>
-                <p className="text-2xl font-bold text-slate-800">{formatCurrency(stats.engajado)}</p>
+                <p className="text-2xl font-bold text-slate-800">{formatCurrency(stats.empenhado)}</p>
               </div>
               <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
                 <DollarSign className="h-6 w-6 text-blue-600" />

@@ -90,7 +90,7 @@ export async function getSiteStats(): Promise<SiteStats> {
       where: { exercicio: currentYear }
     }),
     prisma.despesa.aggregate({
-      _sum: { valorPago: true },
+      _sum: { valorEmpenhado: true },
       where: { exercicio: currentYear }
     }),
     prisma.licitacao.count({
@@ -103,7 +103,7 @@ export async function getSiteStats(): Promise<SiteStats> {
 
   return {
     totalReceitas: receitas._sum.valorArrecadado || 0,
-    totalDespesas: despesas._sum.valorPago || 0,
+    totalDespesas: despesas._sum.valorEmpenhado || 0,
     totalLicitacoes: licitacoes,
     totalContratos: contratos
   }

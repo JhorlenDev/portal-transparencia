@@ -42,6 +42,6 @@ next-env.d.ts
 
 /src/generated/prisma
 
-# local docs
+# local-only workspace files
 /document-api/
 /.opencode/

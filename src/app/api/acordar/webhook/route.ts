@@ -136,6 +136,50 @@ const entityAttachmentType: Record<string, string> = {
   agreements: 'convenio',
 }
 
+function sanitizeFilename(filename: string): string {
+  const decodedFilename = (() => {
+    try {
+      return decodeURIComponent(filename)
+    } catch {
+      return filename
+    }
+  })()
+
+  return decodedFilename
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^\w\s.-]/g, '_')
+    .replace(/\s+/g, '_')
+}
+
+function parseNumericValue(value: unknown): number | null {
+  if (typeof value === 'number') {
+    return Number.isFinite(value) ? value : null
+  }
+
+  if (typeof value !== 'string') {
+    return null
+  }
+
+  const normalizedValue = value.trim()
+  if (!normalizedValue) {
+    return null
+  }
+
+  const lastCommaIndex = normalizedValue.lastIndexOf(',')
+  const lastDotIndex = normalizedValue.lastIndexOf('.')
+
+  let sanitizedValue = normalizedValue
+  if (lastCommaIndex > lastDotIndex) {
+    sanitizedValue = normalizedValue.replace(/\./g, '').replace(',', '.')
+  } else if (lastDotIndex > lastCommaIndex) {
+    sanitizedValue = normalizedValue.replace(/,/g, '')
+  }
+
+  const parsed = Number.parseFloat(sanitizedValue)
+  return Number.isFinite(parsed) ? parsed : null
+}
+
 async function downloadAttachment(url: string, filename: string, entityId: string): Promise<string | null> {
   try {
     const uploadsDir = path.join(process.cwd(), 'public', 'uploads', 'anexos', entityId)
@@ -152,7 +196,7 @@ async function downloadAttachment(url: string, filename: string, entityId: strin
     const arrayBuffer = await response.arrayBuffer()
     const buffer = Buffer.from(arrayBuffer)
 
-    const sanitizedFilename = decodeURIComponent(filename).replace(/[^\w\s\-.]/g, '_').replace(/\s+/g, '_')
+    const sanitizedFilename = sanitizeFilename(filename)
     const uniqueFilename = `${Date.now()}-${sanitizedFilename}`
     const filePath = path.join(uploadsDir, uniqueFilename)
     fs.writeFileSync(filePath, buffer)
@@ -190,7 +234,7 @@ async function saveAttachments(
   for (const att of attachments) {
     const localUrl = await downloadAttachment(att.url, att.name, entityId)
     if (localUrl) {
-      const sanitizedNomeArquivo = decodeURIComponent(att.name).replace(/[^\w\s\-.]/g, '_').replace(/\s+/g, '_')
+      const sanitizedNomeArquivo = sanitizeFilename(att.name)
       await prisma.anexo.create({
         data: {
           nomeArquivo: sanitizedNomeArquivo,
@@ -251,8 +295,8 @@ function mapExternalToPrisma(entity: string, externalData: ExternalData): Record
         result[prismaKey] = dateObj
       }
     } else if (externalKey === 'estimated_value' || externalKey === 'value' || externalKey === 'predicted_value' || externalKey === 'collected_value' || externalKey === 'initial_value' || externalKey === 'total_value' || externalKey === 'base_salary' || externalKey === 'benefits' || externalKey === 'allowances' || externalKey === 'deductions' || externalKey === 'net_salary') {
-      const num = parseFloat(stringValue)
-      if (!isNaN(num)) {
+      const num = parseNumericValue(value)
+      if (num !== null) {
         result[prismaKey] = num
       }
     } else if (externalKey === 'is_reissue' || externalKey === 'send_transferegov') {
