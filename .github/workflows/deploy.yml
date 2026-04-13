@@ -1,0 +1,35 @@
+name: Deploy Portal Transparencia
+
+on:
+  push:
+    branches:
+      - master  # Branch que você está usando no servidor
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
+
+      # 1. Conecta o GitHub na sua VPN Privada
+      - name: Conectar ao Tailscale
+        uses: tailscale/github-action@v2
+        with:
+          oauth-client-id: ${{ secrets.TS_OAUTH_ID }}
+          oauth-secret: ${{ secrets.TS_OAUTH_SECRET }}
+          tags: tag:ci
+
+      # 2. Entra no servidor e faz o deploy
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            cd /home/tefe-portaltransparencia/htdocs
+            git pull origin master
+            npm install --production
+            pm2 reload transparencia --update-env
