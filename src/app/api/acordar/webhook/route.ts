@@ -1,9 +1,10 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { after, NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import path from 'path'
 import fs from 'fs'
 
 export const dynamic = 'force-dynamic'
+export const maxDuration = 300
 
 const EXTERNAL_API_BASE = 'https://prefeitura.tefe.am.gov.br/api/transparencia'
 const DEFAULT_ORG = 'cgm'
@@ -20,6 +21,38 @@ interface ExternalData {
   organization_id?: string
   attachments?: ExternalAttachment[]
   [key: string]: unknown
+}
+
+interface ImportResults {
+  created: number
+  updated: number
+  errors: number
+  attachments: number
+  deleted: number
+}
+
+interface EntityWebhookResult {
+  success: true
+  entity: string
+  org: string
+  message?: string
+  totalRecords?: number
+  imported: ImportResults
+}
+
+interface EntityWebhookFailure {
+  success: false
+  entity: string
+  org: string
+  error: string
+}
+
+interface PrismaWebhookModel {
+  findFirst(args: { where: { idExternalRef: string } }): Promise<{ id: string } | null>
+  update(args: { where: { id: string }, data: Record<string, unknown> }): Promise<{ id: string }>
+  create(args: { data: Record<string, unknown> }): Promise<{ id: string }>
+  deleteMany(args: { where: { idExternalRef: { notIn?: string[], not?: null } } }): Promise<{ count: number }>
+  findMany(args: { where: { idExternalRef: { notIn: string[] } }, select: { id: true } }): Promise<Array<{ id: string }>>
 }
 
 const entityFieldMapping: Record<string, Record<string, string>> = {
@@ -134,6 +167,13 @@ const entityAttachmentType: Record<string, string> = {
   contracts: 'contrato',
   server_payroll: 'servidor',
   agreements: 'convenio',
+}
+
+const validEntities = Object.keys(entityFieldMapping)
+
+function getPrismaModel(entity: string): PrismaWebhookModel | null {
+  const modelName = prismaModelMap[entity]
+  return modelName ? prisma[modelName as keyof typeof prisma] as unknown as PrismaWebhookModel : null
 }
 
 function sanitizeFilename(filename: string): string {
@@ -314,15 +354,10 @@ function mapExternalToPrisma(entity: string, externalData: ExternalData): Record
   return result
 }
 
-async function importData(entity: string, data: ExternalData[]) {
-  const modelName = prismaModelMap[entity]
-  if (!modelName) {
-    throw new Error(`Unknown model for entity: ${entity}`)
-  }
-
-  const prismaModel = (prisma as any)[modelName]
+async function importData(entity: string, data: ExternalData[]): Promise<ImportResults> {
+  const prismaModel = getPrismaModel(entity)
   if (!prismaModel) {
-    throw new Error(`Prisma model not found: ${modelName}`)
+    throw new Error(`Unknown model for entity: ${entity}`)
   }
 
   const entityType = entityAttachmentType[entity]
@@ -336,7 +371,8 @@ async function importData(entity: string, data: ExternalData[]) {
       const externalId = item.id
       const attachments = item.attachments as ExternalAttachment[] | undefined
       
-      const { attachments: _att, ...cleanPayload } = item
+      const cleanPayload: Record<string, unknown> = { ...item }
+      delete cleanPayload.attachments
       mappedData.payload = cleanPayload
 
       const existing = await prismaModel.findFirst({
@@ -397,20 +433,92 @@ async function importData(entity: string, data: ExternalData[]) {
   return importResults
 }
 
+async function processEntityWebhook(entity: string, org: string): Promise<EntityWebhookResult> {
+  console.log(`Fetching ${entity} from external API with org=${org}`)
+
+  const externalData = await fetchExternalData(entity, org)
+
+  if (!externalData || externalData.length === 0) {
+    const prismaModel = getPrismaModel(entity)
+    if (prismaModel) {
+      const deletedAll = await prismaModel.deleteMany({
+        where: { idExternalRef: { not: null } }
+      })
+      return {
+        success: true,
+        entity,
+        org,
+        message: 'Nenhum dado encontrado - todos os registros foram removidos',
+        imported: { created: 0, updated: 0, errors: 0, attachments: 0, deleted: deletedAll.count },
+      }
+    }
+    return {
+      success: true,
+      entity,
+      org,
+      message: 'Nenhum dado encontrado para importação',
+      imported: { created: 0, updated: 0, errors: 0, attachments: 0, deleted: 0 },
+    }
+  }
+
+  const importResults = await importData(entity, externalData)
+
+  return {
+    success: true,
+    entity,
+    org,
+    totalRecords: externalData.length,
+    imported: importResults,
+  }
+}
+
+async function processAllEntityWebhooks(org: string): Promise<Array<EntityWebhookResult | EntityWebhookFailure>> {
+  console.log(`Starting webhook sync for all entities with org=${org}`)
+
+  const results: Array<EntityWebhookResult | EntityWebhookFailure> = []
+
+  for (const entity of validEntities) {
+    try {
+      results.push(await processEntityWebhook(entity, org))
+    } catch (error) {
+      console.error(`Webhook error for ${entity}:`, error)
+      results.push({
+        success: false,
+        entity,
+        org,
+        error: error instanceof Error ? error.message : 'Unknown error',
+      })
+    }
+  }
+
+  const failedCount = results.filter((result) => result.success === false).length
+  console.log(`Finished webhook sync for all entities with ${failedCount} error(s)`)
+
+  return results
+}
+
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
-    const entity = searchParams.get('entity')
+    const entity = searchParams.get('entity')?.trim()
     const org = searchParams.get('org') || DEFAULT_ORG
 
     if (!entity) {
+      after(async () => {
+        await processAllEntityWebhooks(org)
+      })
+
       return NextResponse.json(
-        { error: 'Parâmetro "entity" é obrigatório' },
-        { status: 400 }
+        {
+          success: true,
+          org,
+          scheduled: true,
+          entities: validEntities,
+          message: 'Importação de todas as entidades agendada para execução em segundo plano',
+        }
       )
     }
 
-    const validEntities = Object.keys(entityFieldMapping)
     if (!validEntities.includes(entity)) {
       return NextResponse.json(
         { error: `Entidade inválida. Entidades disponíveis: ${validEntities.join(', ')}` },
@@ -418,42 +526,9 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    console.log(`Fetching ${entity} from external API with org=${org}`)
+    const result = await processEntityWebhook(entity, org)
 
-    const externalData = await fetchExternalData(entity, org)
-
-    if (!externalData || externalData.length === 0) {
-      const prismaModel = (prisma as any)[prismaModelMap[entity]]
-      if (prismaModel) {
-        const deletedAll = await prismaModel.deleteMany({
-          where: { idExternalRef: { not: null } }
-        })
-        return NextResponse.json({
-          success: true,
-          entity,
-          org,
-          message: 'Nenhum dado encontrado - todos os registros foram removidos',
-          imported: { created: 0, updated: 0, errors: 0, attachments: 0, deleted: deletedAll.count },
-        })
-      }
-      return NextResponse.json({
-        success: true,
-        entity,
-        org,
-        message: 'Nenhum dado encontrado para importação',
-        imported: { created: 0, updated: 0, errors: 0, attachments: 0, deleted: 0 },
-      })
-    }
-
-    const importResults = await importData(entity, externalData)
-
-    return NextResponse.json({
-      success: true,
-      entity,
-      org,
-      totalRecords: externalData.length,
-      imported: importResults,
-    })
+    return NextResponse.json(result)
   } catch (error) {
     console.error('Webhook error:', error)
     return NextResponse.json(
