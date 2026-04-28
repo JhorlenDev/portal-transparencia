@@ -1,18 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import fs from 'fs'
+import path from 'path'
 
 export const dynamic = 'force-dynamic'
 
-function getPublicBaseUrl(requestUrl: string) {
-  const configuredUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.APP_URL || process.env.SITE_URL
+function resolveAttachmentPath(urlArquivo: string) {
+  const normalizedPath = (() => {
+    if (urlArquivo.startsWith('http://') || urlArquivo.startsWith('https://')) {
+      return new URL(urlArquivo).pathname
+    }
 
-  if (!configuredUrl) {
-    return requestUrl
-  }
+    return urlArquivo
+  })()
 
-  return configuredUrl.startsWith('http://') || configuredUrl.startsWith('https://')
-    ? configuredUrl
-    : `https://${configuredUrl}`
+  return path.join(process.cwd(), 'public', normalizedPath.replace(/^\//, ''))
 }
 
 export async function GET(
@@ -27,7 +29,23 @@ export async function GET(
       return new NextResponse('Anexo nao encontrado', { status: 404 })
     }
 
-    return NextResponse.redirect(new URL(anexo.urlArquivo, getPublicBaseUrl(request.url)))
+    const filePath = resolveAttachmentPath(anexo.urlArquivo)
+
+    if (!fs.existsSync(filePath)) {
+      return new NextResponse('Arquivo nao encontrado no disco', { status: 404 })
+    }
+
+    const buffer = fs.readFileSync(filePath)
+
+    return new NextResponse(buffer, {
+      status: 200,
+      headers: {
+        'Content-Type': anexo.tipoMime || 'application/octet-stream',
+        'Content-Disposition': `inline; filename="${anexo.nomeArquivo}"`,
+        'Content-Length': String(buffer.length),
+        'Cache-Control': 'public, max-age=31536000, immutable',
+      },
+    })
   } catch (error) {
     console.error('Error serving attachment:', error)
     return new NextResponse('Erro interno', { status: 500 })
