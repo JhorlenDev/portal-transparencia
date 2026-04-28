@@ -33,7 +33,7 @@ jobs:
             cd /home/tefe-portaltransparencia/htdocs
             sudo git fetch origin master
             sudo git reset --hard origin/master
-            sudo npm install --production
+            sudo npm install
             sudo npx prisma generate
             sudo npm run build
             sudo pm2 reload transparencia --update-env
