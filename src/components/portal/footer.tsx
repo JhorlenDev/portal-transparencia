@@ -9,8 +9,6 @@ export default function Footer({ config }: { config?: Record<string, string | nu
 
   const safeConfig = config || {}
 
-  const nomeSite = safeConfig.nome_site || 'Portal da Transparência'
-  const subtitulo = safeConfig.subtitulo_site || 'Prefeitura Municipal'
   const descricao = safeConfig.descricao || 'Portal de transparência pública da Prefeitura Municipal.'
   const endereco = safeConfig.endereco || 'Rua Olavo Bilac, S/N - Centro\nTefé - AM, CEP 69470-000'
   const telefone = safeConfig.telefone_contato || '(97) 3343-2527'

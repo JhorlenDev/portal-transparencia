@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { authenticateRequest } from '@/lib/auth'
+import { getServidoresPage, parsePaginationParams } from '@/lib/site-data'
 
 export const dynamic = 'force-dynamic'
 
@@ -8,18 +9,26 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
     const anoReferencia = searchParams.get('anoReferencia')
+    const ano = searchParams.get('ano')
     const orgaoNome = searchParams.get('orgaoNome')
-    
-    const where: any = {}
-    if (anoReferencia) where.anoReferencia = parseInt(anoReferencia)
-    if (orgaoNome) where.orgaoNome = orgaoNome
-    
-    const servidores = await prisma.servidor.findMany({
-      where,
-      orderBy: { nome: 'asc' },
-    })
-    return NextResponse.json(servidores)
-  } catch (error) {
+    const q = searchParams.get('q')
+    const vinculo = searchParams.get('vinculo')
+
+    const result = await getServidoresPage(
+      {
+        anoReferencia: parseInt(anoReferencia || ano || String(new Date().getFullYear())),
+        search: q || undefined,
+        vinculo: vinculo || undefined,
+        lotacao: orgaoNome || undefined,
+      },
+      parsePaginationParams({
+        page: searchParams.get('page') || undefined,
+        limit: searchParams.get('limit') || undefined,
+      })
+    )
+
+    return NextResponse.json(result)
+  } catch {
     return NextResponse.json({ error: 'Erro ao buscar servidores' }, { status: 500 })
   }
 }
@@ -59,7 +68,7 @@ export async function POST(request: NextRequest) {
       id: servidor.id,
       data: servidor,
     }, { status: 201 })
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: 'Erro ao criar servidor' }, { status: 500 })
   }
 }

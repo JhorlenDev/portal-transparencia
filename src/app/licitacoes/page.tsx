@@ -4,7 +4,8 @@ import { PageSkeleton } from "@/components/ui/skeletons"
 import { FilterBar } from "@/components/portal/filter-bar"
 import { Breadcrumbs } from "@/components/portal/breadcrumbs"
 import { StructuredData } from "@/components/portal/structured-data"
-import { getLicitacoes, getLicitacoesStats } from "@/lib/site-data"
+import { DataPageHero } from "@/components/portal/data-page-hero"
+import { getLicitacoesPage, getLicitacoesStats, parsePaginationParams } from "@/lib/site-data"
 import { LicitacoesContent } from "./licitacoes-client"
 
 export const dynamic = 'force-dynamic'
@@ -22,19 +23,19 @@ export async function generateMetadata() {
 }
 
 interface PageProps {
-  searchParams: Promise<{ q?: string; ano?: string; status?: string; modalidade?: string }>
+  searchParams: Promise<{ q?: string; ano?: string; status?: string; modalidade?: string; page?: string; limit?: string }>
 }
 
 async function LicitacoesWrapper({ searchParams }: PageProps) {
   const params = await searchParams
   const currentYear = parseInt(params.ano || String(new Date().getFullYear()))
 
-  const [licitacoes, stats] = await Promise.all([
-    getLicitacoes({ ano: currentYear, search: params.q || undefined, status: params.status || undefined }),
+  const [licitacoesPage, stats] = await Promise.all([
+    getLicitacoesPage({ ano: currentYear, search: params.q || undefined, status: params.status || undefined, modalidade: params.modalidade || undefined }, parsePaginationParams(params)),
     getLicitacoesStats(currentYear)
   ])
 
-  return <LicitacoesContent licitacoes={licitacoes} stats={stats} currentYear={currentYear} />
+  return <LicitacoesContent licitacoes={licitacoesPage.data} stats={stats} currentYear={currentYear} pagination={licitacoesPage.pagination} />
 }
 
 const statuses = [
@@ -55,17 +56,14 @@ export default async function Licitacoes({ searchParams }: PageProps) {
         { label: "Licitações" }
       ]} />
 
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-800 flex items-center gap-3">
-            <Scale className="h-7 w-7 text-purple-600" />
-            Licitações e Contratações
-          </h1>
-          <p className="text-slate-600 mt-1">
-            Processos licitatórios, dispensas, inexigibilidades e adesões.
-          </p>
-        </div>
-      </div>
+      <DataPageHero
+        icon={<Scale className="h-6 w-6" />}
+        eyebrow="Compras públicas"
+        title="Licitações e Contratações"
+        description="Acompanhe processos licitatórios, dispensas, inexigibilidades e adesões com status, modalidade, valores e documentos vinculados."
+        accent="purple"
+        badges={["Modalidade", "Status", "Valor estimado", "PNCP e anexos"]}
+      />
 
       <FilterBar 
         page="licitacoes"

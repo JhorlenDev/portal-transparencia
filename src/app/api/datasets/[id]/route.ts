@@ -20,7 +20,7 @@ export async function GET(
     }
 
     return NextResponse.json(dataset)
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: 'Erro ao buscar dataset' }, { status: 500 })
   }
 }
@@ -54,7 +54,7 @@ export async function PUT(
     })
 
     return NextResponse.json(dataset)
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: 'Erro ao atualizar dataset' }, { status: 500 })
   }
 }
@@ -70,7 +70,7 @@ export async function DELETE(
     const { id } = await params
     await prisma.dataset.delete({ where: { id } })
     return NextResponse.json({ message: 'Dataset excluído com sucesso' })
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: 'Erro ao excluir dataset' }, { status: 500 })
   }
 }

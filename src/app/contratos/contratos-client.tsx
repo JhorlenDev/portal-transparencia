@@ -2,8 +2,9 @@
 
 import React from "react"
 import { Card, CardContent } from "@/components/ui/card"
-import { FileText } from "lucide-react"
 import { AttachmentsCell } from "@/components/attachments/attachments-modal"
+import { PaginationControls } from "@/components/portal/pagination-controls"
+import type { PaginationMeta } from "@/lib/site-data"
 
 function formatCurrency(value: number): string {
   return new Intl.NumberFormat('pt-BR', {
@@ -46,9 +47,10 @@ interface ContratosContentProps {
   stats: Stats
   currentYear: number
   searchParams?: { q?: string; ano?: string; status?: string; tipo?: string }
+  pagination?: PaginationMeta
 }
 
-export function ContratosContent({ contratos, stats, currentYear }: ContratosContentProps) {
+export function ContratosContent({ contratos, stats, pagination }: ContratosContentProps) {
   return (
     <>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
@@ -132,6 +134,8 @@ export function ContratosContent({ contratos, stats, currentYear }: ContratosCon
           </div>
         </CardContent>
       </Card>
+
+      {pagination && <PaginationControls pagination={pagination} />}
     </>
   )
 }

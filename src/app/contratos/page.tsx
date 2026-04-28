@@ -4,7 +4,8 @@ import { PageSkeleton } from "@/components/ui/skeletons"
 import { FilterBar } from "@/components/portal/filter-bar"
 import { Breadcrumbs } from "@/components/portal/breadcrumbs"
 import { StructuredData } from "@/components/portal/structured-data"
-import { getContratos, getContratosStats } from "@/lib/site-data"
+import { DataPageHero } from "@/components/portal/data-page-hero"
+import { getContratosPage, getContratosStats, parsePaginationParams } from "@/lib/site-data"
 import { ContratosContent } from "./contratos-client"
 
 export const dynamic = 'force-dynamic'
@@ -22,19 +23,19 @@ export async function generateMetadata() {
 }
 
 interface PageProps {
-  searchParams: Promise<{ q?: string; ano?: string; status?: string; tipo?: string }>
+  searchParams: Promise<{ q?: string; ano?: string; status?: string; tipo?: string; page?: string; limit?: string }>
 }
 
 async function ContratosWrapper({ searchParams }: PageProps) {
   const params = await searchParams
   const currentYear = parseInt(params.ano || String(new Date().getFullYear()))
 
-  const [contratos, stats] = await Promise.all([
-    getContratos({ ano: currentYear, search: params.q || undefined, status: params.status || undefined }),
+  const [contratosPage, stats] = await Promise.all([
+    getContratosPage({ ano: currentYear, search: params.q || undefined, status: params.status || undefined, tipo: params.tipo || undefined }, parsePaginationParams(params)),
     getContratosStats()
   ])
 
-  return <ContratosContent contratos={contratos} stats={stats} currentYear={currentYear} />
+  return <ContratosContent contratos={contratosPage.data} stats={stats} currentYear={currentYear} pagination={contratosPage.pagination} />
 }
 
 const statuses = [
@@ -53,15 +54,14 @@ export default async function Contratos({ searchParams }: PageProps) {
         { label: "Contratos" }
       ]} />
 
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-800 flex items-center gap-3">
-            <FileText className="h-7 w-7 text-amber-800" />
-            Contratos Administrativos
-          </h1>
-          <p className="text-slate-600 mt-1">Contratos, atas de registro de preços e aditivos.</p>
-        </div>
-      </div>
+      <DataPageHero
+        icon={<FileText className="h-6 w-6" />}
+        eyebrow="Execução contratual"
+        title="Contratos Administrativos"
+        description="Consulte contratos, atas de registro de preços, aditivos e instrumentos similares com contratado, objeto, vigência e valores."
+        accent="amber"
+        badges={["Contratado", "Vigência", "Valor inicial", "Anexos"]}
+      />
 
       <FilterBar 
         page="contratos"

@@ -23,7 +23,7 @@ export async function GET(
     }
 
     return NextResponse.json(contrato)
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: 'Erro ao buscar contrato' }, { status: 500 })
   }
 }
@@ -69,7 +69,7 @@ export async function PUT(
     })
 
     return NextResponse.json(contrato)
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: 'Erro ao atualizar contrato' }, { status: 500 })
   }
 }
@@ -85,7 +85,7 @@ export async function DELETE(
     const { id } = await params
     await prisma.contrato.delete({ where: { id } })
     return NextResponse.json({ message: 'Contrato excluído com sucesso' })
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: 'Erro ao excluir contrato' }, { status: 500 })
   }
 }

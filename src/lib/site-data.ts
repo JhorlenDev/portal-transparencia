@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/prisma'
+import { Prisma } from '@prisma/client'
 
 export interface SiteConfig {
   [key: string]: string | null
@@ -81,6 +82,57 @@ export interface SiteStats {
   totalContratos: number
 }
 
+export interface PaginationInput {
+  page?: number
+  pageSize?: number
+}
+
+export interface PaginationMeta {
+  page: number
+  pageSize: number
+  total: number
+  totalPages: number
+}
+
+export interface PaginatedResult<T> {
+  data: T[]
+  pagination: PaginationMeta
+}
+
+const DEFAULT_PAGE_SIZE = 50
+const MAX_PAGE_SIZE = 100
+
+export function getPagination(input?: PaginationInput) {
+  const page = Math.max(1, Math.floor(input?.page || 1))
+  const pageSize = Math.min(MAX_PAGE_SIZE, Math.max(1, Math.floor(input?.pageSize || DEFAULT_PAGE_SIZE)))
+
+  return {
+    page,
+    pageSize,
+    skip: (page - 1) * pageSize,
+    take: pageSize,
+  }
+}
+
+export function parsePaginationParams(params: { page?: string; limit?: string }): PaginationInput {
+  return {
+    page: params.page ? Number(params.page) : undefined,
+    pageSize: params.limit ? Number(params.limit) : undefined,
+  }
+}
+
+function buildPaginatedResult<T>(data: T[], total: number, page: number, pageSize: number): PaginatedResult<T> {
+  return {
+    data,
+    pagination: {
+      page,
+      pageSize,
+      total,
+      totalPages: Math.max(1, Math.ceil(total / pageSize)),
+    },
+  }
+}
+
 export async function getSiteStats(): Promise<SiteStats> {
   const currentYear = new Date().getFullYear()
 
@@ -148,7 +200,7 @@ export interface ReceitasFilters {
 
 export async function getReceitas(filters?: ReceitasFilters) {
   const year = filters?.exercicio || new Date().getFullYear()
-  const where: any = { exercicio: year }
+  const where: Prisma.ReceitaWhereInput = { exercicio: year }
   
   if (filters?.categoria) {
     where.categoriaEconomica = filters.categoria
@@ -165,6 +217,35 @@ export async function getReceitas(filters?: ReceitasFilters) {
     where,
     orderBy: { exercicio: 'desc' }
   }))
+}
+
+export async function getReceitasPage(filters?: ReceitasFilters, paginationInput?: PaginationInput) {
+  const year = filters?.exercicio || new Date().getFullYear()
+  const where: Prisma.ReceitaWhereInput = { exercicio: year }
+  const pagination = getPagination(paginationInput)
+
+  if (filters?.categoria) {
+    where.categoriaEconomica = filters.categoria
+  }
+
+  if (filters?.search) {
+    where.OR = [
+      { naturezaReceita: { contains: filters.search } },
+      { codigoNatureza: { contains: filters.search } }
+    ]
+  }
+
+  const [receitas, total] = await Promise.all([
+    getEntityWithAnexos('receita', prisma.receita.findMany({
+      where,
+      orderBy: [{ exercicio: 'desc' }, { createdAt: 'desc' }],
+      skip: pagination.skip,
+      take: pagination.take,
+    })),
+    prisma.receita.count({ where }),
+  ])
+
+  return buildPaginatedResult(receitas, total, pagination.page, pagination.pageSize)
 }
 
 export async function getReceitasStats(exercicio?: number) {
@@ -189,10 +270,10 @@ export interface DespesasFilters {
 
 export async function getDespesas(filters?: DespesasFilters) {
   const year = filters?.exercicio || new Date().getFullYear()
-  const where: any = { exercicio: year }
+  const where: Prisma.DespesaWhereInput = { exercicio: year }
   
   if (filters?.categoria) {
-    where.categoriaDespesa = filters.categoria
+    where.elementoDespesaNome = filters.categoria
   }
   
   if (filters?.search) {
@@ -203,42 +284,90 @@ export async function getDespesas(filters?: DespesasFilters) {
     ]
   }
   
-  const despesas = await prisma.despesa.findMany({
+  return getEntityWithAnexos('despesa', prisma.despesa.findMany({
     where,
     orderBy: { dataEmpenho: 'desc' }
-  })
-  
-  const despesasWithAnexos = await Promise.all(
-    despesas.map(async (despesa) => {
-      const anexos = await prisma.anexo.findMany({
-        where: {
-          entidadeTipo: 'despesa',
-          entidadeId: despesa.id
-        }
-      })
-      return { ...despesa, anexos }
-    })
-  )
-  
-  return despesasWithAnexos
+  }))
+}
+
+export async function getDespesasPage(filters?: DespesasFilters, paginationInput?: PaginationInput) {
+  const year = filters?.exercicio || new Date().getFullYear()
+  const where: Prisma.DespesaWhereInput = { exercicio: year }
+  const pagination = getPagination(paginationInput)
+
+  if (filters?.categoria) {
+    where.elementoDespesaNome = filters.categoria
+  }
+
+  if (filters?.search) {
+    where.OR = [
+      { objeto: { contains: filters.search } },
+      { credorNome: { contains: filters.search } },
+      { numeroEmpenho: { contains: filters.search } }
+    ]
+  }
+
+  const [despesas, total] = await Promise.all([
+    getEntityWithAnexos('despesa', prisma.despesa.findMany({
+      where,
+      orderBy: { dataEmpenho: 'desc' },
+      skip: pagination.skip,
+      take: pagination.take,
+    })),
+    prisma.despesa.count({ where }),
+  ])
+
+  return buildPaginatedResult(despesas, total, pagination.page, pagination.pageSize)
+}
+
+interface AttachmentData {
+  id: string
+  nomeArquivo: string
+  urlArquivo: string
+  tamanho: number | null
+  tipoMime: string | null
 }
 
 async function getEntityWithAnexos<T extends { id: string }>(
-  entity: 'contrato' | 'convenio' | 'licitacao' | 'receita' | 'servidor',
+  entity: 'contrato' | 'convenio' | 'licitacao' | 'receita' | 'servidor' | 'despesa',
   prismaQuery: Promise<T[]>
-): Promise<T[]> {
+): Promise<Array<T & { anexos: AttachmentData[] }>> {
   const items = await prismaQuery
-  return Promise.all(
-    items.map(async (item) => {
-      const anexos = await prisma.anexo.findMany({
-        where: {
-          entidadeTipo: entity,
-          entidadeId: item.id
-        }
-      })
-      return { ...item, anexos }
+  const ids = items.map((item) => item.id)
+
+  if (ids.length === 0) {
+    return []
+  }
+
+  const anexos = await prisma.anexo.findMany({
+    where: {
+      entidadeTipo: entity,
+      entidadeId: { in: ids }
+    },
+    select: {
+      id: true,
+      nomeArquivo: true,
+      urlArquivo: true,
+      tamanho: true,
+      tipoMime: true,
+      entidadeId: true,
+    }
+  })
+
+  const anexosByEntity = new Map<string, AttachmentData[]>()
+  for (const anexo of anexos) {
+    const current = anexosByEntity.get(anexo.entidadeId) || []
+    current.push({
+      id: anexo.id,
+      nomeArquivo: anexo.nomeArquivo,
+      urlArquivo: anexo.urlArquivo,
+      tamanho: anexo.tamanho,
+      tipoMime: anexo.tipoMime,
     })
-  )
+    anexosByEntity.set(anexo.entidadeId, current)
+  }
+
+  return items.map((item) => ({ ...item, anexos: anexosByEntity.get(item.id) || [] }))
 }
 
 export async function getDespesasStats(exercicio?: number) {
@@ -264,7 +393,7 @@ export interface LicitacoesFilters {
 
 export async function getLicitacoes(filters?: LicitacoesFilters) {
   const year = filters?.ano || new Date().getFullYear()
-  const where: any = { ano: year }
+  const where: Prisma.LicitacaoWhereInput = { ano: year }
   
   if (filters?.status) {
     where.status = filters.status
@@ -285,6 +414,39 @@ export async function getLicitacoes(filters?: LicitacoesFilters) {
     where,
     orderBy: { dataAbertura: 'desc' }
   }))
+}
+
+export async function getLicitacoesPage(filters?: LicitacoesFilters, paginationInput?: PaginationInput) {
+  const year = filters?.ano || new Date().getFullYear()
+  const where: Prisma.LicitacaoWhereInput = { ano: year }
+  const pagination = getPagination(paginationInput)
+
+  if (filters?.status) {
+    where.status = filters.status
+  }
+
+  if (filters?.modalidade) {
+    where.modalidade = filters.modalidade
+  }
+
+  if (filters?.search) {
+    where.OR = [
+      { objeto: { contains: filters.search } },
+      { numero: { contains: filters.search } }
+    ]
+  }
+
+  const [licitacoes, total] = await Promise.all([
+    getEntityWithAnexos('licitacao', prisma.licitacao.findMany({
+      where,
+      orderBy: { dataAbertura: 'desc' },
+      skip: pagination.skip,
+      take: pagination.take,
+    })),
+    prisma.licitacao.count({ where }),
+  ])
+
+  return buildPaginatedResult(licitacoes, total, pagination.page, pagination.pageSize)
 }
 
 export async function getLicitacoesStats(ano?: number) {
@@ -308,7 +470,7 @@ export interface ContratosFilters {
 
 export async function getContratos(filters?: ContratosFilters) {
   const year = filters?.ano || new Date().getFullYear()
-  const where: any = { ano: year }
+  const where: Prisma.ContratoWhereInput = { ano: year }
   
   if (filters?.status) {
     where.status = filters.status
@@ -332,6 +494,40 @@ export async function getContratos(filters?: ContratosFilters) {
   }))
 }
 
+export async function getContratosPage(filters?: ContratosFilters, paginationInput?: PaginationInput) {
+  const year = filters?.ano || new Date().getFullYear()
+  const where: Prisma.ContratoWhereInput = { ano: year }
+  const pagination = getPagination(paginationInput)
+
+  if (filters?.status) {
+    where.status = filters.status
+  }
+
+  if (filters?.tipo) {
+    where.tipoContrato = filters.tipo
+  }
+
+  if (filters?.search) {
+    where.OR = [
+      { objeto: { contains: filters.search } },
+      { contratadoNome: { contains: filters.search } },
+      { numero: { contains: filters.search } }
+    ]
+  }
+
+  const [contratos, total] = await Promise.all([
+    getEntityWithAnexos('contrato', prisma.contrato.findMany({
+      where,
+      orderBy: { dataInicioVigencia: 'desc' },
+      skip: pagination.skip,
+      take: pagination.take,
+    })),
+    prisma.contrato.count({ where }),
+  ])
+
+  return buildPaginatedResult(contratos, total, pagination.page, pagination.pageSize)
+}
+
 export async function getContratosStats() {
   const total = await prisma.contrato.count()
   const vigentes = await prisma.contrato.count({ where: { status: 'vigente' } })
@@ -352,7 +548,7 @@ export interface ServidoresFilters {
 
 export async function getServidores(filters?: ServidoresFilters) {
   const year = filters?.anoReferencia || new Date().getFullYear()
-  const where: any = { anoReferencia: year }
+  const where: Prisma.ServidorWhereInput = { anoReferencia: year }
   
   if (filters?.vinculo) {
     where.vinculo = filters.vinculo
@@ -374,6 +570,40 @@ export async function getServidores(filters?: ServidoresFilters) {
     where,
     orderBy: { nome: 'asc' }
   }))
+}
+
+export async function getServidoresPage(filters?: ServidoresFilters, paginationInput?: PaginationInput) {
+  const year = filters?.anoReferencia || new Date().getFullYear()
+  const where: Prisma.ServidorWhereInput = { anoReferencia: year }
+  const pagination = getPagination(paginationInput)
+
+  if (filters?.vinculo) {
+    where.vinculo = filters.vinculo
+  }
+
+  if (filters?.lotacao) {
+    where.lotacao = filters.lotacao
+  }
+
+  if (filters?.search) {
+    where.OR = [
+      { nome: { contains: filters.search } },
+      { matricula: { contains: filters.search } },
+      { cargo: { contains: filters.search } }
+    ]
+  }
+
+  const [servidores, total] = await Promise.all([
+    getEntityWithAnexos('servidor', prisma.servidor.findMany({
+      where,
+      orderBy: { nome: 'asc' },
+      skip: pagination.skip,
+      take: pagination.take,
+    })),
+    prisma.servidor.count({ where }),
+  ])
+
+  return buildPaginatedResult(servidores, total, pagination.page, pagination.pageSize)
 }
 
 export async function getGlobalSearch(query: string) {
@@ -425,7 +655,7 @@ export interface ConveniosFilters {
 
 export async function getConvenios(filters?: ConveniosFilters) {
   const year = filters?.ano || new Date().getFullYear()
-  const where: any = { ano: year }
+  const where: Prisma.ConvenioWhereInput = { ano: year }
   
   if (filters?.status) {
     where.status = filters.status
@@ -447,6 +677,40 @@ export async function getConvenios(filters?: ConveniosFilters) {
     where,
     orderBy: { dataInicioVigencia: 'desc' }
   }))
+}
+
+export async function getConveniosPage(filters?: ConveniosFilters, paginationInput?: PaginationInput) {
+  const year = filters?.ano || new Date().getFullYear()
+  const where: Prisma.ConvenioWhereInput = { ano: year }
+  const pagination = getPagination(paginationInput)
+
+  if (filters?.status) {
+    where.status = filters.status
+  }
+
+  if (filters?.tipo) {
+    where.tipo = filters.tipo
+  }
+
+  if (filters?.search) {
+    where.OR = [
+      { objeto: { contains: filters.search } },
+      { concedente: { contains: filters.search } },
+      { numero: { contains: filters.search } }
+    ]
+  }
+
+  const [convenios, total] = await Promise.all([
+    getEntityWithAnexos('convenio', prisma.convenio.findMany({
+      where,
+      orderBy: { dataInicioVigencia: 'desc' },
+      skip: pagination.skip,
+      take: pagination.take,
+    })),
+    prisma.convenio.count({ where }),
+  ])
+
+  return buildPaginatedResult(convenios, total, pagination.page, pagination.pageSize)
 }
 
 export async function getConveniosStats(ano?: number) {

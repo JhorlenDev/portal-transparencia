@@ -19,6 +19,35 @@ const menuItems = [
   { title: "Dados Abertos", href: "/dados-abertos" },
 ]
 
+interface SearchResultItem {
+  id: string
+  credorNome?: string | null
+  naturezaReceita?: string | null
+  categoriaEconomica?: string | null
+  numero?: string | null
+  ano?: number | null
+  contratadoNome?: string | null
+  nome?: string | null
+  cargo?: string | null
+  objeto?: string | null
+}
+
+interface SearchResults {
+  despesas: SearchResultItem[]
+  receitas: SearchResultItem[]
+  licitacoes: SearchResultItem[]
+  contratos: SearchResultItem[]
+  servidores: SearchResultItem[]
+}
+
+const emptySearchResults: SearchResults = {
+  despesas: [],
+  receitas: [],
+  licitacoes: [],
+  contratos: [],
+  servidores: [],
+}
+
 function DesktopMenuItem({ item, pathname }: { item: typeof menuItems[0]; pathname: string }) {
   const isActive = pathname === item.href || pathname.startsWith(item.href + "/")
   
@@ -43,7 +72,7 @@ export default function Header({ config }: { config?: Record<string, string | nu
   const pathname = usePathname()
   const [searchQuery, setSearchQuery] = useState("")
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-  const [searchResults, setSearchResults] = useState<any>(null)
+  const [searchResults, setSearchResults] = useState<SearchResults | null>(null)
   const [isSearching, setIsSearching] = useState(false)
   const [showDropdown, setShowDropdown] = useState(false)
   const dropdownRef = useRef<HTMLFormElement>(null)
@@ -70,8 +99,8 @@ export default function Header({ config }: { config?: Record<string, string | nu
       try {
         const res = await fetch(`/api/busca?q=${encodeURIComponent(searchQuery)}`)
         if (res.ok) {
-          const data = await res.json()
-          setSearchResults(data)
+          const data = await res.json() as Partial<SearchResults>
+          setSearchResults({ ...emptySearchResults, ...data })
           setShowDropdown(true)
         }
       } catch (error) {
@@ -150,10 +179,10 @@ export default function Header({ config }: { config?: Record<string, string | nu
                       <div>
                         <div className="px-3 py-1.5 text-xs font-semibold text-emerald-800 uppercase tracking-wider bg-emerald-50 rounded-md">Despesas</div>
                         <ul className="mt-1 space-y-1">
-                          {searchResults.despesas.slice(0, 3).map((d: any) => (
+                          {searchResults.despesas.slice(0, 3).map((d) => (
                             <li key={d.id}>
                               <Link 
-                                href={`/despesas?search=${encodeURIComponent(searchQuery)}#record-${d.id}`}
+                                href={`/despesas?q=${encodeURIComponent(searchQuery)}#record-${d.id}`}
                                 onClick={() => setShowDropdown(false)}
                                 className="block px-3 py-2 rounded-lg hover:bg-slate-50 text-sm transition-colors"
                               >
@@ -170,10 +199,10 @@ export default function Header({ config }: { config?: Record<string, string | nu
                       <div>
                         <div className="px-3 py-1.5 text-xs font-semibold text-blue-800 uppercase tracking-wider bg-blue-50 rounded-md">Receitas</div>
                         <ul className="mt-1 space-y-1">
-                          {searchResults.receitas.slice(0, 3).map((r: any) => (
+                          {searchResults.receitas.slice(0, 3).map((r) => (
                             <li key={r.id}>
                               <Link 
-                                href={`/receitas?search=${encodeURIComponent(searchQuery)}#record-${r.id}`}
+                                href={`/receitas?q=${encodeURIComponent(searchQuery)}#record-${r.id}`}
                                 onClick={() => setShowDropdown(false)}
                                 className="block px-3 py-2 rounded-lg hover:bg-slate-50 text-sm transition-colors"
                               >
@@ -190,10 +219,10 @@ export default function Header({ config }: { config?: Record<string, string | nu
                       <div>
                         <div className="px-3 py-1.5 text-xs font-semibold text-purple-800 uppercase tracking-wider bg-purple-50 rounded-md">Licitações</div>
                         <ul className="mt-1 space-y-1">
-                          {searchResults.licitacoes.slice(0, 3).map((l: any) => (
+                          {searchResults.licitacoes.slice(0, 3).map((l) => (
                             <li key={l.id}>
                               <Link 
-                                href={`/licitacoes?search=${encodeURIComponent(searchQuery)}#record-${l.id}`}
+                                href={`/licitacoes?q=${encodeURIComponent(searchQuery)}#record-${l.id}`}
                                 onClick={() => setShowDropdown(false)}
                                 className="block px-3 py-2 rounded-lg hover:bg-slate-50 text-sm transition-colors"
                               >
@@ -210,10 +239,10 @@ export default function Header({ config }: { config?: Record<string, string | nu
                       <div>
                         <div className="px-3 py-1.5 text-xs font-semibold text-amber-800 uppercase tracking-wider bg-amber-50 rounded-md">Contratos</div>
                         <ul className="mt-1 space-y-1">
-                          {searchResults.contratos.slice(0, 3).map((c: any) => (
+                          {searchResults.contratos.slice(0, 3).map((c) => (
                             <li key={c.id}>
                               <Link 
-                                href={`/contratos?search=${encodeURIComponent(searchQuery)}#record-${c.id}`}
+                                href={`/contratos?q=${encodeURIComponent(searchQuery)}#record-${c.id}`}
                                 onClick={() => setShowDropdown(false)}
                                 className="block px-3 py-2 rounded-lg hover:bg-slate-50 text-sm transition-colors"
                               >
@@ -230,10 +259,10 @@ export default function Header({ config }: { config?: Record<string, string | nu
                       <div>
                         <div className="px-3 py-1.5 text-xs font-semibold text-rose-800 uppercase tracking-wider bg-rose-50 rounded-md">Servidores</div>
                         <ul className="mt-1 space-y-1">
-                          {searchResults.servidores.slice(0, 3).map((s: any) => (
+                          {searchResults.servidores.slice(0, 3).map((s) => (
                             <li key={s.id}>
                               <Link 
-                                href={`/servidores?search=${encodeURIComponent(searchQuery)}#record-${s.id}`}
+                                href={`/servidores?q=${encodeURIComponent(searchQuery)}#record-${s.id}`}
                                 onClick={() => setShowDropdown(false)}
                                 className="block px-3 py-2 rounded-lg hover:bg-slate-50 text-sm transition-colors"
                               >
@@ -246,13 +275,13 @@ export default function Header({ config }: { config?: Record<string, string | nu
                       </div>
                     )}
 
-                    {Object.values(searchResults).every((arr: any) => arr?.length === 0) && (
+                    {Object.values(searchResults).every((arr) => arr.length === 0) && (
                       <div className="p-4 text-center text-sm text-slate-600">
-                        Nenhum resultado encontrado para "{searchQuery}"
+                        Nenhum resultado encontrado para &quot;{searchQuery}&quot;
                       </div>
                     )}
 
-                    {!Object.values(searchResults).every((arr: any) => arr?.length === 0) && (
+                    {!Object.values(searchResults).every((arr) => arr.length === 0) && (
                       <Link 
                         href={`/busca?q=${encodeURIComponent(searchQuery)}`}
                         onClick={() => setShowDropdown(false)}
@@ -330,4 +359,3 @@ export default function Header({ config }: { config?: Record<string, string | nu
     </>
   )
 }
-

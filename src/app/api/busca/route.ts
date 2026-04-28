@@ -12,7 +12,7 @@ export async function GET(request: Request) {
   try {
     const results = await getGlobalSearch(query)
     return NextResponse.json(results)
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: 'Erro ao buscar dados' }, { status: 500 })
   }
 }

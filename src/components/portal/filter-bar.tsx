@@ -1,8 +1,8 @@
 "use client"
 
 import { useRouter, useSearchParams, usePathname } from "next/navigation"
-import { Search, X, Loader2, Download, FileSpreadsheet, FileJson, Info } from "lucide-react"
-import { useState, useEffect, useCallback } from "react"
+import { Search, X, Loader2, Download, FileSpreadsheet, FileJson } from "lucide-react"
+import { useState, useEffect, useCallback, useTransition } from "react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import {
@@ -52,30 +52,36 @@ export function FilterBar({
   const [status, setStatus] = useState(searchParams.get("status") || "")
   const [isFiltering, setIsFiltering] = useState(false)
   const [showClearConfirm, setShowClearConfirm] = useState(false)
+  const [isPending, startTransition] = useTransition()
 
-  const applyFilters = useCallback(() => {
+  const applyFilters = useCallback((next?: Partial<{ search: string; ano: string; categoria: string; status: string }>) => {
     setIsFiltering(true)
     const params = new URLSearchParams()
-    if (search && search.length >= 3) params.set("q", search)
-    if (ano) params.set("ano", ano)
-    if (categoria) params.set("categoria", categoria)
-    if (status) params.set("status", status)
+    const nextSearch = next?.search ?? search
+    const nextAno = next?.ano ?? ano
+    const nextCategoria = next?.categoria ?? categoria
+    const nextStatus = next?.status ?? status
+
+    if (nextSearch && nextSearch.length >= 3) params.set("q", nextSearch)
+    if (nextAno) params.set("ano", nextAno)
+    if (nextCategoria) params.set("categoria", nextCategoria)
+    if (nextStatus) params.set("status", nextStatus)
     
     const queryString = params.toString()
-    setTimeout(() => {
+    startTransition(() => {
       router.push(queryString ? `${pathname}?${queryString}` : pathname)
-      setIsFiltering(false)
-    }, 300)
+    })
+    setIsFiltering(false)
   }, [search, ano, categoria, status, pathname, router])
 
   useEffect(() => {
     if (search.length >= 3) {
       const timeout = setTimeout(() => {
-        applyFilters()
+        applyFilters({ search })
       }, 500)
       return () => clearTimeout(timeout)
     }
-  }, [search])
+  }, [search, applyFilters])
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearch(e.target.value)
@@ -92,17 +98,22 @@ export function FilterBar({
     params.delete("q")
     params.delete("categoria")
     params.delete("status")
-    router.push(`${pathname}?${params.toString()}`)
+    params.delete("page")
+    startTransition(() => {
+      router.push(`${pathname}?${params.toString()}`)
+    })
   }
 
   const handleCategoriaChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setCategoria(e.target.value)
-    applyFilters()
+    const nextCategoria = e.target.value
+    setCategoria(nextCategoria)
+    applyFilters({ categoria: nextCategoria })
   }
 
   const handleStatusChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setStatus(e.target.value)
-    applyFilters()
+    const nextStatus = e.target.value
+    setStatus(nextStatus)
+    applyFilters({ status: nextStatus })
   }
 
   const clearFilters = () => {
@@ -111,7 +122,9 @@ export function FilterBar({
     setAno(years[0]?.toString() || "")
     setCategoria("")
     setStatus("")
-    router.push(pathname)
+    startTransition(() => {
+      router.push(pathname)
+    })
   }
 
   const handleExport = () => {
@@ -144,7 +157,7 @@ export function FilterBar({
                 onChange={handleSearchChange}
                 className="pl-10"
               />
-              {isFiltering && (
+              {(isFiltering || isPending || isLoading) && (
                 <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-emerald-800 animate-spin" />
               )}
             </div>
@@ -201,9 +214,9 @@ export function FilterBar({
                 variant="outline" 
                 onClick={() => setShowClearConfirm(true)} 
                 className="text-slate-600"
-                disabled={isFiltering}
+                disabled={isFiltering || isPending || isLoading}
               >
-                {isFiltering ? (
+                {(isFiltering || isPending || isLoading) ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
                 ) : (
                   <X className="h-4 w-4 mr-1" />

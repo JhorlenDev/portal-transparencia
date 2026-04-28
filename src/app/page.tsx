@@ -1,9 +1,10 @@
 import Link from "next/link"
+import type { Metadata } from "next"
 import { Search, DollarSign, Scale, FileText, Users, HandCoins, MessageSquare, Database, ChevronRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { getSiteConfig, getSiteStats, getLatestDespesas, getLatestReceitas, getLatestLicitacoes, getLatestContratos } from "@/lib/site-data"
+import { getSiteConfig, getSiteStats, getLatestDespesas, getLatestReceitas, getLatestLicitacoes } from "@/lib/site-data"
 
 const quickLinks = [
   { title: 'Despesas', icon: DollarSign, href: '/despesas', color: 'emerald', description: 'Empenhos, liquidações e pagamentos' },
@@ -38,14 +39,26 @@ function formatCurrency(value: number): string {
 
 export const dynamic = 'force-dynamic'
 
+export const metadata: Metadata = {
+  title: "Portal da Transparência de Tefé",
+  description: "Consulte dados oficiais da Prefeitura Municipal de Tefé: despesas, receitas, licitações, contratos, servidores, convênios, e-SIC e dados abertos.",
+  alternates: {
+    canonical: "/",
+  },
+  openGraph: {
+    title: "Portal da Transparência de Tefé",
+    description: "Acesso público aos dados oficiais da Prefeitura Municipal de Tefé - AM.",
+    url: "/",
+  },
+}
+
 export default async function Home() {
-  const [siteConfig, stats, latestDespesas, latestReceitas, latestLicitacoes, latestContratos] = await Promise.all([
+  const [siteConfig, stats, latestDespesas, latestReceitas, latestLicitacoes] = await Promise.all([
     getSiteConfig(),
     getSiteStats(),
     getLatestDespesas(3),
     getLatestReceitas(3),
-    getLatestLicitacoes(3),
-    getLatestContratos(3)
+    getLatestLicitacoes(3)
   ])
 
   const currentYear = new Date().getFullYear()

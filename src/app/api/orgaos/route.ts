@@ -4,13 +4,13 @@ import { authenticateRequest } from '@/lib/auth'
 
 export const dynamic = 'force-dynamic'
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     const orgaos = await prisma.orgao.findMany({
       orderBy: { nome: 'asc' },
     })
     return NextResponse.json(orgaos)
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: 'Erro ao buscar órgãos' }, { status: 500 })
   }
 }
@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
       id: orgao.id,
       data: orgao,
     }, { status: 201 })
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: 'Erro ao criar órgão' }, { status: 500 })
   }
 }

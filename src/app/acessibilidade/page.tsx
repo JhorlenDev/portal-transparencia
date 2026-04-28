@@ -1,7 +1,16 @@
-import { Accessibility, Eye, Monitor, Smartphone, ZoomIn, ZoomOut } from "lucide-react"
+import type { Metadata } from "next"
+import { Accessibility, Eye, Monitor, Smartphone, ZoomIn } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
 export const dynamic = 'force-dynamic'
+
+export const metadata: Metadata = {
+  title: "Acessibilidade",
+  description: "Recursos e compromisso de acessibilidade digital do Portal da Transparência de Tefé.",
+  alternates: {
+    canonical: "/acessibilidade",
+  },
+}
 
 export default function Acessibilidade() {
   return (

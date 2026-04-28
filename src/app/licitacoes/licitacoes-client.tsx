@@ -2,8 +2,9 @@
 
 import React from "react"
 import { Card, CardContent } from "@/components/ui/card"
-import { Scale } from "lucide-react"
 import { AttachmentsCell } from "@/components/attachments/attachments-modal"
+import { PaginationControls } from "@/components/portal/pagination-controls"
+import type { PaginationMeta } from "@/lib/site-data"
 
 function formatCurrency(value: number): string {
   return new Intl.NumberFormat('pt-BR', {
@@ -53,9 +54,10 @@ interface LicitacoesContentProps {
   licitacoes: LicitacaoWithAnexos[]
   stats: Stats
   currentYear: number
+  pagination?: PaginationMeta
 }
 
-export function LicitacoesContent({ licitacoes, stats, currentYear }: LicitacoesContentProps) {
+export function LicitacoesContent({ licitacoes, stats, currentYear, pagination }: LicitacoesContentProps) {
   const emAndamento = stats.porStatus.find((s) => s.status === 'em_andamento')?._count || 0
   const homologados = stats.porStatus.find((s) => s.status === 'homologado')?._count || 0
 
@@ -141,6 +143,8 @@ export function LicitacoesContent({ licitacoes, stats, currentYear }: Licitacoes
           </div>
         </CardContent>
       </Card>
+
+      {pagination && <PaginationControls pagination={pagination} />}
     </>
   )
 }

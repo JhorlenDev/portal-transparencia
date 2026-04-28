@@ -33,13 +33,20 @@ interface TableSchema {
   rowCount: number
 }
 
+interface WebsiteSchema {
+  name: string
+  url: string
+  description: string
+  searchUrl?: string
+}
+
 interface StructuredDataProps {
-  type: "organization" | "webpage" | "table" | "faq" | "breadcrumb"
-  data: OrganizationSchema | WebPageSchema | TableSchema | BreadcrumbItem[] | any
+  type: "organization" | "website" | "webpage" | "table" | "faq" | "breadcrumb"
+  data: OrganizationSchema | WebsiteSchema | WebPageSchema | TableSchema | BreadcrumbItem[]
 }
 
 export function StructuredData({ type, data }: StructuredDataProps) {
-  let schema: any = null
+  let schema: Record<string, unknown> | null = null
 
   switch (type) {
     case "organization": {
@@ -65,6 +72,25 @@ export function StructuredData({ type, data }: StructuredDataProps) {
             "addressLocality": org.address.addressLocality,
             "addressRegion": org.address.addressRegion,
             "streetAddress": org.address.streetAddress
+          }
+        })
+      }
+      break
+    }
+
+    case "website": {
+      const website = data as WebsiteSchema
+      schema = {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": website.name,
+        "url": website.url,
+        "description": website.description,
+        ...(website.searchUrl && {
+          "potentialAction": {
+            "@type": "SearchAction",
+            "target": `${website.searchUrl}?q={search_term_string}`,
+            "query-input": "required name=search_term_string"
           }
         })
       }

@@ -1,9 +1,10 @@
-import { ReactNode, Suspense } from "react"
+import { Suspense } from "react"
 import { Database, FileJson, FileSpreadsheet } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
 import { PageSkeleton } from "@/components/ui/skeletons"
 import { Breadcrumbs } from "@/components/portal/breadcrumbs"
 import { StructuredData } from "@/components/portal/structured-data"
+import { DataPageHero } from "@/components/portal/data-page-hero"
 import DatasetGridClient from "./dataset-grid-client"
 import { prisma } from "@/lib/prisma"
 
@@ -46,7 +47,7 @@ export default async function DadosAbertos() {
   ])
 
   const formatDate = (date: Date | null | undefined) => date ? date.toLocaleDateString('pt-BR') : new Date().toLocaleDateString('pt-BR')
-  const formatStr = (val: any, fallback: string) => val ? String(val) : fallback
+  const formatStr = (val: unknown, fallback: string) => val ? String(val) : fallback
 
   const PUBLIC_DATABASES = [
     {
@@ -86,7 +87,7 @@ export default async function DadosAbertos() {
         { campo: 'natureza_receita', tipo: 'string', descricao: 'Natureza da Receita', exemplo: formatStr(exReceita?.naturezaReceita, 'Impostos') },
         { campo: 'categoria_economica', tipo: 'string', descricao: 'Categoria Econômica', exemplo: formatStr(exReceita?.categoriaEconomica, 'Receitas Correntes') },
         { campo: 'valor_previsto', tipo: 'float', descricao: 'Valor Previsto', exemplo: formatStr(exReceita?.valorPrevisto, '1000000.00') },
-        { campo: 'valor_arrecadado', type: 'float', descricao: 'Valor Arrecadado', exemplo: formatStr(exReceita?.valorArrecadado, '950000.00') },
+        { campo: 'valor_arrecadado', tipo: 'float', descricao: 'Valor Arrecadado', exemplo: formatStr(exReceita?.valorArrecadado, '950000.00') },
       ]
     },
     {
@@ -190,15 +191,14 @@ export default async function DadosAbertos() {
         { label: "Dados Abertos" }
       ]} />
 
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-slate-800 flex items-center gap-3">
-          <Database className="h-7 w-7 text-indigo-600" />
-          Dados Abertos
-        </h1>
-        <p className="text-slate-600 mt-2 max-w-3xl">
-          Acesse todos os dados públicos do município em formatos abertos (CSV e JSON) ou via API REST pública.
-        </p>
-      </div>
+      <DataPageHero
+        icon={<Database className="h-6 w-6" />}
+        eyebrow="Catálogo público"
+        title="Dados Abertos"
+        description="Acesse bases públicas do município em formatos abertos, com dicionário de dados, periodicidade de atualização e API REST pública."
+        accent="indigo"
+        badges={["CSV", "JSON", "API pública", "Dicionário de dados"]}
+      />
 
       <Suspense fallback={<PageSkeleton />}>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
@@ -241,7 +241,7 @@ export default async function DadosAbertos() {
         </div>
 
         <div className="mb-6">
-          <DatasetGridClient databases={PUBLIC_DATABASES as any} />
+          <DatasetGridClient databases={PUBLIC_DATABASES} />
         </div>
 
         <Card className="mt-8 bg-indigo-50 border-indigo-200">

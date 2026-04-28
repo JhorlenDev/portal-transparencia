@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { prisma } from '@/lib/prisma'
 import { authenticateRequest } from '@/lib/auth'
-import { getSiteConfig, saveConfig, getAllConfigs } from '@/lib/site-data'
+import { saveConfig, getAllConfigs } from '@/lib/site-data'
 
 export const dynamic = 'force-dynamic'
 
@@ -21,7 +20,7 @@ export async function GET() {
     })
 
     return NextResponse.json(configObj)
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: 'Erro ao buscar configuração' }, { status: 500 })
   }
 }
@@ -53,7 +52,7 @@ export async function POST(request: NextRequest) {
     }
 
     return NextResponse.json({ error: 'Formato inválido' }, { status: 400 })
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: 'Erro ao salvar configuração' }, { status: 500 })
   }
 }

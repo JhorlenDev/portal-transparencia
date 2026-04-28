@@ -1,12 +1,12 @@
 import { Suspense } from "react"
 import { DollarSign } from "lucide-react"
-import { Card, CardContent } from "@/components/ui/card"
 import { PageSkeleton } from "@/components/ui/skeletons"
 import { FilterBar } from "@/components/portal/filter-bar"
 import { Breadcrumbs } from "@/components/portal/breadcrumbs"
 import { StructuredData } from "@/components/portal/structured-data"
-import { getDespesas, getDespesasStats } from "@/lib/site-data"
-import { DespesasContent, formatCurrency } from "./despesas-client"
+import { DataPageHero } from "@/components/portal/data-page-hero"
+import { getDespesasPage, getDespesasStats, parsePaginationParams } from "@/lib/site-data"
+import { DespesasContent } from "./despesas-client"
 
 export const dynamic = 'force-dynamic'
 
@@ -23,24 +23,52 @@ export async function generateMetadata() {
 }
 
 interface PageProps {
-  searchParams: Promise<{ q?: string; ano?: string; categoria?: string; status?: string }>
+  searchParams: Promise<{ q?: string; ano?: string; categoria?: string; status?: string; page?: string; limit?: string }>
 }
 
-export default async function Despesas({ searchParams }: PageProps) {
+async function DespesasWrapper({ searchParams }: PageProps) {
   const params = await searchParams
   const currentYear = new Date().getFullYear()
-  const years = Array.from({ length: 5 }, (_, i) => currentYear - i)
-  
+  const selectedYear = parseInt(params.ano || String(currentYear))
+   
   const filters = {
-    exercicio: parseInt(params.ano || String(currentYear)),
+    exercicio: selectedYear,
     search: params.q || undefined,
     categoria: params.categoria || undefined
   }
 
-  const [despesas, stats] = await Promise.all([
-    getDespesas(filters),
-    getDespesasStats(parseInt(params.ano || String(currentYear)))
+  const [despesasPage, stats] = await Promise.all([
+    getDespesasPage(filters, parsePaginationParams(params)),
+    getDespesasStats(selectedYear)
   ])
+
+  return (
+    <>
+      <StructuredData 
+        type="webpage" 
+        data={{
+          title: `Despesas Públicas ${selectedYear}`,
+          description: `Lista de despesas públicas do município. ${despesasPage.pagination.total} registros encontrados.`,
+          url: `/despesas${params.ano ? `?ano=${params.ano}` : ''}`,
+          breadcrumbs: [
+            { name: "Home", url: "/" },
+            { name: "Despesas", url: "/despesas" }
+          ]
+        }}
+      />
+      <DespesasContent 
+        despesas={despesasPage.data} 
+        stats={stats} 
+        currentYear={selectedYear}
+        pagination={despesasPage.pagination}
+      />
+    </>
+  )
+}
+
+export default async function Despesas({ searchParams }: PageProps) {
+  const currentYear = new Date().getFullYear()
+  const years = Array.from({ length: 5 }, (_, i) => currentYear - i)
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -49,17 +77,14 @@ export default async function Despesas({ searchParams }: PageProps) {
         { label: "Despesas" }
       ]} />
 
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-800 flex items-center gap-3">
-            <DollarSign className="h-7 w-7 text-emerald-800" />
-            Despesas Publicas
-          </h1>
-          <p className="text-slate-600 mt-1">
-            Consulte empenhos, liquidacoes e pagamentos realizados pelo municipio.
-          </p>
-        </div>
-      </div>
+      <DataPageHero
+        icon={<DollarSign className="h-6 w-6" />}
+        eyebrow="Execução orçamentária"
+        title="Despesas Públicas"
+        description="Consulte empenhos, liquidações e pagamentos realizados pelo município, com filtros por ano e busca direta por credor, objeto ou número do empenho."
+        accent="emerald"
+        badges={["Empenhos", "Liquidações", "Pagamentos", "Anexos oficiais"]}
+      />
 
       <FilterBar 
         page="despesas"
@@ -68,24 +93,7 @@ export default async function Despesas({ searchParams }: PageProps) {
       />
 
       <Suspense fallback={<PageSkeleton />}>
-        <StructuredData 
-          type="webpage" 
-          data={{
-            title: `Despesas Públicas ${currentYear}`,
-            description: `Lista de despesas públicas do município. ${despesas.length} registros encontrados.`,
-            url: `/despesas${params.ano ? `?ano=${params.ano}` : ''}`,
-            breadcrumbs: [
-              { name: "Home", url: "/" },
-              { name: "Despesas", url: "/despesas" }
-            ]
-          }}
-        />
-        <DespesasContent 
-          despesas={despesas as any} 
-          stats={stats as any} 
-          currentYear={parseInt(params.ano || String(currentYear))}
-          searchParams={params}
-        />
+        <DespesasWrapper searchParams={searchParams} />
       </Suspense>
     </div>
   )

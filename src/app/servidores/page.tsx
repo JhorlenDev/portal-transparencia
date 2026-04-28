@@ -2,10 +2,11 @@ import { Suspense } from "react"
 import { Metadata } from "next"
 import { Users } from "lucide-react"
 import { PageSkeleton } from "@/components/ui/skeletons"
-import { getServidores, getServidoresStats } from "@/lib/site-data"
+import { getServidoresPage, getServidoresStats, parsePaginationParams } from "@/lib/site-data"
 import { FilterBar } from "@/components/portal/filter-bar"
 import { Breadcrumbs } from "@/components/portal/breadcrumbs"
 import { StructuredData } from "@/components/portal/structured-data"
+import { DataPageHero } from "@/components/portal/data-page-hero"
 import { ServidoresContent } from "./servidores-client"
 
 export const dynamic = 'force-dynamic'
@@ -17,24 +18,24 @@ const statuses = [
 ]
 
 interface PageProps {
-  searchParams: Promise<{ q?: string; ano?: string; vinculo?: string; lotacao?: string }>
+  searchParams: Promise<{ q?: string; ano?: string; vinculo?: string; lotacao?: string; page?: string; limit?: string }>
 }
 
 async function ServidoresWrapper({ searchParams }: PageProps) {
   const params = await searchParams
-  const currentYear = new Date().getFullYear()
-  const [servidores, stats] = await Promise.all([
-    getServidores({ anoReferencia: currentYear, search: params.q || undefined, vinculo: params.vinculo || undefined }),
+  const currentYear = parseInt(params.ano || String(new Date().getFullYear()))
+  const [servidoresPage, stats] = await Promise.all([
+    getServidoresPage({ anoReferencia: currentYear, search: params.q || undefined, vinculo: params.vinculo || undefined, lotacao: params.lotacao || undefined }, parsePaginationParams(params)),
     getServidoresStats(currentYear)
   ])
 
-  return <ServidoresContent servidores={servidores} stats={stats} currentYear={currentYear} />
+  return <ServidoresContent servidores={servidoresPage.data} stats={stats} currentYear={currentYear} pagination={servidoresPage.pagination} />
 }
 
 export async function generateMetadata({
   searchParams
 }: {
-  searchParams: Promise<{ q?: string; ano?: string; vinculo?: string; lotacao?: string }>
+  searchParams: Promise<{ q?: string; ano?: string; vinculo?: string; lotacao?: string; page?: string; limit?: string }>
 }): Promise<Metadata> {
   const params = await searchParams
   const baseTitle = "Servidores Públicos"
@@ -48,6 +49,7 @@ export async function generateMetadata({
 
 export default function Servidores({ searchParams }: PageProps) {
   const currentYear = new Date().getFullYear()
+  const years = Array.from({ length: 5 }, (_, i) => currentYear - i)
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -58,15 +60,14 @@ export default function Servidores({ searchParams }: PageProps) {
         ]}
       />
 
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-800 flex items-center gap-3">
-            <Users className="h-7 w-7 text-rose-600" />
-            Servidores Públicos
-          </h1>
-          <p className="text-slate-600 mt-1">Quadro de pessoal e remuneração dos servidores municipais.</p>
-        </div>
-      </div>
+      <DataPageHero
+        icon={<Users className="h-6 w-6" />}
+        eyebrow="Quadro de pessoal"
+        title="Servidores Públicos"
+        description="Consulte servidores municipais por ano, vínculo, nome, matrícula ou cargo, com lotação e remuneração informadas em transparência ativa."
+        accent="rose"
+        badges={["Nome e matrícula", "Cargo", "Lotação", "Remuneração"]}
+      />
 
       <StructuredData
         type="webpage"
@@ -83,6 +84,7 @@ export default function Servidores({ searchParams }: PageProps) {
 
       <FilterBar
         page="servidores"
+        years={years}
         statuses={statuses}
         searchPlaceholder="Buscar por nome, matrícula ou cargo..."
       />

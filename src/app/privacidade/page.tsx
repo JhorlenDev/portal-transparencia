@@ -1,7 +1,16 @@
+import type { Metadata } from "next"
 import { Shield, Lock, Eye, Mail } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
 export const dynamic = 'force-dynamic'
+
+export const metadata: Metadata = {
+  title: "Política de Privacidade",
+  description: "Política de privacidade e tratamento de dados pessoais do Portal da Transparência de Tefé.",
+  alternates: {
+    canonical: "/privacidade",
+  },
+}
 
 export default function Privacidade() {
   return (

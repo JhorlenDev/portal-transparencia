@@ -52,7 +52,7 @@ interface PrismaWebhookModel {
   update(args: { where: { id: string }, data: Record<string, unknown> }): Promise<{ id: string }>
   create(args: { data: Record<string, unknown> }): Promise<{ id: string }>
   deleteMany(args: { where: { idExternalRef: { notIn?: string[], not?: null } } }): Promise<{ count: number }>
-  findMany(args: { where: { idExternalRef: { notIn: string[] } }, select: { id: true } }): Promise<Array<{ id: string }>>
+  findMany(args: { where: { idExternalRef: { notIn?: string[], not?: null } }, select: { id: true } }): Promise<Array<{ id: string }>>
 }
 
 const entityFieldMapping: Record<string, Record<string, string>> = {
@@ -101,13 +101,12 @@ const entityFieldMapping: Record<string, Record<string, string>> = {
   },
   revenues: {
     id: 'idExternalRef',
-    accounting_id: 'accountingId',
+    accounting_id: 'codigoNatureza',
     revenue_nature: 'naturezaReceita',
     predicted_value: 'valorPrevisto',
     collected_value: 'valorArrecadado',
     fiscal_year: 'exercicio',
-    org_unit: 'orgaoNome',
-    source_destination: 'fonteRecurso',
+    source_destination: 'fonteRecursoNome',
     created_at: 'createdAt',
   },
   contracts: {
@@ -135,18 +134,17 @@ const entityFieldMapping: Record<string, Record<string, string>> = {
     allowances: 'adicionais',
     deductions: 'outrosDescontos',
     net_salary: 'remuneracaoLiquida',
-    reference_period: 'referenciaPeriod',
     created_at: 'createdAt',
   },
   agreements: {
     id: 'idExternalRef',
-    parties: 'partes',
+    parties: 'concedente',
     object: 'objeto',
     status: 'status',
     total_value: 'valorTotal',
     start_date: 'dataInicioVigencia',
     end_date: 'dataFimVigencia',
-    goals: 'objetivos',
+    goals: 'objetoResumido',
     created_at: 'createdAt',
   },
 }
@@ -168,6 +166,8 @@ const entityAttachmentType: Record<string, string> = {
   server_payroll: 'servidor',
   agreements: 'convenio',
 }
+
+const entitiesWithPayload = new Set(['procurements', 'expenses', 'revenues', 'contracts', 'server_payroll'])
 
 const validEntities = Object.keys(entityFieldMapping)
 
@@ -218,6 +218,119 @@ function parseNumericValue(value: unknown): number | null {
 
   const parsed = Number.parseFloat(sanitizedValue)
   return Number.isFinite(parsed) ? parsed : null
+}
+
+function parseYear(value: unknown, fallback = new Date().getFullYear()): number {
+  if (typeof value === 'number' && Number.isFinite(value)) {
+    return Math.trunc(value)
+  }
+
+  if (typeof value === 'string') {
+    const match = value.match(/\d{4}/)
+    if (match) {
+      return Number.parseInt(match[0], 10)
+    }
+  }
+
+  return fallback
+}
+
+function parseMonth(value: unknown): number | undefined {
+  if (typeof value !== 'string') return undefined
+
+  const match = value.match(/\d{4}\D+(\d{1,2})/)
+  if (!match) return undefined
+
+  const month = Number.parseInt(match[1], 10)
+  return month >= 1 && month <= 12 ? month : undefined
+}
+
+function getDateYear(value: unknown): number {
+  if (typeof value === 'string' || value instanceof Date) {
+    const date = new Date(value)
+    if (!Number.isNaN(date.getTime())) {
+      return date.getFullYear()
+    }
+  }
+
+  return new Date().getFullYear()
+}
+
+function normalizeForEntity(entity: string, externalData: ExternalData, mappedData: Record<string, unknown>) {
+  switch (entity) {
+    case 'revenues': {
+      mappedData.codigoNatureza ||= String(externalData.accounting_id || externalData.id)
+      mappedData.naturezaReceita ||= String(externalData.revenue_nature || 'Receita não informada')
+      mappedData.categoriaEconomica ||= String(externalData.source_destination || externalData.org_unit || 'Receitas Correntes')
+      mappedData.valorPrevisto = parseNumericValue(mappedData.valorPrevisto) ?? 0
+      mappedData.valorArrecadado = parseNumericValue(mappedData.valorArrecadado) ?? 0
+      mappedData.exercicio = parseYear(mappedData.exercicio || externalData.fiscal_year)
+      break
+    }
+
+    case 'agreements': {
+      const startDate = mappedData.dataInicioVigencia instanceof Date
+        ? mappedData.dataInicioVigencia
+        : new Date(String(externalData.start_date || externalData.created_at || new Date().toISOString()))
+
+      mappedData.numero ||= String(externalData.agreement_number || externalData.number || externalData.id).slice(0, 36)
+      mappedData.ano ||= getDateYear(startDate)
+      mappedData.tipo ||= 'Convênio'
+      mappedData.objeto ||= 'Objeto não informado'
+      mappedData.status ||= 'vigente'
+      mappedData.concedente ||= String(externalData.parties || 'Concedente não informado')
+      mappedData.dataInicioVigencia = Number.isNaN(startDate.getTime()) ? new Date() : startDate
+      mappedData.valorTotal = parseNumericValue(mappedData.valorTotal) ?? 0
+      break
+    }
+
+    case 'server_payroll': {
+      const grossSalary =
+        (parseNumericValue(externalData.base_salary) || 0) +
+        (parseNumericValue(externalData.benefits) || 0) +
+        (parseNumericValue(externalData.allowances) || 0)
+
+      mappedData.nome ||= String(externalData.server_name || 'Servidor não informado')
+      mappedData.matricula ||= String(externalData.registration || externalData.employee_id || externalData.id)
+      mappedData.cargo ||= String(externalData.position || 'Cargo não informado')
+      mappedData.vinculo ||= String(externalData.employment_type || 'efetivo')
+      mappedData.anoReferencia ||= parseYear(externalData.reference_period)
+      mappedData.mesReferencia ||= parseMonth(externalData.reference_period)
+      mappedData.remuneracaoBruta = parseNumericValue(mappedData.remuneracaoBruta) ?? grossSalary
+      mappedData.remuneracaoLiquida = parseNumericValue(mappedData.remuneracaoLiquida) ?? 0
+      break
+    }
+
+    case 'contracts': {
+      mappedData.numero ||= String(externalData.contract_number || externalData.id).slice(0, 36)
+      mappedData.ano ||= parseYear(externalData.contract_year || externalData.start_date)
+      mappedData.objeto ||= 'Objeto não informado'
+      mappedData.status ||= 'vigente'
+      mappedData.valorInicial = parseNumericValue(mappedData.valorInicial) ?? 0
+      mappedData.contratadoNome ||= String(externalData.contractor_name || 'Contratado não informado')
+      mappedData.contratadoCnpj ||= String(externalData.contractor_cnpj || '')
+      mappedData.dataInicioVigencia ||= new Date()
+      break
+    }
+
+    case 'procurements': {
+      mappedData.numero ||= String(externalData.procurement_number || externalData.id).slice(0, 36)
+      mappedData.ano ||= parseYear(externalData.procurement_year || externalData.opening_date)
+      mappedData.modalidade ||= String(externalData.modality || 'Não informada')
+      mappedData.objeto ||= 'Objeto não informado'
+      mappedData.status ||= 'planejamento'
+      break
+    }
+
+    case 'expenses': {
+      mappedData.numeroEmpenho ||= String(externalData.commitment_number || externalData.id).slice(0, 36)
+      mappedData.exercicio ||= parseYear(externalData.fiscal_year || externalData.commitment_date)
+      mappedData.valorEmpenhado = parseNumericValue(mappedData.valorEmpenhado) ?? 0
+      break
+    }
+  }
+
+  return mappedData
 }
 
 async function downloadAttachment(url: string, filename: string, entityId: string): Promise<string | null> {
@@ -272,7 +385,7 @@ async function saveAttachments(
   }
 
   for (const att of attachments) {
-    const localUrl = await downloadAttachment(att.url, att.name, entityId)
+    const localUrl = process.env.VERCEL ? att.url : await downloadAttachment(att.url, att.name, entityId)
     if (localUrl) {
       const sanitizedNomeArquivo = sanitizeFilename(att.name)
       await prisma.anexo.create({
@@ -329,7 +442,7 @@ function mapExternalToPrisma(entity: string, externalData: ExternalData): Record
     const stringValue = String(value).trim()
     if (stringValue === '') continue
 
-    if (externalKey.includes('_date') || externalKey === 'start_date' || externalKey === 'end_date' || externalKey === 'commitment_date' || externalKey === 'opening_date') {
+    if (externalKey.includes('_date') || externalKey === 'created_at' || externalKey === 'start_date' || externalKey === 'end_date' || externalKey === 'commitment_date' || externalKey === 'opening_date') {
       const dateObj = new Date(stringValue)
       if (!isNaN(dateObj.getTime())) {
         result[prismaKey] = dateObj
@@ -367,13 +480,15 @@ async function importData(entity: string, data: ExternalData[]): Promise<ImportR
 
   for (const item of data) {
     try {
-      const mappedData = mapExternalToPrisma(entity, item)
+      const mappedData = normalizeForEntity(entity, item, mapExternalToPrisma(entity, item))
       const externalId = item.id
       const attachments = item.attachments as ExternalAttachment[] | undefined
       
       const cleanPayload: Record<string, unknown> = { ...item }
       delete cleanPayload.attachments
-      mappedData.payload = cleanPayload
+      if (entitiesWithPayload.has(entity)) {
+        mappedData.payload = cleanPayload
+      }
 
       const existing = await prismaModel.findFirst({
         where: { idExternalRef: externalId },
@@ -407,6 +522,13 @@ async function importData(entity: string, data: ExternalData[]): Promise<ImportR
   }
 
   if (externalIds.length > 0) {
+    const deletedRecordsList = await prismaModel.findMany({
+      where: {
+        idExternalRef: { notIn: externalIds }
+      },
+      select: { id: true }
+    })
+
     const deletedRecords = await prismaModel.deleteMany({
       where: {
         idExternalRef: { notIn: externalIds }
@@ -414,11 +536,7 @@ async function importData(entity: string, data: ExternalData[]): Promise<ImportR
     })
     importResults.deleted = deletedRecords.count
 
-    if (deletedRecords.count > 0) {
-      const deletedRecordsList = await prismaModel.findMany({
-        where: { idExternalRef: { notIn: externalIds } },
-        select: { id: true }
-      })
+    if (deletedRecordsList.length > 0) {
       const deletedIds = deletedRecordsList.map((r: { id: string }) => r.id)
       
       await prisma.anexo.deleteMany({
@@ -502,19 +620,37 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url)
     const entity = searchParams.get('entity')?.trim()
     const org = searchParams.get('org') || DEFAULT_ORG
+    const background = searchParams.get('background') === '1'
 
     if (!entity) {
-      after(async () => {
-        await processAllEntityWebhooks(org)
-      })
+      if (background) {
+        after(async () => {
+          await processAllEntityWebhooks(org)
+        })
+
+        return NextResponse.json(
+          {
+            success: true,
+            org,
+            scheduled: true,
+            entities: validEntities,
+            message: 'Importação de todas as entidades agendada para execução em segundo plano',
+          }
+        )
+      }
+
+      const results = await processAllEntityWebhooks(org)
+      const failedCount = results.filter((result) => result.success === false).length
 
       return NextResponse.json(
         {
-          success: true,
+          success: failedCount === 0,
           org,
-          scheduled: true,
           entities: validEntities,
-          message: 'Importação de todas as entidades agendada para execução em segundo plano',
+          results,
+          message: failedCount === 0
+            ? 'Importação de todas as entidades concluída'
+            : `Importação concluída com ${failedCount} erro(s)`,
         }
       )
     }

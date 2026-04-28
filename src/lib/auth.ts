@@ -7,7 +7,9 @@ const API_KEYS = new Set([
   'dev-api-key-2026',
 ])
 
-export async function authenticateRequest(request: NextRequest): Promise<NextResponse | null> {
+export async function authenticateRequest(_request: NextRequest): Promise<NextResponse | null> {
+  void _request
+
   const headersList = await headers()
   const authHeader = headersList.get('authorization')
 

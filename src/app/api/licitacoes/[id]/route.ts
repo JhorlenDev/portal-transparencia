@@ -23,7 +23,7 @@ export async function GET(
     }
 
     return NextResponse.json(licitacao)
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: 'Erro ao buscar licitação' }, { status: 500 })
   }
 }
@@ -78,7 +78,7 @@ export async function PUT(
     })
 
     return NextResponse.json(licitacao)
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: 'Erro ao atualizar licitação' }, { status: 500 })
   }
 }
@@ -94,7 +94,7 @@ export async function DELETE(
     const { id } = await params
     await prisma.licitacao.delete({ where: { id } })
     return NextResponse.json({ message: 'Licitação excluída com sucesso' })
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: 'Erro ao excluir licitação' }, { status: 500 })
   }
 }

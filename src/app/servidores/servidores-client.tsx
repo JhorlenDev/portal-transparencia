@@ -2,8 +2,9 @@
 
 import React from "react"
 import { Card, CardContent } from "@/components/ui/card"
-import { Users } from "lucide-react"
 import { AttachmentsCell } from "@/components/attachments/attachments-modal"
+import { PaginationControls } from "@/components/portal/pagination-controls"
+import type { PaginationMeta } from "@/lib/site-data"
 
 function formatCurrency(value: number): string {
   return new Intl.NumberFormat('pt-BR', {
@@ -44,9 +45,10 @@ interface ServidoresContentProps {
   servidores: ServidorWithAnexos[]
   stats: Stats
   currentYear: number | null
+  pagination?: PaginationMeta
 }
 
-export function ServidoresContent({ servidores, stats, currentYear }: ServidoresContentProps) {
+export function ServidoresContent({ servidores, stats, currentYear, pagination }: ServidoresContentProps) {
   return (
     <>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
@@ -132,6 +134,8 @@ export function ServidoresContent({ servidores, stats, currentYear }: Servidores
           </div>
         </CardContent>
       </Card>
+
+      {pagination && <PaginationControls pagination={pagination} />}
     </>
   )
 }

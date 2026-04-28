@@ -20,7 +20,7 @@ export async function GET(
     }
 
     return NextResponse.json(convenio)
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: 'Erro ao buscar convênio' }, { status: 500 })
   }
 }
@@ -61,7 +61,7 @@ export async function PUT(
     })
 
     return NextResponse.json(convenio)
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: 'Erro ao atualizar convênio' }, { status: 500 })
   }
 }
@@ -77,7 +77,7 @@ export async function DELETE(
     const { id } = await params
     await prisma.convenio.delete({ where: { id } })
     return NextResponse.json({ message: 'Convênio excluído com sucesso' })
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: 'Erro ao excluir convênio' }, { status: 500 })
   }
 }

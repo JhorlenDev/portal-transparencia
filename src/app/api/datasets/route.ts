@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { Prisma } from '@prisma/client'
 import { prisma } from '@/lib/prisma'
 import { authenticateRequest } from '@/lib/auth'
 
@@ -10,7 +11,7 @@ export async function GET(request: NextRequest) {
     const categoria = searchParams.get('categoria')
     const ativo = searchParams.get('ativo')
     
-    const where: any = {}
+    const where: Prisma.DatasetWhereInput = {}
     if (categoria) where.categoria = categoria
     if (ativo !== null) where.ativo = ativo === 'true'
     
@@ -19,7 +20,7 @@ export async function GET(request: NextRequest) {
       orderBy: { nome: 'asc' },
     })
     return NextResponse.json(datasets)
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: 'Erro ao buscar datasets' }, { status: 500 })
   }
 }
@@ -48,7 +49,7 @@ export async function POST(request: NextRequest) {
       id: dataset.id,
       data: dataset,
     }, { status: 201 })
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: 'Erro ao criar dataset' }, { status: 500 })
   }
 }

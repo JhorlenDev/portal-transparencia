@@ -13,6 +13,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     '/convenios',
     '/esic',
     '/dados-abertos',
+    '/acessibilidade',
+    '/privacidade',
   ]
 
   return routes.map((route) => ({

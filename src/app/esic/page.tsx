@@ -1,7 +1,16 @@
+import type { Metadata } from "next"
 import { MessageSquare, FileText, Clock, HelpCircle, ExternalLink } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+
+export const metadata: Metadata = {
+  title: "e-SIC e Lei de Acesso à Informação",
+  description: "Solicite e acompanhe pedidos de informação pública à Prefeitura Municipal de Tefé pelo Serviço de Informação ao Cidadão.",
+  alternates: {
+    canonical: "/esic",
+  },
+}
 
 export default function ESIC() {
   return (

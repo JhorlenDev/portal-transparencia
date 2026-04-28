@@ -1,11 +1,10 @@
 "use client"
 
-import React, { Suspense, useState } from "react"
+import React, { useState } from "react"
 import { DollarSign, TrendingUp, Paperclip, Eye } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
-import { PageSkeleton } from "@/components/ui/skeletons"
-import { FilterBar } from "@/components/portal/filter-bar"
-import { Breadcrumbs } from "@/components/portal/breadcrumbs"
+import { PaginationControls } from "@/components/portal/pagination-controls"
+import type { PaginationMeta } from "@/lib/site-data"
 
 function formatCurrency(value: number): string {
   const safeValue = Number.isFinite(value) ? value : 0
@@ -27,7 +26,7 @@ interface Attachment {
 interface DespesaWithAnexos {
   id: string
   numeroEmpenho: string
-  dataEmpenho: string | null
+  dataEmpenho: Date | string | null
   credorNome: string | null
   credorCpfCnpj: string | null
   objeto: string | null
@@ -195,10 +194,10 @@ interface DespesasContentProps {
   despesas: DespesaWithAnexos[]
   stats: Stats
   currentYear: number
-  searchParams: { q?: string; ano?: string }
+  pagination?: PaginationMeta
 }
 
-function DespesasContent({ despesas, stats, currentYear, searchParams }: DespesasContentProps) {
+function DespesasContent({ despesas, stats, currentYear, pagination }: DespesasContentProps) {
   return (
     <>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
@@ -248,6 +247,8 @@ function DespesasContent({ despesas, stats, currentYear, searchParams }: Despesa
           <DespesasTable despesas={despesas} currentYear={currentYear} />
         </CardContent>
       </Card>
+
+      {pagination && <PaginationControls pagination={pagination} />}
 
       <Card className="mt-8 bg-slate-50 border-dashed">
         <CardContent className="p-6">

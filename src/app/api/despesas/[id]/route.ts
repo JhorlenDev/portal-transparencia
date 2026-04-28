@@ -23,7 +23,7 @@ export async function GET(
     }
 
     return NextResponse.json(despesa)
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: 'Erro ao buscar despesa' }, { status: 500 })
   }
 }
@@ -62,7 +62,7 @@ export async function PUT(
     })
 
     return NextResponse.json(despesa)
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: 'Erro ao atualizar despesa' }, { status: 500 })
   }
 }
@@ -78,7 +78,7 @@ export async function DELETE(
     const { id } = await params
     await prisma.despesa.delete({ where: { id } })
     return NextResponse.json({ message: 'Despesa excluída com sucesso' })
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: 'Erro ao excluir despesa' }, { status: 500 })
   }
 }

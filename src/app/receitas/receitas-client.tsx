@@ -4,6 +4,8 @@ import React from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { TrendingUp, ArrowUpRight } from "lucide-react"
 import { AttachmentsCell } from "@/components/attachments/attachments-modal"
+import { PaginationControls } from "@/components/portal/pagination-controls"
+import type { PaginationMeta } from "@/lib/site-data"
 
 function formatCurrency(value: number): string {
   return new Intl.NumberFormat('pt-BR', {
@@ -42,9 +44,10 @@ interface ReceitasContentProps {
   receitas: ReceitaWithAnexos[]
   stats: Stats
   currentYear: number
+  pagination?: PaginationMeta
 }
 
-export function ReceitasContent({ receitas, stats, currentYear }: ReceitasContentProps) {
+export function ReceitasContent({ receitas, stats, currentYear, pagination }: ReceitasContentProps) {
   const realizacao = stats.previsto > 0 
     ? ((stats.arrecadado / stats.previsto) * 100).toFixed(1) 
     : '0'
@@ -156,6 +159,8 @@ export function ReceitasContent({ receitas, stats, currentYear }: ReceitasConten
           </div>
         </CardContent>
       </Card>
+
+      {pagination && <PaginationControls pagination={pagination} />}
     </>
   )
 }

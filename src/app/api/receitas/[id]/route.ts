@@ -20,7 +20,7 @@ export async function GET(
     }
 
     return NextResponse.json(receita)
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: 'Erro ao buscar receita' }, { status: 500 })
   }
 }
@@ -53,7 +53,7 @@ export async function PUT(
     })
 
     return NextResponse.json(receita)
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: 'Erro ao atualizar receita' }, { status: 500 })
   }
 }
@@ -69,7 +69,7 @@ export async function DELETE(
     const { id } = await params
     await prisma.receita.delete({ where: { id } })
     return NextResponse.json({ message: 'Receita excluída com sucesso' })
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: 'Erro ao excluir receita' }, { status: 500 })
   }
 }

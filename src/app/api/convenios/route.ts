@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { authenticateRequest } from '@/lib/auth'
+import { getConveniosPage, parsePaginationParams } from '@/lib/site-data'
 
 export const dynamic = 'force-dynamic'
 
@@ -9,17 +10,24 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url)
     const ano = searchParams.get('ano')
     const status = searchParams.get('status')
-    
-    const where: any = {}
-    if (ano) where.ano = parseInt(ano)
-    if (status) where.status = status
-    
-    const convenios = await prisma.convenio.findMany({
-      where,
-      orderBy: { dataInicioVigencia: 'desc' },
-    })
-    return NextResponse.json(convenios)
-  } catch (error) {
+    const q = searchParams.get('q')
+    const tipo = searchParams.get('tipo')
+
+    const result = await getConveniosPage(
+      {
+        ano: parseInt(ano || String(new Date().getFullYear())),
+        status: status || undefined,
+        search: q || undefined,
+        tipo: tipo || undefined,
+      },
+      parsePaginationParams({
+        page: searchParams.get('page') || undefined,
+        limit: searchParams.get('limit') || undefined,
+      })
+    )
+
+    return NextResponse.json(result)
+  } catch {
     return NextResponse.json({ error: 'Erro ao buscar convênios' }, { status: 500 })
   }
 }
@@ -55,7 +63,7 @@ export async function POST(request: NextRequest) {
       id: convenio.id,
       data: convenio,
     }, { status: 201 })
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: 'Erro ao criar convênio' }, { status: 500 })
   }
 }

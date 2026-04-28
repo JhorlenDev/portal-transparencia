@@ -1,13 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { Prisma } from '@prisma/client'
 import { prisma } from '@/lib/prisma'
 
 export const dynamic = 'force-dynamic'
 
-function arrayToCSV(data: any[], columns: string[], headers: string[]): string {
+function arrayToCSV<T extends object>(data: T[], columns: string[], headers: string[]): string {
   const headerRow = headers.join(',')
   const rows = data.map(item => 
     columns.map(col => {
-      const value = item[col]
+      const value = (item as Record<string, unknown>)[col]
       if (value === null || value === undefined) return ''
       const str = String(value)
       if (str.includes(',') || str.includes('"') || str.includes('\n')) {
@@ -33,7 +34,7 @@ export async function GET(request: NextRequest) {
   try {
     switch (type) {
       case 'despesas': {
-        const where: any = { exercicio: year }
+        const where: Prisma.DespesaWhereInput = { exercicio: year }
         if (search) {
           where.OR = [
             { objeto: { contains: search } },
@@ -41,7 +42,7 @@ export async function GET(request: NextRequest) {
             { numeroEmpenho: { contains: search } }
           ]
         }
-        if (categoria) where.categoriaDespesa = categoria
+        if (categoria) where.elementoDespesaNome = categoria
 
         const data = await prisma.despesa.findMany({ where, orderBy: { dataEmpenho: 'desc' } })
         
@@ -66,7 +67,7 @@ export async function GET(request: NextRequest) {
       }
 
       case 'receitas': {
-        const where: any = { exercicio: year }
+        const where: Prisma.ReceitaWhereInput = { exercicio: year }
         if (search) {
           where.OR = [
             { naturezaReceita: { contains: search } },
@@ -98,7 +99,7 @@ export async function GET(request: NextRequest) {
       }
 
       case 'licitacoes': {
-        const where: any = { ano: year }
+        const where: Prisma.LicitacaoWhereInput = { ano: year }
         if (search) {
           where.OR = [
             { objeto: { contains: search } },
@@ -130,7 +131,7 @@ export async function GET(request: NextRequest) {
       }
 
       case 'contratos': {
-        const where: any = { ano: year }
+        const where: Prisma.ContratoWhereInput = { ano: year }
         if (search) {
           where.OR = [
             { objeto: { contains: search } },
@@ -163,7 +164,7 @@ export async function GET(request: NextRequest) {
       }
 
       case 'servidores': {
-        const where: any = { anoReferencia: year }
+        const where: Prisma.ServidorWhereInput = { anoReferencia: year }
         if (search) {
           where.OR = [
             { nome: { contains: search } },
@@ -196,7 +197,7 @@ export async function GET(request: NextRequest) {
       }
 
       case 'convenios': {
-        const where: any = { ano: year }
+        const where: Prisma.ConvenioWhereInput = { ano: year }
         if (search) {
           where.OR = [
             { objeto: { contains: search } },

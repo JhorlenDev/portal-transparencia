@@ -1,11 +1,11 @@
 "use client"
 
 import { useState } from "react"
-import { Database, Download, FileJson, FileSpreadsheet, Clock, Info, DollarSign, TrendingUp, Scale, FileText, Users, HandCoins, Code, BookOpen } from "lucide-react"
+import type { ReactNode } from "react"
+import { Download, FileJson, FileSpreadsheet, Clock, Info, Code, BookOpen } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
-import Link from "next/link"
+import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog"
 
 interface Coluna {
   campo: string
@@ -18,7 +18,7 @@ interface Dataset {
   slug: string
   nome: string
   descricao: string
-  icone: any
+  icone: ReactNode
   cor: string
   rota: string
   periodicidade: string
@@ -257,8 +257,8 @@ export default function DatasetGridClient({ databases }: { databases: Dataset[] 
                         <pre className="text-[11px] md:text-xs leading-relaxed overflow-x-auto text-sky-300">
 <span className="text-slate-500">[</span>
   <span className="text-slate-500">{`{`}</span>
-    <span className="text-indigo-300">"{selectedDb.colunas[0]?.campo}"</span><span className="text-slate-500">:</span> <span className="text-emerald-300">"{selectedDb.colunas[0]?.exemplo}"</span><span className="text-slate-500">,</span>
-    <span className="text-indigo-300">"{selectedDb.colunas[1]?.campo}"</span><span className="text-slate-500">:</span> <span className="text-emerald-300">"{selectedDb.colunas[1]?.exemplo}"</span><span className="text-slate-500">,</span>
+    <span className="text-indigo-300">&quot;{selectedDb.colunas[0]?.campo}&quot;</span><span className="text-slate-500">:</span> <span className="text-emerald-300">&quot;{selectedDb.colunas[0]?.exemplo}&quot;</span><span className="text-slate-500">,</span>
+    <span className="text-indigo-300">&quot;{selectedDb.colunas[1]?.campo}&quot;</span><span className="text-slate-500">:</span> <span className="text-emerald-300">&quot;{selectedDb.colunas[1]?.exemplo}&quot;</span><span className="text-slate-500">,</span>
     <span className="text-slate-600">...</span>
   <span className="text-slate-500">{`}`}</span>
 <span className="text-slate-500">]</span>

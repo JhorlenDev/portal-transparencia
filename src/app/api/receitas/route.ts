@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { authenticateRequest } from '@/lib/auth'
+import { getReceitasPage, parsePaginationParams } from '@/lib/site-data'
 
 export const dynamic = 'force-dynamic'
 
@@ -8,15 +9,24 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
     const exercicio = searchParams.get('exercicio')
+    const ano = searchParams.get('ano')
+    const q = searchParams.get('q')
+    const categoria = searchParams.get('categoria')
     
-    const where = exercicio ? { exercicio: parseInt(exercicio) } : {}
-    
-    const receitas = await prisma.receita.findMany({
-      where,
-      orderBy: { exercicio: 'desc' },
-    })
-    return NextResponse.json(receitas)
-  } catch (error) {
+    const result = await getReceitasPage(
+      {
+        exercicio: parseInt(exercicio || ano || String(new Date().getFullYear())),
+        search: q || undefined,
+        categoria: categoria || undefined,
+      },
+      parsePaginationParams({
+        page: searchParams.get('page') || undefined,
+        limit: searchParams.get('limit') || undefined,
+      })
+    )
+
+    return NextResponse.json(result)
+  } catch {
     return NextResponse.json({ error: 'Erro ao buscar receitas' }, { status: 500 })
   }
 }
@@ -44,7 +54,7 @@ export async function POST(request: NextRequest) {
       id: receita.id,
       data: receita,
     }, { status: 201 })
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: 'Erro ao criar receita' }, { status: 500 })
   }
 }

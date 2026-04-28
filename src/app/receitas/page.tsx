@@ -4,7 +4,8 @@ import { PageSkeleton } from "@/components/ui/skeletons"
 import { FilterBar } from "@/components/portal/filter-bar"
 import { Breadcrumbs } from "@/components/portal/breadcrumbs"
 import { StructuredData } from "@/components/portal/structured-data"
-import { getReceitas, getReceitasStats } from "@/lib/site-data"
+import { DataPageHero } from "@/components/portal/data-page-hero"
+import { getReceitasPage, getReceitasStats, parsePaginationParams } from "@/lib/site-data"
 import { ReceitasContent } from "./receitas-client"
 
 export const dynamic = 'force-dynamic'
@@ -18,7 +19,7 @@ export async function generateMetadata() {
 }
 
 interface PageProps {
-  searchParams: Promise<{ q?: string; ano?: string; categoria?: string }>
+  searchParams: Promise<{ q?: string; ano?: string; categoria?: string; page?: string; limit?: string }>
 }
 
 async function ReceitasWrapper({ searchParams }: PageProps) {
@@ -31,12 +32,12 @@ async function ReceitasWrapper({ searchParams }: PageProps) {
     categoria: params.categoria || undefined
   }
   
-  const [receitas, stats] = await Promise.all([
-    getReceitas(filters),
+  const [receitasPage, stats] = await Promise.all([
+    getReceitasPage(filters, parsePaginationParams(params)),
     getReceitasStats(currentYear)
   ])
 
-  return <ReceitasContent receitas={receitas} stats={stats} currentYear={currentYear} />
+  return <ReceitasContent receitas={receitasPage.data} stats={stats} currentYear={currentYear} pagination={receitasPage.pagination} />
 }
 
 export default async function Receitas({ searchParams }: PageProps) {
@@ -50,17 +51,14 @@ export default async function Receitas({ searchParams }: PageProps) {
         { label: "Receitas" }
       ]} />
       
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-800 flex items-center gap-3">
-            <TrendingUp className="h-7 w-7 text-blue-600" />
-            Receitas Públicas
-          </h1>
-          <p className="text-slate-600 mt-1">
-            Acompanhe a previsão e arrecadação das receitas municipais.
-          </p>
-        </div>
-      </div>
+      <DataPageHero
+        icon={<TrendingUp className="h-6 w-6" />}
+        eyebrow="Arrecadação municipal"
+        title="Receitas Públicas"
+        description="Acompanhe a previsão e a arrecadação das receitas municipais por natureza, categoria econômica e fonte de recurso."
+        accent="blue"
+        badges={["Receita prevista", "Receita arrecadada", "Realização", "Dados por ano"]}
+      />
 
       <FilterBar page="receitas" years={years} searchPlaceholder="Buscar por natureza, código..." />
 

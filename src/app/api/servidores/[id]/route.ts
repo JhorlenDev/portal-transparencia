@@ -23,7 +23,7 @@ export async function GET(
     }
 
     return NextResponse.json(servidor)
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: 'Erro ao buscar servidor' }, { status: 500 })
   }
 }
@@ -68,7 +68,7 @@ export async function PUT(
     })
 
     return NextResponse.json(servidor)
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: 'Erro ao atualizar servidor' }, { status: 500 })
   }
 }
@@ -84,7 +84,7 @@ export async function DELETE(
     const { id } = await params
     await prisma.servidor.delete({ where: { id } })
     return NextResponse.json({ message: 'Servidor excluído com sucesso' })
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: 'Erro ao excluir servidor' }, { status: 500 })
   }
 }

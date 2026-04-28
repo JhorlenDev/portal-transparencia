@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { authenticateRequest } from '@/lib/auth'
+import { getDespesasPage, parsePaginationParams } from '@/lib/site-data'
 
 export const dynamic = 'force-dynamic'
 
@@ -8,28 +9,22 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
     const exercicio = searchParams.get('exercicio')
+    const ano = searchParams.get('ano')
+    const q = searchParams.get('q')
     
-    const where = exercicio ? { exercicio: parseInt(exercicio) } : {}
-    
-    const despesas = await prisma.despesa.findMany({
-      where,
-      orderBy: { dataEmpenho: 'desc' },
-    })
-    
-    const despesasWithAnexos = await Promise.all(
-      despesas.map(async (despesa) => {
-        const anexos = await prisma.anexo.findMany({
-          where: {
-            entidadeTipo: 'despesa',
-            entidadeId: despesa.id,
-          },
-        })
-        return { ...despesa, anexos }
+    const result = await getDespesasPage(
+      {
+        exercicio: parseInt(exercicio || ano || String(new Date().getFullYear())),
+        search: q || undefined,
+      },
+      parsePaginationParams({
+        page: searchParams.get('page') || undefined,
+        limit: searchParams.get('limit') || undefined,
       })
     )
-    
-    return NextResponse.json(despesasWithAnexos)
-  } catch (error) {
+
+    return NextResponse.json(result)
+  } catch {
     return NextResponse.json({ error: 'Erro ao buscar despesas' }, { status: 500 })
   }
 }
@@ -63,7 +58,7 @@ export async function POST(request: NextRequest) {
       id: despesa.id,
       data: despesa,
     }, { status: 201 })
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: 'Erro ao criar despesa' }, { status: 500 })
   }
 }

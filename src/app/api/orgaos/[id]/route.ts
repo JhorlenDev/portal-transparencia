@@ -28,7 +28,7 @@ export async function GET(
     }
 
     return NextResponse.json(orgao)
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: 'Erro ao buscar órgão' }, { status: 500 })
   }
 }
@@ -56,7 +56,7 @@ export async function PUT(
     })
 
     return NextResponse.json(orgao)
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: 'Erro ao atualizar órgão' }, { status: 500 })
   }
 }
@@ -72,7 +72,7 @@ export async function DELETE(
     const { id } = await params
     await prisma.orgao.delete({ where: { id } })
     return NextResponse.json({ message: 'Órgão excluído com sucesso' })
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: 'Erro ao excluir órgão' }, { status: 500 })
   }
 }

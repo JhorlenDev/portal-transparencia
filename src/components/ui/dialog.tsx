@@ -12,6 +12,8 @@ interface DialogProps {
 
 export function Dialog({ open, onOpenChange, children }: DialogProps) {
   if (!open) return null
+
+  type DialogChildProps = { onClose?: () => void }
   
   return (
     <>
@@ -22,7 +24,7 @@ export function Dialog({ open, onOpenChange, children }: DialogProps) {
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none">
         <div className="pointer-events-auto w-full flex justify-center">
           {React.Children.map(children, (child) => 
-            React.isValidElement(child) ? React.cloneElement(child as React.ReactElement<any>, { onClose: () => onOpenChange(false) }) : child
+            React.isValidElement<DialogChildProps>(child) ? React.cloneElement(child, { onClose: () => onOpenChange(false) }) : child
           )}
         </div>
       </div>
