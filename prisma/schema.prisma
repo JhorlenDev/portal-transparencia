@@ -52,8 +52,8 @@ model Despesa {
   tipoMovimento     String   @default("Empenho") @map("tipo_movimento")
   credorNome        String?  @map("credor_nome")
   credorCpfCnpj     String?  @map("credor_cpf_cnpj")
-  objeto            String?
-  historico         String?
+  objeto            String?  @db.Text
+  historico         String?  @db.Text
   orgaoId           String?  @map("orgao_id")
   orgaoNome         String?  @map("orgao_nome")
   elementoDespesa   String?  @map("elemento_despesa")
@@ -79,15 +79,15 @@ model Licitacao {
   modalidade                 String
   regulamento                String?  @map("regulamento")
   criterioJulgamento         String?  @map("criterio_julgamento")
-  objeto                     String
-  objetoResumido             String?  @map("objeto_resumido")
+  objeto                     String   @db.Text
+  objetoResumido             String?  @db.Text @map("objeto_resumido")
   status                     String   @default("planejamento")
   dataAbertura               DateTime? @map("data_abertura")
   valorEstimado              Float?   @map("valor_estimado")
   numeroProcesso             String?  @map("numero_processo")
   orgaoId                    String?  @map("orgao_id")
   orgaoNome                  String?  @map("orgao_nome")
-  justificativa               String?
+  justificativa               String?  @db.Text
   linkPncp                   String?  @map("link_pncp")
   createdAt                  DateTime @default(now()) @map("created_date")
   updatedAt                  DateTime @updatedAt @map("updated_date")
@@ -121,8 +121,8 @@ model Contrato {
   numero            String
   ano               Int
   tipoContrato      String?  @map("tipo_contrato")
-  objeto            String
-  objetoResumido    String?  @map("objeto_resumido")
+  objeto            String   @db.Text
+  objetoResumido    String?  @db.Text @map("objeto_resumido")
   status            String   @default("vigente")
   dataInicioVigencia DateTime @map("data_inicio_vigencia")
   dataFimVigencia   DateTime? @map("data_fim_vigencia")
@@ -188,8 +188,8 @@ model Convenio {
   numero            String
   ano               Int
   tipo              String
-  objeto            String
-  objetoResumido    String?  @map("objeto_resumido")
+  objeto            String   @db.Text
+  objetoResumido    String?  @db.Text @map("objeto_resumido")
   status            String   @default("em_execucao")
   concedente        String
   concedenteCnpj    String?  @map("concedente_cnpj")
