@@ -28,8 +28,12 @@ jobs:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
+          script_stop: true
           script: |
             cd /home/tefe-portaltransparencia/htdocs
-            git pull origin master
-            npm install --production
-            pm2 reload transparencia --update-env
+            sudo git fetch origin master
+            sudo git reset --hard origin/master
+            sudo npm install --production
+            sudo npx prisma generate
+            sudo npm run build
+            sudo pm2 reload transparencia --update-env
