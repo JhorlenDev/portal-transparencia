@@ -45,3 +45,4 @@ next-env.d.ts
 # local-only workspace files
 /document-api/
 /.opencode/
+/.ssh/
