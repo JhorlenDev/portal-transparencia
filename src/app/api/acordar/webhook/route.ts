@@ -1,4 +1,4 @@
-import { after, NextRequest, NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import path from 'path'
 import fs from 'fs'
@@ -45,6 +45,43 @@ interface EntityWebhookFailure {
   entity: string
   org: string
   error: string
+}
+
+type WebhookSyncResult = EntityWebhookResult | EntityWebhookFailure
+
+interface SyncJob {
+  id: string
+  org: string
+  entity?: string
+  status: 'running' | 'completed' | 'failed'
+  startedAt: string
+  finishedAt?: string
+  message: string
+  results?: WebhookSyncResult[]
+  result?: EntityWebhookResult
+  error?: string
+}
+
+interface SyncJobState {
+  running: boolean
+  currentJob: SyncJob | null
+  lastJob: SyncJob | null
+}
+
+const syncStateKey = Symbol.for('portal-transparencia.acordar-sync-state')
+
+function getSyncJobState(): SyncJobState {
+  const globalState = globalThis as typeof globalThis & { [syncStateKey]?: SyncJobState }
+
+  if (!globalState[syncStateKey]) {
+    globalState[syncStateKey] = {
+      running: false,
+      currentJob: null,
+      lastJob: null,
+    }
+  }
+
+  return globalState[syncStateKey]
 }
 
 interface PrismaWebhookModel {
@@ -615,30 +652,125 @@ async function processAllEntityWebhooks(org: string): Promise<Array<EntityWebhoo
   return results
 }
 
+function getPublicJob(job: SyncJob | null) {
+  if (!job) return null
+
+  return {
+    id: job.id,
+    org: job.org,
+    entity: job.entity,
+    status: job.status,
+    startedAt: job.startedAt,
+    finishedAt: job.finishedAt,
+    message: job.message,
+    results: job.results,
+    result: job.result,
+    error: job.error,
+  }
+}
+
+function startBackgroundSync(org: string, entity?: string) {
+  const state = getSyncJobState()
+
+  if (state.running && state.currentJob) {
+    return {
+      accepted: false,
+      job: state.currentJob,
+    }
+  }
+
+  const job: SyncJob = {
+    id: `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`,
+    org,
+    entity,
+    status: 'running',
+    startedAt: new Date().toISOString(),
+    message: entity
+      ? `Importação de ${entity} em execução em segundo plano`
+      : 'Importação de todas as entidades em execução em segundo plano',
+  }
+
+  state.running = true
+  state.currentJob = job
+  state.lastJob = job
+
+  void (async () => {
+    try {
+      if (entity) {
+        job.result = await processEntityWebhook(entity, org)
+        job.message = `Importação de ${entity} concluída`
+      } else {
+        job.results = await processAllEntityWebhooks(org)
+        const failedCount = job.results.filter((result) => result.success === false).length
+        job.message = failedCount === 0
+          ? 'Importação de todas as entidades concluída'
+          : `Importação concluída com ${failedCount} erro(s)`
+      }
+
+      job.status = 'completed'
+    } catch (error) {
+      job.status = 'failed'
+      job.error = error instanceof Error ? error.message : 'Unknown error'
+      job.message = 'Importação em segundo plano falhou'
+      console.error('Background webhook sync failed:', error)
+    } finally {
+      job.finishedAt = new Date().toISOString()
+      state.running = false
+      state.currentJob = null
+      state.lastJob = job
+    }
+  })()
+
+  return {
+    accepted: true,
+    job,
+  }
+}
+
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
     const entity = searchParams.get('entity')?.trim()
     const org = searchParams.get('org') || DEFAULT_ORG
-    const background = searchParams.get('background') === '1'
+    const wait = searchParams.get('wait') === '1'
+    const status = searchParams.get('status') === '1'
+
+    if (status) {
+      const state = getSyncJobState()
+
+      return NextResponse.json({
+        success: true,
+        running: state.running,
+        currentJob: getPublicJob(state.currentJob),
+        lastJob: getPublicJob(state.lastJob),
+      })
+    }
+
+    if (entity && !validEntities.includes(entity)) {
+      return NextResponse.json(
+        { error: `Entidade inválida. Entidades disponíveis: ${validEntities.join(', ')}` },
+        { status: 400 }
+      )
+    }
+
+    if (!wait) {
+      const { accepted, job } = startBackgroundSync(org, entity || undefined)
+
+      return NextResponse.json({
+        success: true,
+        org,
+        entity: entity || undefined,
+        scheduled: accepted,
+        alreadyRunning: !accepted,
+        job: getPublicJob(job),
+        statusUrl: '/api/acordar/webhook?status=1',
+        message: accepted
+          ? 'Importação agendada para execução em segundo plano'
+          : 'Já existe uma importação em execução em segundo plano',
+      })
+    }
 
     if (!entity) {
-      if (background) {
-        after(async () => {
-          await processAllEntityWebhooks(org)
-        })
-
-        return NextResponse.json(
-          {
-            success: true,
-            org,
-            scheduled: true,
-            entities: validEntities,
-            message: 'Importação de todas as entidades agendada para execução em segundo plano',
-          }
-        )
-      }
-
       const results = await processAllEntityWebhooks(org)
       const failedCount = results.filter((result) => result.success === false).length
 
@@ -652,13 +784,6 @@ export async function GET(request: NextRequest) {
             ? 'Importação de todas as entidades concluída'
             : `Importação concluída com ${failedCount} erro(s)`,
         }
-      )
-    }
-
-    if (!validEntities.includes(entity)) {
-      return NextResponse.json(
-        { error: `Entidade inválida. Entidades disponíveis: ${validEntities.join(', ')}` },
-        { status: 400 }
       )
     }
 
