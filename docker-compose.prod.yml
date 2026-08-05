@@ -8,6 +8,12 @@
 # 2. Todo bind mount leva `:z`. O SELinux esta em Enforcing; sem o rotulo o
 #    container sobe normalmente e falha em toda leitura e escrita naquele
 #    caminho, sem que nada no log da aplicacao mencione SELinux.
+#
+# O `name` abaixo nao e enfeite. Sem ele o Compose deriva o nome do projeto do
+# diretorio — que aqui e `app`, exatamente como o de /opt/pmt-2026/app. Com dois
+# projetos de mesmo nome, um `up` daqui trata os containers do outro como orfaos
+# e OS REMOVE: foi assim que o pmt-2026-web (tefe.am.gov.br) caiu em 05/08/2026.
+name: portal-transparencia
 
 services:
   # Banco proprio desta VPS. Na 160 o MySQL era local (127.0.0.1) e o ufw de la
