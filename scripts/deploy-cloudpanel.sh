@@ -35,6 +35,7 @@ fi
 
 npm install
 npx prisma generate
+npx prisma migrate deploy
 npm run lint
 npm run build
 pm2 restart "$PM2_APP" --update-env

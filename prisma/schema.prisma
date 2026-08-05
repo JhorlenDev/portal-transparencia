@@ -281,3 +281,90 @@ model Anexo {
 
   @@map("anexos")
 }
+
+/// Configuracao unica do sistema de backup (registro singleton, id = "singleton").
+model BackupConfig {
+  id              String  @id @default("singleton")
+  incluirBanco    Boolean @default(true) @map("incluir_banco")
+  incluirMidias   Boolean @default(true) @map("incluir_midias")
+  pularDuplicados Boolean @default(true) @map("pular_duplicados")
+
+  // Agendamento local. modo: INTERVALO | DIARIO | SEMANAL
+  localAtivo          Boolean @default(false) @map("local_ativo")
+  localModo           String  @default("DIARIO") @map("local_modo")
+  localIntervaloHoras Int     @default(24) @map("local_intervalo_horas")
+  localHorarios       String  @default("03:00") @map("local_horarios")
+  localDiasSemana     String  @default("1") @map("local_dias_semana")
+  localRetencaoQtd    Int     @default(7) @map("local_retencao_qtd")
+  localRetencaoDias   Int     @default(0) @map("local_retencao_dias")
+
+  // Agendamento em nuvem (Google Drive)
+  nuvemAtivo          Boolean @default(false) @map("nuvem_ativo")
+  nuvemModo           String  @default("DIARIO") @map("nuvem_modo")
+  nuvemIntervaloHoras Int     @default(24) @map("nuvem_intervalo_horas")
+  nuvemHorarios       String  @default("04:00") @map("nuvem_horarios")
+  nuvemDiasSemana     String  @default("1") @map("nuvem_dias_semana")
+  nuvemRetencaoQtd    Int     @default(14) @map("nuvem_retencao_qtd")
+  nuvemRetencaoDias   Int     @default(0) @map("nuvem_retencao_dias")
+
+  driveFolderId   String? @map("drive_folder_id")
+  driveFolderNome String? @map("drive_folder_nome")
+
+  createdAt DateTime @default(now()) @map("created_date")
+  updatedAt DateTime @updatedAt @map("updated_date")
+
+  @@map("backup_config")
+}
+
+/// Conexao com o Google Drive obtida via broker do BackupHub.
+model BackupDriveConta {
+  id            String    @id @default(cuid())
+  email         String
+  googleSub     String?   @map("google_sub")
+  escopo        String?
+  tokenCifrado  String    @db.Text @map("token_cifrado")
+  quotaTotal    String?   @map("quota_total")
+  quotaUsada    String?   @map("quota_usada")
+  conectadoEm   DateTime  @default(now()) @map("conectado_em")
+  ultimoUsoEm   DateTime? @map("ultimo_uso_em")
+  revogadoEm    DateTime? @map("revogado_em")
+  ultimoErro    String?   @db.Text @map("ultimo_erro")
+
+  createdAt DateTime @default(now()) @map("created_date")
+  updatedAt DateTime @updatedAt @map("updated_date")
+
+  @@index([revogadoEm])
+  @@map("backup_drive_contas")
+}
+
+/// Historico de execucoes de backup.
+model BackupJob {
+  id            String    @id @default(cuid())
+  tipo          String    @default("LOCAL")
+  origem        String    @default("MANUAL")
+  escopo        String    @default("COMPLETO")
+  status        String    @default("EXECUTANDO")
+  arquivo       String?
+  tamanhoBytes  BigInt?   @map("tamanho_bytes")
+  sha256        String?   @db.VarChar(64)
+  contentHash   String?   @map("content_hash") @db.VarChar(64)
+  caminhoLocal  String?   @db.Text @map("caminho_local")
+  driveFileId   String?   @map("drive_file_id")
+  driveFolderId String?   @map("drive_folder_id")
+  duplicadoDeId String?   @map("duplicado_de_id")
+  totalTabelas  Int?      @map("total_tabelas")
+  totalRegistros Int?     @map("total_registros")
+  totalArquivos Int?      @map("total_arquivos")
+  iniciadoEm    DateTime  @default(now()) @map("iniciado_em")
+  finalizadoEm  DateTime? @map("finalizado_em")
+  duracaoMs     Int?      @map("duracao_ms")
+  erro          String?   @db.Text
+  log           String?   @db.Text
+
+  createdAt DateTime @default(now()) @map("created_date")
+  updatedAt DateTime @updatedAt @map("updated_date")
+
+  @@index([tipo, status, iniciadoEm])
+  @@index([contentHash])
+  @@map("backup_jobs")
+}

@@ -32,6 +32,7 @@ yarn-error.log*
 
 # env files
 .env*
+!.env.example
 
 # vercel
 .vercel
@@ -46,3 +47,6 @@ next-env.d.ts
 /document-api/
 /.opencode/
 /.ssh/
+
+# backups gerados pelo sistema de backup
+/backups/

@@ -126,6 +126,17 @@ Principais tabelas (via Prisma):
 - `ConfiguracaoSite` - Configurações do portal
 - `Orgao`, `Credor`, `FonteRecurso` - Dados de apoio
 
+## Backup
+
+Painel em `/admin/backup` (senha em `ADMIN_PASSWORD`): cópias do banco e das mídias enviadas,
+no servidor e/ou no Google Drive, com agendamento e retenção configuráveis.
+Detalhes, variáveis de ambiente e como restaurar: [docs/backup.md](docs/backup.md).
+
+```bash
+npx tsx scripts/test-backup.ts        # testes do backup local
+npx tsx scripts/test-backup-drive.ts  # testes do envio para a nuvem
+```
+
 ## Desenvolvimento
 
 ```bash
