@@ -1,0 +1,74 @@
+# Producao na VPS 10.10.0.161 (AlmaLinux + Docker + Nginx Proxy Manager).
+#
+# Duas regras da casa que este arquivo obedece:
+#
+# 1. Nenhuma app publica porta na rede. Quem atende a internet e o NPM, que
+#    alcanca este container pelo nome dele na rede `proxy`. As portas publicadas
+#    abaixo sao no LOOPBACK, so para health check, restauracao e diagnostico.
+# 2. Todo bind mount leva `:z`. O SELinux esta em Enforcing; sem o rotulo o
+#    container sobe normalmente e falha em toda leitura e escrita naquele
+#    caminho, sem que nada no log da aplicacao mencione SELinux.
+
+services:
+  # Banco proprio desta VPS. Na 160 o MySQL era local (127.0.0.1) e o ufw de la
+  # so libera 22/80/443 — a 161 nao alcanca aquele banco de jeito nenhum. Este
+  # aqui e uma replica dos dados, carregada no momento da migracao.
+  db:
+    image: mysql:8.0
+    container_name: portal-transparencia-db
+    restart: unless-stopped
+    env_file: .env.db
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+    volumes:
+      # Datadir do MySQL. Diferente dos outros bind mounts da casa, este e do
+      # uid 999 (o usuario `mysql` da imagem oficial), nao do 1000: o entrypoint
+      # do MySQL precisa criar o socket em /var/run/mysqld, e forcar user 1000
+      # quebra isso. Como so o proprio container escreve aqui, o alinhamento com
+      # o apps-core nao faz falta.
+      - /opt/portal-transparencia/mysql:/var/lib/mysql:z
+    ports:
+      # So para restauracao e diagnostico a partir do host.
+      - "127.0.0.1:3307:3306"
+    networks:
+      - interna
+    healthcheck:
+      # A senha vem do env do proprio container; `$$` impede o compose de
+      # interpolar a variavel no momento de ler o arquivo.
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -u root -p\"$$MYSQL_ROOT_PASSWORD\" --silent"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 40s
+    mem_limit: 768m
+
+  web:
+    image: portal-transparencia:latest
+    container_name: portal-transparencia-web
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      # Dentro do container a porta e sempre 3000; quem diferencia as apps na
+      # maquina e a porta publicada no loopback, logo abaixo.
+      PORT: "3000"
+    volumes:
+      # Estado mora fora da arvore do git: o deploy faz `git reset --hard` e o
+      # que estiver dentro dela some.
+      - /opt/portal-transparencia/uploads:/app/public/uploads:z
+      - /opt/portal-transparencia/backups:/app/backups:z
+    ports:
+      - "127.0.0.1:3013:3000"
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - proxy
+      - interna
+    mem_limit: 1536m
+
+networks:
+  proxy:
+    external: true
+  interna:
+    name: portaltransparencia_interna

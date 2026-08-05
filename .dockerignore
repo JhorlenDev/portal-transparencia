@@ -1,0 +1,33 @@
+# Contexto de build. ATENCAO: o .gitignore NAO vale aqui — o que nao estiver
+# listado neste arquivo entra na imagem, e imagem vai para registry.
+
+node_modules
+.next
+out
+build
+
+.git
+.github
+.vscode
+.opencode
+.agents
+
+# Segredos. O .env chega em runtime pelo env_file do compose, nunca numa camada.
+.env
+.env.*
+!.env.example
+
+# Dados. Anexos enviados pelos usuarios e pacotes de backup ficam em bind mount
+# no host; dentro da imagem eles so espalhariam dado pessoal.
+public/uploads
+backups
+*.db
+dev.db
+
+# Ruido
+npm-debug.log*
+*.tsbuildinfo
+.DS_Store
+coverage
+document-api
+.ssh
