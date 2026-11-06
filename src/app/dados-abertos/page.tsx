@@ -7,6 +7,7 @@ import { StructuredData } from "@/components/portal/structured-data"
 import { DataPageHero } from "@/components/portal/data-page-hero"
 import DatasetGridClient from "./dataset-grid-client"
 import { prisma } from "@/lib/prisma"
+import { contratosVisiveis, despesasVisiveis, licitacoesVisiveis, receitasVisiveis } from "@/lib/site-data"
 
 export const dynamic = 'force-dynamic'
 
@@ -25,25 +26,33 @@ export default async function DadosAbertos() {
     totalContratos,
     totalServidores,
     totalConvenios,
+    totalDiarias,
+    totalTransferencias,
     exDespesa,
     exReceita,
     exLicitacao,
     exContrato,
     exServidor,
-    exConvenio
+    exConvenio,
+    exDiaria,
+    exTransferencia
   ] = await Promise.all([
-    prisma.despesa.count(),
-    prisma.receita.count(),
-    prisma.licitacao.count(),
-    prisma.contrato.count(),
+    despesasVisiveis().then((where) => prisma.despesa.count({ where })),
+    receitasVisiveis().then((where) => prisma.receita.count({ where })),
+    licitacoesVisiveis().then((where) => prisma.licitacao.count({ where })),
+    contratosVisiveis().then((where) => prisma.contrato.count({ where })),
     prisma.servidor.count(),
     prisma.convenio.count(),
-    prisma.despesa.findFirst({ orderBy: { dataEmpenho: 'desc' }, select: { dataEmpenho: true, numeroEmpenho: true, credorNome: true, credorCpfCnpj: true, objeto: true, orgaoNome: true, valorEmpenhado: true, valorLiquidado: true, valorPago: true } }),
-    prisma.receita.findFirst({ orderBy: { exercicio: 'desc' }, select: { codigoNatureza: true, naturezaReceita: true, categoriaEconomica: true, valorPrevisto: true, valorArrecadado: true } }),
-    prisma.licitacao.findFirst({ orderBy: { dataAbertura: 'desc' }, select: { numero: true, ano: true, modalidade: true, objeto: true, status: true, dataAbertura: true, valorEstimado: true } }),
-    prisma.contrato.findFirst({ orderBy: { dataInicioVigencia: 'desc' }, select: { numero: true, ano: true, tipoContrato: true, contratadoNome: true, contratadoCnpj: true, objeto: true, status: true, valorInicial: true, dataInicioVigencia: true } }),
+    prisma.diaria.count(),
+    prisma.transferencia.count(),
+    despesasVisiveis().then((where) => prisma.despesa.findFirst({ where, orderBy: { dataEmpenho: 'desc' }, select: { dataEmpenho: true, numeroEmpenho: true, credorNome: true, credorCpfCnpj: true, objeto: true, orgaoNome: true, valorEmpenhado: true, valorLiquidado: true, valorPago: true } })),
+    receitasVisiveis().then((where) => prisma.receita.findFirst({ where, orderBy: { exercicio: 'desc' }, select: { codigoNatureza: true, naturezaReceita: true, categoriaEconomica: true, valorPrevisto: true, valorArrecadado: true } })),
+    licitacoesVisiveis().then((where) => prisma.licitacao.findFirst({ where, orderBy: { dataAbertura: 'desc' }, select: { numero: true, ano: true, modalidade: true, objeto: true, status: true, dataAbertura: true, valorEstimado: true } })),
+    contratosVisiveis().then((where) => prisma.contrato.findFirst({ where, orderBy: { dataInicioVigencia: 'desc' }, select: { numero: true, ano: true, tipoContrato: true, contratadoNome: true, contratadoCnpj: true, objeto: true, status: true, valorInicial: true, dataInicioVigencia: true } })),
     prisma.servidor.findFirst({ orderBy: { updatedAt: 'desc' }, select: { matricula: true, nome: true, cargo: true, funcao: true, lotacao: true, vinculo: true, remuneracaoBruta: true, remuneracaoLiquida: true, updatedAt: true } }),
-    prisma.convenio.findFirst({ orderBy: { dataInicioVigencia: 'desc' }, select: { numero: true, ano: true, tipo: true, concedente: true, objeto: true, status: true, valorTotal: true, dataInicioVigencia: true } })
+    prisma.convenio.findFirst({ orderBy: { dataInicioVigencia: 'desc' }, select: { numero: true, ano: true, tipo: true, concedente: true, objeto: true, status: true, valorTotal: true, dataInicioVigencia: true } }),
+    prisma.diaria.findFirst({ orderBy: { data: 'desc' }, select: { data: true, favorecido: true, cargo: true, cpf: true, orgaoNome: true, descricao: true, quantidade: true, valor: true } }),
+    prisma.transferencia.findFirst({ orderBy: { data: 'desc' }, select: { data: true, mes: true, entidadePagadora: true, entidadeRecebedora: true, valorRepasse: true, valorDevolucao: true } })
   ])
 
   const formatDate = (date: Date | null | undefined) => date ? date.toLocaleDateString('pt-BR') : new Date().toLocaleDateString('pt-BR')
@@ -172,6 +181,46 @@ export default async function DadosAbertos() {
         { campo: 'status', tipo: 'string', descricao: 'Status', exemplo: formatStr(exConvenio?.status, 'em_execucao') },
         { campo: 'valor_total', tipo: 'float', descricao: 'Valor Total', exemplo: formatStr(exConvenio?.valorTotal, '1000000.00') },
         { campo: 'data_inicio_vigencia', tipo: 'date', descricao: 'Início da Vigência', exemplo: formatDate(exConvenio?.dataInicioVigencia) },
+      ]
+    },
+    {
+      slug: 'diarias',
+      nome: 'Diárias',
+      descricao: 'Diárias pagas a servidores e autoridades para viagens a serviço, com favorecido, cargo, órgão, motivo e valor.',
+      icone: null,
+      cor: 'rose',
+      rota: '/diarias',
+      periodicidade: 'Diária',
+      totalRegistros: totalDiarias,
+      ultimaAtualizacao: formatDate(exDiaria?.data),
+      colunas: [
+        { campo: 'data', tipo: 'date', descricao: 'Data do pagamento', exemplo: formatDate(exDiaria?.data) },
+        { campo: 'favorecido', tipo: 'string', descricao: 'Nome do favorecido', exemplo: formatStr(exDiaria?.favorecido, 'Maria da Silva') },
+        { campo: 'cargo', tipo: 'string', descricao: 'Cargo do favorecido', exemplo: formatStr(exDiaria?.cargo, 'Diretor Escolar') },
+        { campo: 'cpf', tipo: 'string', descricao: 'CPF mascarado', exemplo: formatStr(exDiaria?.cpf, '123.XXX.XXX-00') },
+        { campo: 'orgao_nome', tipo: 'string', descricao: 'Órgão', exemplo: formatStr(exDiaria?.orgaoNome, 'Secretaria de Educação') },
+        { campo: 'descricao', tipo: 'string', descricao: 'Motivo da viagem', exemplo: formatStr(exDiaria?.descricao?.slice(0, 60), 'Participação em capacitação') },
+        { campo: 'quantidade', tipo: 'float', descricao: 'Quantidade de diárias', exemplo: formatStr(exDiaria?.quantidade, '4') },
+        { campo: 'valor', tipo: 'float', descricao: 'Valor pago', exemplo: formatStr(exDiaria?.valor, '1400.00') },
+      ]
+    },
+    {
+      slug: 'transferencias',
+      nome: 'Transferências entre Entidades',
+      descricao: 'Repasses financeiros entre a Prefeitura e os fundos e entidades do município, com data, valor e devoluções.',
+      icone: null,
+      cor: 'indigo',
+      rota: '/transferencias',
+      periodicidade: 'Diária',
+      totalRegistros: totalTransferencias,
+      ultimaAtualizacao: formatDate(exTransferencia?.data),
+      colunas: [
+        { campo: 'data', tipo: 'date', descricao: 'Data do lançamento', exemplo: formatDate(exTransferencia?.data) },
+        { campo: 'mes', tipo: 'integer', descricao: 'Mês de referência', exemplo: formatStr(exTransferencia?.mes, '3') },
+        { campo: 'entidade_pagadora', tipo: 'string', descricao: 'Entidade que repassou', exemplo: formatStr(exTransferencia?.entidadePagadora, 'Prefeitura Municipal') },
+        { campo: 'entidade_recebedora', tipo: 'string', descricao: 'Entidade que recebeu', exemplo: formatStr(exTransferencia?.entidadeRecebedora, 'Fundo Municipal de Saúde') },
+        { campo: 'valor_repasse', tipo: 'float', descricao: 'Valor repassado', exemplo: formatStr(exTransferencia?.valorRepasse, '250000.00') },
+        { campo: 'valor_devolucao', tipo: 'float', descricao: 'Valor devolvido', exemplo: formatStr(exTransferencia?.valorDevolucao, '0') },
       ]
     },
   ]

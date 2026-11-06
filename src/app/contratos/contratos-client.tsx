@@ -1,6 +1,7 @@
 "use client"
 
 import React from "react"
+import Link from "next/link"
 import { Card, CardContent } from "@/components/ui/card"
 import { AttachmentsCell } from "@/components/attachments/attachments-modal"
 import { PaginationControls } from "@/components/portal/pagination-controls"
@@ -29,10 +30,26 @@ interface ContratoWithAnexos {
   tipoContrato: string | null
   objeto: string
   status: string
+  modalidade?: string | null
   valorInicial: number
+  valorAtual?: number | null
   contratadoNome: string
   contratadoCnpj: string | null
+  dataInicioVigencia?: Date | string | null
+  dataFimVigencia?: Date | string | null
+  licitacaoNumero?: string | null
+  licitacao?: { id: string; numero: string; ano: number; numeroProcesso: string | null; modalidade: string } | null
   anexos?: Attachment[]
+}
+
+const CORES_STATUS: Record<string, string> = {
+  vigente: 'bg-green-100 text-green-700',
+  encerrado: 'bg-slate-100 text-slate-700',
+  anulado: 'bg-red-100 text-red-700',
+}
+
+function formatarData(data: Date | string | null | undefined): string {
+  return data ? new Date(data).toLocaleDateString('pt-BR') : '-'
 }
 
 interface Stats {
@@ -50,13 +67,13 @@ interface ContratosContentProps {
   pagination?: PaginationMeta
 }
 
-export function ContratosContent({ contratos, stats, pagination }: ContratosContentProps) {
+export function ContratosContent({ contratos, stats, currentYear, pagination }: ContratosContentProps) {
   return (
     <>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
         <Card>
           <CardContent className="p-4">
-            <p className="text-sm text-slate-600">Total</p>
+            <p className="text-sm text-slate-600">Total em {currentYear}</p>
             <p className="text-2xl font-bold">{stats.total}</p>
           </CardContent>
         </Card>
@@ -89,6 +106,7 @@ export function ContratosContent({ contratos, stats, pagination }: ContratosCont
                 <th className="text-left px-4 py-3 text-sm font-medium text-slate-600">Nº/Ano</th>
                 <th className="text-left px-4 py-3 text-sm font-medium text-slate-600">Contratado</th>
                 <th className="text-left px-4 py-3 text-sm font-medium text-slate-600">Objeto</th>
+                <th className="text-left px-4 py-3 text-sm font-medium text-slate-600">Vigência</th>
                 <th className="text-left px-4 py-3 text-sm font-medium text-slate-600">Status</th>
                 <th className="text-right px-4 py-3 text-sm font-medium text-slate-600">Valor</th>
                 <th className="text-center px-4 py-3 text-sm font-medium text-slate-600">Anexos</th>
@@ -98,8 +116,20 @@ export function ContratosContent({ contratos, stats, pagination }: ContratosCont
               {contratos.length > 0 ? contratos.map((contrato) => (
                 <tr key={contrato.id} id={`record-${contrato.id}`} className="border-b border-slate-200 hover:bg-slate-50 transition-colors target:bg-yellow-100 target:border-yellow-400">
                   <td className="px-4 py-3">
-                    <span className="font-bold text-amber-800">{contrato.numero}/{contrato.ano}</span>
-                    <p className="text-xs text-slate-600">{contrato.tipoContrato || '-'}</p>
+                    <Link href={`/contratos/${contrato.id}`} className="font-bold text-amber-800 hover:underline">
+                      {contrato.numero.includes('/') ? contrato.numero : `${contrato.numero}/${contrato.ano}`}
+                    </Link>
+                    <p className="text-xs text-slate-600">{contrato.modalidade || contrato.tipoContrato || '-'}</p>
+                    {contrato.licitacao ? (
+                      <Link
+                        href={`/licitacoes/${contrato.licitacao.id}`}
+                        className="text-xs text-purple-700 hover:underline whitespace-nowrap"
+                      >
+                        Processo {contrato.licitacao.numeroProcesso || contrato.licitacao.numero}
+                      </Link>
+                    ) : contrato.licitacaoNumero ? (
+                      <p className="text-xs text-slate-500 whitespace-nowrap">Processo {contrato.licitacaoNumero}</p>
+                    ) : null}
                   </td>
                   <td className="px-4 py-3">
                     <p className="font-medium">{contrato.contratadoNome}</p>
@@ -108,15 +138,20 @@ export function ContratosContent({ contratos, stats, pagination }: ContratosCont
                   <td className="px-4 py-3 text-sm text-slate-600 max-w-xs truncate">
                     {contrato.objeto}
                   </td>
+                  <td className="px-4 py-3 text-sm text-slate-600 whitespace-nowrap">
+                    {formatarData(contrato.dataInicioVigencia)}
+                    <p className="text-xs text-slate-500">até {formatarData(contrato.dataFimVigencia)}</p>
+                  </td>
                   <td className="px-4 py-3">
-                    <span className={`px-2 py-1 rounded text-xs ${
-                      contrato.status === 'vigente' ? 'bg-green-100 text-green-700' : 'bg-slate-100 text-slate-700'
-                    }`}>
+                    <span className={`px-2 py-1 rounded text-xs capitalize ${CORES_STATUS[contrato.status] ?? 'bg-slate-100 text-slate-700'}`}>
                       {contrato.status}
                     </span>
                   </td>
-                  <td className="px-4 py-3 text-right font-bold text-emerald-800">
-                    {formatCurrency(contrato.valorInicial)}
+                  <td className="px-4 py-3 text-right font-bold text-emerald-800 whitespace-nowrap">
+                    {formatCurrency(contrato.valorAtual ?? contrato.valorInicial)}
+                    {contrato.valorAtual != null && contrato.valorAtual !== contrato.valorInicial && (
+                      <p className="text-xs font-normal text-slate-500">inicial {formatCurrency(contrato.valorInicial)}</p>
+                    )}
                   </td>
                   <td className="px-4 py-3 text-center">
                     <AttachmentsCell anexos={contrato.anexos} />
@@ -124,7 +159,7 @@ export function ContratosContent({ contratos, stats, pagination }: ContratosCont
                 </tr>
               )) : (
                 <tr>
-                  <td colSpan={6} className="px-4 py-8 text-center text-slate-600">
+                  <td colSpan={7} className="px-4 py-8 text-center text-slate-600">
                     Nenhum contrato encontrado
                   </td>
                 </tr>

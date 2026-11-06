@@ -170,7 +170,24 @@ export default function DatasetGridClient({ databases }: { databases: Dataset[] 
                         Os botões abaixo permitirão o acesso total aos registros abertos desta base de dados.
                       </p>
                     </div>
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                      <div className="border border-slate-200 rounded-xl p-4 flex flex-col items-start gap-4 hover:border-emerald-300 transition-colors">
+                        <div className="flex items-start gap-3 w-full">
+                          <div className="p-3 bg-emerald-50 text-emerald-700 rounded-lg">
+                            <FileSpreadsheet className="h-6 w-6" />
+                          </div>
+                          <div className="flex-1">
+                            <h4 className="font-semibold text-slate-800">Planilha XLSX</h4>
+                            <p className="text-xs text-slate-600 mt-1">Abre direto no Excel ou LibreOffice</p>
+                          </div>
+                        </div>
+                        <Button asChild className="w-full bg-emerald-700 hover:bg-emerald-800 text-white gap-2 cursor-pointer">
+                          <a href={`/api/export?type=${selectedDb.slug}&format=xlsx`}>
+                            <Download className="h-4 w-4" /> Baixar XLSX
+                          </a>
+                        </Button>
+                      </div>
+
                       <div className="border border-slate-200 rounded-xl p-4 flex flex-col items-start gap-4 hover:border-green-300 transition-colors">
                         <div className="flex items-start gap-3 w-full">
                           <div className="p-3 bg-green-50 text-green-600 rounded-lg">

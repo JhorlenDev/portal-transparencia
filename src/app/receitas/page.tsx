@@ -5,7 +5,7 @@ import { FilterBar } from "@/components/portal/filter-bar"
 import { Breadcrumbs } from "@/components/portal/breadcrumbs"
 import { StructuredData } from "@/components/portal/structured-data"
 import { DataPageHero } from "@/components/portal/data-page-hero"
-import { getReceitasPage, getReceitasStats, parsePaginationParams } from "@/lib/site-data"
+import { getReceitasPage, getReceitasTipos, getReceitasStats, parsePaginationParams } from "@/lib/site-data"
 import { ReceitasContent } from "./receitas-client"
 
 export const dynamic = 'force-dynamic'
@@ -19,7 +19,7 @@ export async function generateMetadata() {
 }
 
 interface PageProps {
-  searchParams: Promise<{ q?: string; ano?: string; categoria?: string; page?: string; limit?: string }>
+  searchParams: Promise<{ q?: string; ano?: string; categoria?: string; tipo?: string; page?: string; limit?: string }>
 }
 
 async function ReceitasWrapper({ searchParams }: PageProps) {
@@ -29,20 +29,29 @@ async function ReceitasWrapper({ searchParams }: PageProps) {
   const filters = {
     exercicio: currentYear,
     search: params.q || undefined,
-    categoria: params.categoria || undefined
+    categoria: params.categoria || undefined,
+    tipo: params.tipo || undefined,
   }
   
   const [receitasPage, stats] = await Promise.all([
     getReceitasPage(filters, parsePaginationParams(params)),
-    getReceitasStats(currentYear)
+    getReceitasStats(currentYear, filters.tipo)
   ])
 
   return <ReceitasContent receitas={receitasPage.data} stats={stats} currentYear={currentYear} pagination={receitasPage.pagination} />
 }
 
+// Receita orcamentaria e o padrao (sem o filtro); Uniao e Estado sao recortes das transferencias.
+const NOMES_TIPOS: Record<string, string> = {
+  uniao: "Transferências da União",
+  estado: "Transferências do Estado",
+}
+
 export default async function Receitas({ searchParams }: PageProps) {
   const currentYear = new Date().getFullYear()
   const years = Array.from({ length: 5 }, (_, i) => currentYear - i)
+  const params = await searchParams
+  const tipos = (await getReceitasTipos(parseInt(params.ano || String(currentYear)))).filter((t) => t in NOMES_TIPOS)
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -60,7 +69,14 @@ export default async function Receitas({ searchParams }: PageProps) {
         badges={["Receita prevista", "Receita arrecadada", "Realização", "Dados por ano"]}
       />
 
-      <FilterBar page="receitas" years={years} searchPlaceholder="Buscar por natureza, código..." />
+      <FilterBar
+        page="receitas"
+        years={years}
+        searchPlaceholder="Buscar por natureza, código..."
+        extras={tipos.length > 0 ? [
+          { param: "tipo", label: "Receita orçamentária", options: tipos.map((t) => ({ value: t, label: NOMES_TIPOS[t] })) },
+        ] : []}
+      />
 
       <StructuredData 
         type="webpage" 

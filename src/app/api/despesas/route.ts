@@ -16,6 +16,12 @@ export async function GET(request: NextRequest) {
       {
         exercicio: parseInt(exercicio || ano || String(new Date().getFullYear())),
         search: q || undefined,
+        categoria: searchParams.get('categoria') || undefined,
+        orgao: searchParams.get('orgao') || undefined,
+        credor: searchParams.get('credor') || undefined,
+        fonteRecurso: searchParams.get('fonteRecurso') || undefined,
+        ordenar: searchParams.get('ordenar') || undefined,
+        ordem: searchParams.get('ordem') || undefined,
       },
       parsePaginationParams({
         page: searchParams.get('page') || undefined,

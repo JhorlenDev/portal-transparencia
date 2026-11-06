@@ -26,6 +26,9 @@ model Orgao {
 model Receita {
   id                String   @id @default(cuid())
   idExternalRef     String?  @map("id_external_ref")
+  /// Integracao que criou o registro: "acordar" (API da Prefeitura) ou "fiorilli" (SCPI).
+  /// Cada integracao so atualiza/remove os registros da propria fonte.
+  fonte             String   @default("acordar") @db.VarChar(20)
   payload           Json?    @map("payload")
   exercicio         Int
   mes               Int?
@@ -36,15 +39,28 @@ model Receita {
   fonteRecursoNome  String?  @map("fonte_recurso_nome")
   valorPrevisto     Float    @map("valor_previsto")
   valorArrecadado   Float    @map("valor_arrecadado")
+
+  // Campos da Fiorilli. A receita vem em arvore: niveis 1-7 sao totalizadores e o nivel 10
+  // e a linha analitica; somar todos os niveis conta o mesmo valor mais de uma vez.
+  tipoReceita       String?  @map("tipo_receita") @db.VarChar(30) // orcamentaria | uniao | estado | extraorcamentaria
+  nivel             Int?
+  valorPrevistoAtualizado Float? @map("valor_previsto_atualizado")
+  valorArrecadadoPeriodo  Float? @map("valor_arrecadado_periodo")
+
   createdAt         DateTime @default(now()) @map("created_date")
   updatedAt         DateTime @updatedAt @map("updated_date")
 
+  @@unique([fonte, idExternalRef])
+  @@index([fonte, exercicio])
   @@map("receitas")
 }
 
 model Despesa {
   id                String   @id @default(cuid())
   idExternalRef     String?  @map("id_external_ref")
+  /// Integracao que criou o registro: "acordar" (API da Prefeitura) ou "fiorilli" (SCPI).
+  /// Cada integracao so atualiza/remove os registros da propria fonte.
+  fonte             String   @default("acordar") @db.VarChar(20)
   payload           Json?    @map("payload")
   exercicio         Int
   numeroEmpenho     String   @map("numero_empenho")
@@ -61,17 +77,39 @@ model Despesa {
   valorEmpenhado    Float?   @map("valor_empenhado")
   valorLiquidado    Float?   @map("valor_liquidado")
   valorPago         Float?   @map("valor_pago")
+
+  // Campos da Fiorilli (DespesasGerais).
+  tipoEmpenho       String?  @map("tipo_empenho") @db.VarChar(10) // OR, ES, GL
+  unidadeCodigo     String?  @map("unidade_codigo")
+  unidadeNome       String?  @map("unidade_nome")
+  funcao            String?
+  subfuncao         String?
+  programa          String?
+  acao              String?
+  fonteRecurso      String?  @map("fonte_recurso")
+  fonteRecursoNome  String?  @map("fonte_recurso_nome")
+  modalidadeLicitacao String? @map("modalidade_licitacao")
+  numeroLicitacao   String?  @map("numero_licitacao")
+  valorAnulado      Float?   @map("valor_anulado")
+
   createdAt         DateTime @default(now()) @map("created_date")
   updatedAt         DateTime @updatedAt @map("updated_date")
 
   orgao             Orgao?   @relation(fields: [orgaoId], references: [id])
 
+  @@unique([fonte, idExternalRef])
+  @@index([fonte, exercicio])
+  /// Listagem padrao do portal: filtra por exercicio e ordena pela data do empenho.
+  @@index([exercicio, dataEmpenho])
   @@map("despesas")
 }
 
 model Licitacao {
   id                         String   @id @default(cuid())
   idExternalRef              String?  @map("id_external_ref")
+  /// Integracao que criou o registro: "acordar" (API da Prefeitura) ou "fiorilli" (SCPI).
+  /// Cada integracao so atualiza/remove os registros da propria fonte.
+  fonte                      String   @default("acordar") @db.VarChar(20)
   payload                    Json?    @map("payload")
   autoridade                 String?  @map("autoridade")
   numero                     String
@@ -108,15 +146,24 @@ model Licitacao {
   validadeMeses              Int?     @map("validade_meses")
   prazoPagamento             String?  @map("prazo_pagamento")
 
+  // Campos da Fiorilli.
+  dataEncerramento           DateTime? @map("data_encerramento")
+  registroPreco              Boolean?  @map("registro_preco")
+
   orgao             Orgao?   @relation(fields: [orgaoId], references: [id])
   contratos         Contrato[]
 
+  @@unique([fonte, idExternalRef])
+  @@index([fonte, ano])
   @@map("licitacoes")
 }
 
 model Contrato {
   id                String   @id @default(cuid())
   idExternalRef     String?  @map("id_external_ref")
+  /// Integracao que criou o registro: "acordar" (API da Prefeitura) ou "fiorilli" (SCPI).
+  /// Cada integracao so atualiza/remove os registros da propria fonte.
+  fonte             String   @default("acordar") @db.VarChar(20)
   payload           Json?    @map("payload")
   numero            String
   ano               Int
@@ -140,18 +187,32 @@ model Contrato {
   fiscalNome        String?  @map("fiscal_nome")
   fiscalCargo       String?  @map("fiscal_cargo")
   linkPncp          String?  @map("link_pncp")
+
+  // Campos da Fiorilli.
+  modalidade        String?
+  dataAssinatura    DateTime? @map("data_assinatura")
+  dataPublicacao    DateTime? @map("data_publicacao")
+  valorEmpenhado    Float?   @map("valor_empenhado")
+  valorLiquidado    Float?   @map("valor_liquidado")
+  valorAditado      Float?   @map("valor_aditado")
+
   createdAt         DateTime @default(now()) @map("created_date")
   updatedAt         DateTime @updatedAt @map("updated_date")
 
   orgao             Orgao?   @relation(fields: [orgaoId], references: [id])
   licitacao         Licitacao? @relation(fields: [licitacaoId], references: [id])
 
+  @@unique([fonte, idExternalRef])
+  @@index([fonte, ano])
   @@map("contratos")
 }
 
 model Servidor {
   id                String   @id @default(cuid())
   idExternalRef     String?  @map("id_external_ref")
+  /// Integracao que criou o registro: "acordar" (API da Prefeitura) ou "fiorilli" (SCPI).
+  /// Cada integracao so atualiza/remove os registros da propria fonte.
+  fonte             String   @default("acordar") @db.VarChar(20)
   payload           Json?    @map("payload")
   nome              String
   matricula         String
@@ -179,12 +240,16 @@ model Servidor {
 
   orgao             Orgao?   @relation(fields: [orgaoId], references: [id])
 
+  @@unique([fonte, idExternalRef])
   @@map("servidores")
 }
 
 model Convenio {
   id                String   @id @default(cuid())
   idExternalRef     String?  @map("id_external_ref")
+  /// Integracao que criou o registro: "acordar" (API da Prefeitura) ou "fiorilli" (SCPI).
+  /// Cada integracao so atualiza/remove os registros da propria fonte.
+  fonte             String   @default("acordar") @db.VarChar(20)
   numero            String
   ano               Int
   tipo              String
@@ -205,7 +270,61 @@ model Convenio {
   createdAt         DateTime @default(now()) @map("created_date")
   updatedAt         DateTime @updatedAt @map("updated_date")
 
+  @@unique([fonte, idExternalRef])
   @@map("convenios")
+}
+
+/// Diarias pagas a servidores e autoridades (Fiorilli, listagem Diarias).
+model Diaria {
+  id              String    @id @default(cuid())
+  idExternalRef   String    @map("id_external_ref")
+  fonte           String    @default("fiorilli") @db.VarChar(20)
+  payload         Json?
+  exercicio       Int
+  data            DateTime?
+  favorecido      String
+  cargo           String?
+  /// CPF ja vem mascarado pela API ("904.XXX.XXX-20").
+  cpf             String?
+  orgaoCodigo     String?   @map("orgao_codigo")
+  orgaoNome       String?   @map("orgao_nome")
+  unidadeNome     String?   @map("unidade_nome")
+  descricao       String?   @db.Text
+  elementoDespesa String?   @map("elemento_despesa")
+  numeroEmpenho   String?   @map("numero_empenho")
+  quantidade      Float?
+  valor           Float
+  valorAnulado    Float?    @map("valor_anulado")
+  createdAt       DateTime  @default(now()) @map("created_date")
+  updatedAt       DateTime  @updatedAt @map("updated_date")
+
+  @@unique([fonte, idExternalRef])
+  @@index([exercicio, data])
+  @@map("diarias")
+}
+
+/// Repasses financeiros entre entidades do municipio (Fiorilli, listagem Transf).
+model Transferencia {
+  id                 String    @id @default(cuid())
+  idExternalRef      String    @map("id_external_ref")
+  fonte              String    @default("fiorilli") @db.VarChar(20)
+  payload            Json?
+  exercicio          Int
+  mes                Int?
+  data               DateTime?
+  entidadePagadora   String    @map("entidade_pagadora")
+  cnpjPagadora       String?   @map("cnpj_pagadora")
+  entidadeRecebedora String    @map("entidade_recebedora")
+  cnpjRecebedora     String?   @map("cnpj_recebedora")
+  valorRepasse       Float     @map("valor_repasse")
+  valorDevolucao     Float?    @map("valor_devolucao")
+  valorPrevisto      Float?    @map("valor_previsto")
+  createdAt          DateTime  @default(now()) @map("created_date")
+  updatedAt          DateTime  @updatedAt @map("updated_date")
+
+  @@unique([fonte, idExternalRef])
+  @@index([exercicio, mes])
+  @@map("transferencias")
 }
 
 model SolicitacaoSIC {
@@ -367,4 +486,32 @@ model BackupJob {
   @@index([tipo, status, iniciadoEm])
   @@index([contentHash])
   @@map("backup_jobs")
+}
+
+/// Historico das execucoes de sincronizacao com APIs externas (uma linha por listagem/periodo).
+model SincronizacaoLog {
+  id           String    @id @default(cuid())
+  fonte        String    @db.VarChar(20)
+  modulo       String
+  listagem     String?
+  exercicio    Int?
+  periodo      String?
+  origem       String    @default("MANUAL")
+  status       String    @default("EXECUTANDO")
+  recebidos    Int       @default(0)
+  inseridos    Int       @default(0)
+  atualizados  Int       @default(0)
+  removidos    Int       @default(0)
+  erros        Int       @default(0)
+  mensagemErro String?   @db.Text @map("mensagem_erro")
+  iniciadoEm   DateTime  @default(now()) @map("iniciado_em")
+  finalizadoEm DateTime? @map("finalizado_em")
+  duracaoMs    Int?      @map("duracao_ms")
+
+  createdAt DateTime @default(now()) @map("created_date")
+  updatedAt DateTime @updatedAt @map("updated_date")
+
+  @@index([fonte, modulo, iniciadoEm])
+  @@index([status])
+  @@map("sincronizacao_logs")
 }

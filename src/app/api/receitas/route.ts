@@ -18,6 +18,9 @@ export async function GET(request: NextRequest) {
         exercicio: parseInt(exercicio || ano || String(new Date().getFullYear())),
         search: q || undefined,
         categoria: categoria || undefined,
+        tipo: searchParams.get('tipo') || undefined,
+        ordenar: searchParams.get('ordenar') || undefined,
+        ordem: searchParams.get('ordem') || undefined,
       },
       parsePaginationParams({
         page: searchParams.get('page') || undefined,

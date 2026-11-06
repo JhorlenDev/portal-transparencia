@@ -1,6 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
+import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import {
   AlertTriangle,
@@ -314,6 +315,9 @@ export function BackupDashboard() {
           </p>
         </div>
         <div className="flex gap-2">
+          <Button variant="outline" size="sm" asChild>
+            <Link href="/admin/sincronizacao">Sincronização</Link>
+          </Button>
           <Button variant="outline" size="sm" onClick={() => void carregar()}>
             <RefreshCw className="h-4 w-4" aria-hidden /> Atualizar
           </Button>

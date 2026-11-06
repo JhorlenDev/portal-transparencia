@@ -8,6 +8,8 @@ export const maxDuration = 300
 
 const EXTERNAL_API_BASE = 'https://prefeitura.tefe.am.gov.br/api/transparencia'
 const DEFAULT_ORG = 'cgm'
+// As tabelas tambem recebem dados da Fiorilli; este webhook so le e apaga os registros da propria fonte.
+const FONTE = 'acordar'
 
 interface ExternalAttachment {
   name: string
@@ -85,11 +87,11 @@ function getSyncJobState(): SyncJobState {
 }
 
 interface PrismaWebhookModel {
-  findFirst(args: { where: { idExternalRef: string } }): Promise<{ id: string } | null>
+  findFirst(args: { where: { fonte: string, idExternalRef: string } }): Promise<{ id: string } | null>
   update(args: { where: { id: string }, data: Record<string, unknown> }): Promise<{ id: string }>
   create(args: { data: Record<string, unknown> }): Promise<{ id: string }>
-  deleteMany(args: { where: { idExternalRef: { notIn?: string[], not?: null } } }): Promise<{ count: number }>
-  findMany(args: { where: { idExternalRef: { notIn?: string[], not?: null } }, select: { id: true } }): Promise<Array<{ id: string }>>
+  deleteMany(args: { where: { fonte: string, idExternalRef: { notIn?: string[], not?: null } } }): Promise<{ count: number }>
+  findMany(args: { where: { fonte: string, idExternalRef: { notIn?: string[], not?: null } }, select: { id: true } }): Promise<Array<{ id: string }>>
 }
 
 const entityFieldMapping: Record<string, Record<string, string>> = {
@@ -528,7 +530,7 @@ async function importData(entity: string, data: ExternalData[]): Promise<ImportR
       }
 
       const existing = await prismaModel.findFirst({
-        where: { idExternalRef: externalId },
+        where: { fonte: FONTE, idExternalRef: externalId },
       })
 
       let recordId: string
@@ -542,7 +544,7 @@ async function importData(entity: string, data: ExternalData[]): Promise<ImportR
         importResults.updated++
       } else {
         const created = await prismaModel.create({
-          data: mappedData,
+          data: { ...mappedData, fonte: FONTE },
         })
         recordId = created.id
         importResults.created++
@@ -561,6 +563,7 @@ async function importData(entity: string, data: ExternalData[]): Promise<ImportR
   if (externalIds.length > 0) {
     const deletedRecordsList = await prismaModel.findMany({
       where: {
+        fonte: FONTE,
         idExternalRef: { notIn: externalIds }
       },
       select: { id: true }
@@ -568,6 +571,7 @@ async function importData(entity: string, data: ExternalData[]): Promise<ImportR
 
     const deletedRecords = await prismaModel.deleteMany({
       where: {
+        fonte: FONTE,
         idExternalRef: { notIn: externalIds }
       }
     })
@@ -597,7 +601,7 @@ async function processEntityWebhook(entity: string, org: string): Promise<Entity
     const prismaModel = getPrismaModel(entity)
     if (prismaModel) {
       const deletedAll = await prismaModel.deleteMany({
-        where: { idExternalRef: { not: null } }
+        where: { fonte: FONTE, idExternalRef: { not: null } }
       })
       return {
         success: true,

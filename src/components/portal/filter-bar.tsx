@@ -1,8 +1,8 @@
 "use client"
 
 import { useRouter, useSearchParams, usePathname } from "next/navigation"
-import { Search, X, Loader2, Download, FileSpreadsheet, FileJson } from "lucide-react"
-import { useState, useEffect, useCallback, useTransition } from "react"
+import { Search, X, Loader2, Download, FileSpreadsheet, FileJson, ChevronDown } from "lucide-react"
+import { useState, useEffect, useCallback, useRef, useTransition } from "react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import {
@@ -18,11 +18,23 @@ interface FilterOption {
   label: string
 }
 
+/**
+ * Filtro especifico de uma pagina, guardado na URL em `param`. Com `options` vira uma lista;
+ * sem, um campo de texto aplicado com Enter ou ao sair do campo.
+ */
+export interface ExtraFilter {
+  param: string
+  label: string
+  options?: FilterOption[]
+  placeholder?: string
+}
+
 interface FilterBarProps {
-  page: "despesas" | "receitas" | "licitacoes" | "contratos" | "servidores" | "convenios"
+  page: "despesas" | "receitas" | "licitacoes" | "contratos" | "servidores" | "convenios" | "diarias" | "transferencias"
   years?: number[]
   categories?: FilterOption[]
   statuses?: FilterOption[]
+  extras?: ExtraFilter[]
   searchPlaceholder?: string
   onExport?: (params: URLSearchParams) => void
   isLoading?: boolean
@@ -33,11 +45,20 @@ const DEFAULT_YEARS = () => {
   return [currentYear]
 }
 
+const FORMATOS_EXPORTACAO = [
+  { formato: "xlsx", rotulo: "Planilha (XLSX)", icone: FileSpreadsheet },
+  { formato: "csv", rotulo: "CSV", icone: FileSpreadsheet },
+  { formato: "json", rotulo: "JSON", icone: FileJson },
+] as const
+
+const SELECT_CLASS = "px-3 py-2 border border-slate-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
+
 export function FilterBar({
   page,
   years = DEFAULT_YEARS(),
   categories = [],
   statuses = [],
+  extras = [],
   searchPlaceholder = "Buscar...",
   onExport,
   isLoading = false
@@ -50,29 +71,38 @@ export function FilterBar({
   const [ano, setAno] = useState(searchParams.get("ano") || years[0]?.toString() || "")
   const [categoria, setCategoria] = useState(searchParams.get("categoria") || "")
   const [status, setStatus] = useState(searchParams.get("status") || "")
+  const [valoresExtras, setValoresExtras] = useState<Record<string, string>>(() =>
+    Object.fromEntries(extras.map((e) => [e.param, searchParams.get(e.param) || ""]))
+  )
   const [isFiltering, setIsFiltering] = useState(false)
   const [showClearConfirm, setShowClearConfirm] = useState(false)
+  const [menuExportacao, setMenuExportacao] = useState(false)
+  const menuRef = useRef<HTMLDivElement>(null)
   const [isPending, startTransition] = useTransition()
 
-  const applyFilters = useCallback((next?: Partial<{ search: string; ano: string; categoria: string; status: string }>) => {
+  const applyFilters = useCallback((next?: Partial<{ search: string; ano: string; categoria: string; status: string; extras: Record<string, string> }>) => {
     setIsFiltering(true)
     const params = new URLSearchParams()
     const nextSearch = next?.search ?? search
     const nextAno = next?.ano ?? ano
     const nextCategoria = next?.categoria ?? categoria
     const nextStatus = next?.status ?? status
+    const nextExtras = next?.extras ?? valoresExtras
 
     if (nextSearch && nextSearch.length >= 3) params.set("q", nextSearch)
     if (nextAno) params.set("ano", nextAno)
     if (nextCategoria) params.set("categoria", nextCategoria)
     if (nextStatus) params.set("status", nextStatus)
+    for (const [param, valor] of Object.entries(nextExtras)) {
+      if (valor.trim()) params.set(param, valor.trim())
+    }
     
     const queryString = params.toString()
     startTransition(() => {
       router.push(queryString ? `${pathname}?${queryString}` : pathname)
     })
     setIsFiltering(false)
-  }, [search, ano, categoria, status, pathname, router])
+  }, [search, ano, categoria, status, valoresExtras, pathname, router])
 
   useEffect(() => {
     if (search.length >= 3) {
@@ -83,8 +113,25 @@ export function FilterBar({
     }
   }, [search, applyFilters])
 
+  useEffect(() => {
+    if (!menuExportacao) return
+    const fechar = (evento: MouseEvent | KeyboardEvent) => {
+      if (evento instanceof KeyboardEvent ? evento.key === "Escape" : !menuRef.current?.contains(evento.target as Node)) {
+        setMenuExportacao(false)
+      }
+    }
+    document.addEventListener("mousedown", fechar)
+    document.addEventListener("keydown", fechar)
+    return () => {
+      document.removeEventListener("mousedown", fechar)
+      document.removeEventListener("keydown", fechar)
+    }
+  }, [menuExportacao])
+
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearch(e.target.value)
+    // Busca apagada: volta a listagem sem o termo anterior.
+    if (e.target.value === "" && searchParams.get("q")) applyFilters({ search: "" })
   }
 
   const handleAnoChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -99,6 +146,9 @@ export function FilterBar({
     params.delete("categoria")
     params.delete("status")
     params.delete("page")
+    // As opcoes dos filtros extras (ex.: orgaos) mudam de um ano para outro.
+    for (const extra of extras) params.delete(extra.param)
+    setValoresExtras(Object.fromEntries(extras.map((e) => [e.param, ""])))
     startTransition(() => {
       router.push(`${pathname}?${params.toString()}`)
     })
@@ -116,32 +166,48 @@ export function FilterBar({
     applyFilters({ status: nextStatus })
   }
 
+  const alterarExtra = (param: string, valor: string, aplicar: boolean) => {
+    const proximos = { ...valoresExtras, [param]: valor }
+    setValoresExtras(proximos)
+    if (aplicar) applyFilters({ extras: proximos })
+  }
+
+  const aplicarTextoExtra = (param: string) => {
+    if ((valoresExtras[param] || "").trim() !== (searchParams.get(param) || "")) applyFilters()
+  }
+
   const clearFilters = () => {
     setShowClearConfirm(false)
     setSearch("")
     setAno(years[0]?.toString() || "")
     setCategoria("")
     setStatus("")
+    setValoresExtras(Object.fromEntries(extras.map((e) => [e.param, ""])))
     startTransition(() => {
       router.push(pathname)
     })
   }
 
-  const handleExport = () => {
+  const handleExport = (formato: string) => {
+    setMenuExportacao(false)
     const params = new URLSearchParams()
     if (search) params.set("q", search)
     if (ano) params.set("ano", ano)
     if (categoria) params.set("categoria", categoria)
     if (status) params.set("status", status)
+    for (const [param, valor] of Object.entries(valoresExtras)) {
+      if (valor.trim()) params.set(param, valor.trim())
+    }
+    params.set("format", formato)
     
     if (onExport) {
       onExport(params)
     } else {
-      window.location.href = `/api/export?type=${page}&${params.toString()}`
+      window.location.assign(`/api/export?type=${page}&${params.toString()}`)
     }
   }
 
-  const hasFilters = search || categoria || status
+  const hasFilters = search || categoria || status || Object.values(valoresExtras).some((v) => v.trim())
 
   return (
     <>
@@ -166,7 +232,7 @@ export function FilterBar({
               value={ano}
               onChange={handleAnoChange}
               aria-label="Selecionar ano"
-              className="px-3 py-2 border border-slate-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500 min-w-[100px]"
+              className={`${SELECT_CLASS} min-w-[100px]`}
             >
               {years.map((year) => (
                 <option key={year} value={year}>
@@ -180,7 +246,7 @@ export function FilterBar({
                 value={categoria}
                 onChange={handleCategoriaChange}
                 aria-label="Selecionar categoria"
-                className="px-3 py-2 border border-slate-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500 min-w-[150px]"
+                className={`${SELECT_CLASS} min-w-[150px]`}
               >
                 <option value="">Categoria</option>
                 {categories.map((cat) => (
@@ -196,7 +262,7 @@ export function FilterBar({
                 value={status}
                 onChange={handleStatusChange}
                 aria-label="Selecionar status"
-                className="px-3 py-2 border border-slate-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500 min-w-[150px]"
+                className={`${SELECT_CLASS} min-w-[150px]`}
               >
                 <option value="">Status</option>
                 {statuses.map((s) => (
@@ -206,6 +272,37 @@ export function FilterBar({
                 ))}
               </select>
             )}
+
+            {extras.map((extra) => extra.options ? (
+              <select
+                key={extra.param}
+                value={valoresExtras[extra.param] || ""}
+                onChange={(e) => alterarExtra(extra.param, e.target.value, true)}
+                aria-label={extra.label}
+                className={`${SELECT_CLASS} min-w-[150px] max-w-full sm:max-w-[16rem]`}
+              >
+                <option value="">{extra.label}</option>
+                {extra.options.map((opcao) => (
+                  <option key={opcao.value} value={opcao.value}>
+                    {opcao.label}
+                  </option>
+                ))}
+              </select>
+            ) : (
+              <Input
+                key={extra.param}
+                type="search"
+                value={valoresExtras[extra.param] || ""}
+                placeholder={extra.placeholder ?? extra.label}
+                aria-label={extra.label}
+                onChange={(e) => alterarExtra(extra.param, e.target.value, false)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") aplicarTextoExtra(extra.param)
+                }}
+                onBlur={() => aplicarTextoExtra(extra.param)}
+                className="flex-1 min-w-[180px]"
+              />
+            ))}
           </div>
 
           <div className="flex gap-2">
@@ -224,10 +321,35 @@ export function FilterBar({
                 Limpar
               </Button>
             )}
-            <Button variant="outline" onClick={handleExport} className="gap-2 text-slate-600">
-              <Download className="h-4 w-4" />
-              Baixar
-            </Button>
+            <div className="relative" ref={menuRef}>
+              <Button
+                variant="outline"
+                onClick={() => setMenuExportacao((aberto) => !aberto)}
+                className="gap-2 text-slate-600"
+                aria-haspopup="menu"
+                aria-expanded={menuExportacao}
+              >
+                <Download className="h-4 w-4" />
+                Baixar
+                <ChevronDown className="h-4 w-4" />
+              </Button>
+              {menuExportacao && (
+                <div role="menu" className="absolute right-0 z-20 mt-1 w-52 overflow-hidden rounded-lg border border-slate-200 bg-white py-1 shadow-lg">
+                  <p className="px-3 py-1.5 text-xs text-slate-500">Com os filtros aplicados</p>
+                  {FORMATOS_EXPORTACAO.map(({ formato, rotulo, icone: Icone }) => (
+                    <button
+                      key={formato}
+                      role="menuitem"
+                      onClick={() => handleExport(formato)}
+                      className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-slate-700 hover:bg-emerald-50"
+                    >
+                      <Icone className="h-4 w-4 text-emerald-700" />
+                      {rotulo}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>

@@ -5,7 +5,7 @@ import { FilterBar } from "@/components/portal/filter-bar"
 import { Breadcrumbs } from "@/components/portal/breadcrumbs"
 import { StructuredData } from "@/components/portal/structured-data"
 import { DataPageHero } from "@/components/portal/data-page-hero"
-import { getDespesasPage, getDespesasStats, parsePaginationParams } from "@/lib/site-data"
+import { getDespesasOrgaos, getDespesasPage, getDespesasStats, parsePaginationParams } from "@/lib/site-data"
 import { DespesasContent } from "./despesas-client"
 
 export const dynamic = 'force-dynamic'
@@ -23,7 +23,7 @@ export async function generateMetadata() {
 }
 
 interface PageProps {
-  searchParams: Promise<{ q?: string; ano?: string; categoria?: string; status?: string; page?: string; limit?: string }>
+  searchParams: Promise<{ q?: string; ano?: string; categoria?: string; status?: string; orgao?: string; credor?: string; page?: string; limit?: string }>
 }
 
 async function DespesasWrapper({ searchParams }: PageProps) {
@@ -34,12 +34,14 @@ async function DespesasWrapper({ searchParams }: PageProps) {
   const filters = {
     exercicio: selectedYear,
     search: params.q || undefined,
-    categoria: params.categoria || undefined
+    categoria: params.categoria || undefined,
+    orgao: params.orgao || undefined,
+    credor: params.credor || undefined,
   }
 
   const [despesasPage, stats] = await Promise.all([
     getDespesasPage(filters, parsePaginationParams(params)),
-    getDespesasStats(selectedYear)
+    getDespesasStats(selectedYear, filters)
   ])
 
   return (
@@ -69,6 +71,8 @@ async function DespesasWrapper({ searchParams }: PageProps) {
 export default async function Despesas({ searchParams }: PageProps) {
   const currentYear = new Date().getFullYear()
   const years = Array.from({ length: 5 }, (_, i) => currentYear - i)
+  const params = await searchParams
+  const orgaos = await getDespesasOrgaos(parseInt(params.ano || String(currentYear)))
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -90,6 +94,10 @@ export default async function Despesas({ searchParams }: PageProps) {
         page="despesas"
         years={years}
         searchPlaceholder="Buscar por credor, objeto, número..."
+        extras={[
+          { param: "orgao", label: "Órgão", options: orgaos.map((o) => ({ value: o, label: o })) },
+          { param: "credor", label: "Credor", placeholder: "Credor (nome ou CPF/CNPJ)" },
+        ]}
       />
 
       <Suspense fallback={<PageSkeleton />}>

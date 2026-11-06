@@ -1,6 +1,7 @@
 "use client"
 
 import React, { useState } from "react"
+import Link from "next/link"
 import { DollarSign, TrendingUp, Paperclip, Eye } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
 import { PaginationControls } from "@/components/portal/pagination-controls"
@@ -31,6 +32,8 @@ interface DespesaWithAnexos {
   credorCpfCnpj: string | null
   objeto: string | null
   orgaoNome: string | null
+  unidadeNome?: string | null
+  tipoMovimento?: string | null
   valorEmpenhado: number | null
   valorLiquidado: number | null
   valorPago: number | null
@@ -132,7 +135,14 @@ function DespesasTable({
             {despesas.length > 0 ? despesas.map((despesa) => (
               <tr key={despesa.id} id={`record-${despesa.id}`} className="border-b border-slate-200 hover:bg-slate-50 transition-colors target:bg-yellow-100 target:border-yellow-400">
                 <td className="px-4 py-3">
-                  <span className="font-medium">{despesa.numeroEmpenho}</span>
+                  <Link href={`/despesas/${despesa.id}`} className="font-medium text-emerald-800 hover:underline">
+                    {despesa.numeroEmpenho}
+                  </Link>
+                  {despesa.tipoMovimento === 'Anulação' && (
+                    <span className="ml-2 rounded bg-red-100 px-1.5 py-0.5 text-xs font-medium text-red-700" title="Anulação total ou parcial de empenho: entra com valor negativo">
+                      Anulação
+                    </span>
+                  )}
                   <p className="text-xs text-slate-600">
                     {despesa.dataEmpenho ? new Date(despesa.dataEmpenho).toLocaleDateString('pt-BR') : '-'}
                   </p>
@@ -141,13 +151,16 @@ function DespesasTable({
                   <span className="font-medium text-slate-800">{despesa.credorNome || '-'}</span>
                   <p className="text-xs text-slate-600">{despesa.credorCpfCnpj || '-'}</p>
                 </td>
-                <td className="px-4 py-3 text-sm text-slate-600 max-w-xs truncate">
+                <td className="px-4 py-3 text-sm text-slate-600 max-w-[14rem] truncate" title={despesa.objeto || undefined}>
                   {despesa.objeto || '-'}
                 </td>
-                <td className="px-4 py-3 text-sm text-slate-600">
+                <td className="px-4 py-3 text-sm text-slate-600 min-w-[10rem]">
                   {despesa.orgaoNome || '-'}
+                  {despesa.unidadeNome && despesa.unidadeNome !== despesa.orgaoNome && (
+                    <p className="text-xs text-slate-500">{despesa.unidadeNome}</p>
+                  )}
                 </td>
-                <td className="px-4 py-3 text-right font-medium">
+                <td className={`px-4 py-3 text-right font-medium ${(despesa.valorEmpenhado || 0) < 0 ? 'text-red-700' : ''}`}>
                   {formatCurrency(despesa.valorEmpenhado || 0)}
                 </td>
                 <td className="px-4 py-3 text-right font-medium text-amber-800">
@@ -257,6 +270,7 @@ function DespesasContent({ despesas, stats, currentYear, pagination }: DespesasC
             <p><strong>Empenho:</strong> Ato que cria a obrigação de pagamento, reservando o crédito orçamentário.</p>
             <p><strong>Liquidação:</strong> Verificação do direito do credor após a prestação do serviço ou entrega do bem.</p>
             <p><strong>Pagamento:</strong> Efetiva transferência de recursos ao credor.</p>
+            <p><strong>Anulação:</strong> Cancelamento total ou parcial de um empenho. Aparece como lançamento próprio, com valor negativo, e já está descontada dos totais.</p>
           </div>
         </CardContent>
       </Card>

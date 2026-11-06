@@ -11,6 +11,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     '/contratos',
     '/servidores',
     '/convenios',
+    '/diarias',
+    '/transferencias',
     '/esic',
     '/dados-abertos',
     '/acessibilidade',

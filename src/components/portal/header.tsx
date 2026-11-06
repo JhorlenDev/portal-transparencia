@@ -15,6 +15,8 @@ const menuItems = [
   { title: "Contratos", href: "/contratos" },
   { title: "Servidores", href: "/servidores" },
   { title: "Convênios", href: "/convenios" },
+  { title: "Diárias", href: "/diarias" },
+  { title: "Transferências", href: "/transferencias" },
   { title: "e-SIC", href: "/esic" },
   { title: "Dados Abertos", href: "/dados-abertos" },
 ]
@@ -55,7 +57,7 @@ function DesktopMenuItem({ item, pathname }: { item: typeof menuItems[0]; pathna
     <li>
       <Link
         href={item.href}
-        className={`flex items-center h-12 px-4 text-sm font-medium transition-colors ${
+        className={`flex items-center h-12 px-3 xl:px-4 text-sm font-medium transition-colors ${
           isActive 
             ? "bg-emerald-800 text-white" 
             : "text-white hover:bg-emerald-600"
@@ -312,7 +314,7 @@ export default function Header({ config }: { config?: Record<string, string | nu
 
       <nav className="bg-emerald-800 hidden lg:block" aria-label="Menu Principal">
         <div className="container mx-auto px-4">
-          <ul className="flex">
+          <ul className="flex flex-wrap">
             {menuItems.map((item) => (
               <DesktopMenuItem key={item.href} item={item} pathname={pathname} />
             ))}

@@ -23,7 +23,7 @@ export async function generateMetadata() {
 }
 
 interface PageProps {
-  searchParams: Promise<{ q?: string; ano?: string; status?: string; tipo?: string; page?: string; limit?: string }>
+  searchParams: Promise<{ q?: string; ano?: string; status?: string; tipo?: string; fornecedor?: string; page?: string; limit?: string }>
 }
 
 async function ContratosWrapper({ searchParams }: PageProps) {
@@ -31,8 +31,8 @@ async function ContratosWrapper({ searchParams }: PageProps) {
   const currentYear = parseInt(params.ano || String(new Date().getFullYear()))
 
   const [contratosPage, stats] = await Promise.all([
-    getContratosPage({ ano: currentYear, search: params.q || undefined, status: params.status || undefined, tipo: params.tipo || undefined }, parsePaginationParams(params)),
-    getContratosStats()
+    getContratosPage({ ano: currentYear, search: params.q || undefined, status: params.status || undefined, tipo: params.tipo || undefined, fornecedor: params.fornecedor || undefined }, parsePaginationParams(params)),
+    getContratosStats(currentYear)
   ])
 
   return <ContratosContent contratos={contratosPage.data} stats={stats} currentYear={currentYear} pagination={contratosPage.pagination} />
@@ -40,7 +40,8 @@ async function ContratosWrapper({ searchParams }: PageProps) {
 
 const statuses = [
   { value: "vigente", label: "Vigente" },
-  { value: "encerrado", label: "Encerrado" }
+  { value: "encerrado", label: "Encerrado" },
+  { value: "anulado", label: "Anulado" }
 ]
 
 export default async function Contratos({ searchParams }: PageProps) {
@@ -67,6 +68,7 @@ export default async function Contratos({ searchParams }: PageProps) {
         page="contratos"
         years={years}
         statuses={statuses}
+        extras={[{ param: "fornecedor", label: "Fornecedor", placeholder: "Fornecedor (nome ou CNPJ)" }]}
         searchPlaceholder="Buscar por objeto, número..."
       />
 

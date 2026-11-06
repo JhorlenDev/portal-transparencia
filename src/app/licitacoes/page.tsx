@@ -5,7 +5,8 @@ import { FilterBar } from "@/components/portal/filter-bar"
 import { Breadcrumbs } from "@/components/portal/breadcrumbs"
 import { StructuredData } from "@/components/portal/structured-data"
 import { DataPageHero } from "@/components/portal/data-page-hero"
-import { getLicitacoesPage, getLicitacoesStats, parsePaginationParams } from "@/lib/site-data"
+import { getDynamicOptions, getLicitacoesPage, getLicitacoesStats, parsePaginationParams } from "@/lib/site-data"
+import { STATUS_LICITACAO } from "./status"
 import { LicitacoesContent } from "./licitacoes-client"
 
 export const dynamic = 'force-dynamic'
@@ -38,16 +39,15 @@ async function LicitacoesWrapper({ searchParams }: PageProps) {
   return <LicitacoesContent licitacoes={licitacoesPage.data} stats={stats} currentYear={currentYear} pagination={licitacoesPage.pagination} />
 }
 
-const statuses = [
-  { value: "planejamento", label: "Planejamento" },
-  { value: "publicado", label: "Publicado" },
-  { value: "em_andamento", label: "Em Andamento" },
-  { value: "homologado", label: "Homologado" }
-]
+const statuses = Object.entries(STATUS_LICITACAO)
+  .filter(([value]) => value !== "revoked")
+  .map(([value, { label }]) => ({ value, label }))
 
 export default async function Licitacoes({ searchParams }: PageProps) {
   const currentYear = new Date().getFullYear()
   const years = Array.from({ length: 5 }, (_, i) => currentYear - i)
+  const params = await searchParams
+  const modalidades = await getDynamicOptions("licitacoes", "modalidade", parseInt(params.ano || String(currentYear)))
   
   return (
     <div className="container mx-auto px-4 py-8">
@@ -69,7 +69,8 @@ export default async function Licitacoes({ searchParams }: PageProps) {
         page="licitacoes"
         years={years}
         statuses={statuses}
-        searchPlaceholder="Buscar por objeto, número..."
+        extras={modalidades.length > 0 ? [{ param: "modalidade", label: "Modalidade", options: modalidades }] : []}
+        searchPlaceholder="Buscar por objeto, número ou processo..."
       />
 
       <StructuredData 

@@ -1,10 +1,12 @@
 "use client"
 
 import React from "react"
+import Link from "next/link"
 import { Card, CardContent } from "@/components/ui/card"
 import { AttachmentsCell } from "@/components/attachments/attachments-modal"
 import { PaginationControls } from "@/components/portal/pagination-controls"
 import type { PaginationMeta } from "@/lib/site-data"
+import { statusLicitacao } from "./status"
 
 function formatCurrency(value: number): string {
   return new Intl.NumberFormat('pt-BR', {
@@ -12,17 +14,6 @@ function formatCurrency(value: number): string {
     currency: 'BRL',
     minimumFractionDigits: 2
   }).format(value)
-}
-
-function getStatusColor(status: string) {
-  const colors: Record<string, string> = {
-    planejamento: 'bg-slate-100 text-slate-700',
-    publicado: 'bg-blue-100 text-blue-700',
-    em_andamento: 'bg-amber-100 text-amber-700',
-    homologado: 'bg-green-100 text-green-700',
-    revoked: 'bg-red-100 text-red-700',
-  }
-  return colors[status] || 'bg-slate-100 text-slate-700'
 }
 
 interface Attachment {
@@ -40,6 +31,7 @@ interface LicitacaoWithAnexos {
   objeto: string
   status: string
   modalidade: string | null
+  numeroProcesso?: string | null
   dataAbertura: Date | null
   valorEstimado: number | null
   anexos?: Attachment[]
@@ -60,6 +52,7 @@ interface LicitacoesContentProps {
 export function LicitacoesContent({ licitacoes, stats, currentYear, pagination }: LicitacoesContentProps) {
   const emAndamento = stats.porStatus.find((s) => s.status === 'em_andamento')?._count || 0
   const homologados = stats.porStatus.find((s) => s.status === 'homologado')?._count || 0
+  const encerrados = stats.porStatus.find((s) => s.status === 'encerrado')?._count || 0
 
   return (
     <>
@@ -84,8 +77,8 @@ export function LicitacoesContent({ licitacoes, stats, currentYear, pagination }
         </Card>
         <Card>
           <CardContent className="p-4">
-            <p className="text-sm text-slate-600">Processos</p>
-            <p className="text-xl font-bold">{stats.total}</p>
+            <p className="text-sm text-slate-600">Encerrados</p>
+            <p className="text-2xl font-bold text-slate-700">{encerrados}</p>
           </CardContent>
         </Card>
       </div>
@@ -108,15 +101,20 @@ export function LicitacoesContent({ licitacoes, stats, currentYear, pagination }
               {licitacoes.length > 0 ? licitacoes.map((licitacao) => (
                 <tr key={licitacao.id} id={`record-${licitacao.id}`} className="border-b border-slate-200 hover:bg-slate-50 transition-colors target:bg-yellow-100 target:border-yellow-400">
                   <td className="px-4 py-3">
-                    <span className="font-bold text-purple-600">{licitacao.numero}/{licitacao.ano}</span>
+                    <Link href={`/licitacoes/${licitacao.id}`} className="font-bold text-purple-600 hover:underline">
+                      {licitacao.numero}/{licitacao.ano}
+                    </Link>
                     <p className="text-xs text-slate-600">{licitacao.modalidade}</p>
+                    {licitacao.numeroProcesso && (
+                      <p className="text-xs text-slate-500">Processo {licitacao.numeroProcesso}</p>
+                    )}
                   </td>
                   <td className="px-4 py-3 text-sm text-slate-600 max-w-md truncate">
                     {licitacao.objeto}
                   </td>
                   <td className="px-4 py-3">
-                    <span className={`px-2 py-1 rounded text-xs ${getStatusColor(licitacao.status)}`}>
-                      {licitacao.status}
+                    <span className={`px-2 py-1 rounded text-xs whitespace-nowrap ${statusLicitacao(licitacao.status).cor}`}>
+                      {statusLicitacao(licitacao.status).label}
                     </span>
                   </td>
                   <td className="px-4 py-3 text-sm">
@@ -125,7 +123,7 @@ export function LicitacoesContent({ licitacoes, stats, currentYear, pagination }
                       : '-'}
                   </td>
                   <td className="px-4 py-3 text-right font-medium">
-                    {formatCurrency(licitacao.valorEstimado || 0)}
+                    {licitacao.valorEstimado === null ? '-' : formatCurrency(licitacao.valorEstimado)}
                   </td>
                   <td className="px-4 py-3 text-center">
                     <AttachmentsCell anexos={licitacao.anexos} />
@@ -134,7 +132,7 @@ export function LicitacoesContent({ licitacoes, stats, currentYear, pagination }
               )) : (
                 <tr>
                   <td colSpan={6} className="px-4 py-8 text-center text-slate-600">
-                    Nenhuma inúmera encontrada para {currentYear}
+                    Nenhuma licitação encontrada para {currentYear}
                   </td>
                 </tr>
               )}

@@ -121,7 +121,8 @@ src/
 
 Principais tabelas (via Prisma):
 
-- `Despesa`, `Receita`, `Contrato`, `Licitacao`, `Convenio`, `Servidor`
+- `Despesa`, `Receita`, `Contrato`, `Licitacao`, `Convenio`, `Servidor`, `Diaria`, `Transferencia`
+- `SincronizacaoLog` - Histórico das sincronizações com a Fiorilli
 - `Anexo` - Arquivos vinculados às entidades
 - `ConfiguracaoSite` - Configurações do portal
 - `Orgao`, `Credor`, `FonteRecurso` - Dados de apoio
@@ -135,6 +136,20 @@ Detalhes, variáveis de ambiente e como restaurar: [docs/backup.md](docs/backup.
 ```bash
 npx tsx scripts/test-backup.ts        # testes do backup local
 npx tsx scripts/test-backup-drive.ts  # testes do envio para a nuvem
+```
+
+## Integração com a Fiorilli
+
+Despesas, receitas, licitações, contratos, diárias e transferências também vêm da API de Dados
+Abertos da Fiorilli, o sistema contábil da Prefeitura. A sincronização roda todo dia às 02:00,
+10:00 e 18:00 (Manaus) e, aos domingos, também recarrega os anos anteriores. Num ano com dados da Fiorilli, o
+site mostra só esses dados. Painel em `/admin/sincronizacao`.
+Detalhes, variáveis de ambiente, primeira carga e limitações da API:
+[docs/integracao-fiorilli.md](docs/integracao-fiorilli.md).
+
+```bash
+npx tsx scripts/fiorilli-sync.ts --anos 2025,2026  # sincronização manual
+npm run test:fiorilli                              # testes da integração
 ```
 
 ## Desenvolvimento

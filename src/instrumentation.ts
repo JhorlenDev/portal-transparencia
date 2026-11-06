@@ -4,5 +4,8 @@ export async function register() {
 
     const { iniciarAgendador } = await import('./lib/backup/scheduler')
     iniciarAgendador()
+
+    const { iniciarAgendadorFiorilli } = await import('./lib/fiorilli/agendador')
+    iniciarAgendadorFiorilli()
   }
 }

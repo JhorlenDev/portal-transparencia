@@ -121,7 +121,7 @@ export function ReceitasContent({ receitas, stats, currentYear, pagination }: Re
                     <td className="px-4 py-3 font-mono text-sm">{receita.codigoNatureza}</td>
                     <td className="px-4 py-3 font-medium">{receita.naturezaReceita}</td>
                     <td className="px-4 py-3">
-                      <span className="px-2 py-1 bg-emerald-100 text-emerald-800 rounded text-xs">
+                      <span className="px-2 py-1 bg-emerald-100 text-emerald-800 rounded text-xs whitespace-nowrap">
                         {receita.categoriaEconomica}
                       </span>
                     </td>
@@ -132,15 +132,19 @@ export function ReceitasContent({ receitas, stats, currentYear, pagination }: Re
                       {formatCurrency(receita.valorArrecadado || 0)}
                     </td>
                     <td className="px-4 py-3 text-right">
-                      <div className="flex items-center justify-end gap-2">
-                        <div className="w-16 h-2 bg-slate-200 rounded-full overflow-hidden">
-                          <div 
-                            className="h-full bg-emerald-500 rounded-full" 
-                            style={{ width: `${Math.min(percentual, 100)}%` }} 
-                          />
+                      {receita.valorPrevisto > 0 ? (
+                        <div className="flex items-center justify-end gap-2">
+                          <div className="w-16 h-2 bg-slate-200 rounded-full overflow-hidden">
+                            <div 
+                              className="h-full bg-emerald-500 rounded-full" 
+                              style={{ width: `${Math.min(percentual, 100)}%` }} 
+                            />
+                          </div>
+                          <span className="text-sm font-medium">{percentual.toFixed(1)}%</span>
                         </div>
-                        <span className="text-sm font-medium">{percentual.toFixed(1)}%</span>
-                      </div>
+                      ) : (
+                        <span className="text-sm text-slate-500" title="Sem previsão para esta receita">sem previsão</span>
+                      )}
                     </td>
                     <td className="px-4 py-3 text-center">
                       <AttachmentsCell anexos={receita.anexos} />

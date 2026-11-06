@@ -19,6 +19,8 @@ export async function GET(request: NextRequest) {
         status: status || undefined,
         search: q || undefined,
         modalidade: modalidade || undefined,
+        ordenar: searchParams.get('ordenar') || undefined,
+        ordem: searchParams.get('ordem') || undefined,
       },
       parsePaginationParams({
         page: searchParams.get('page') || undefined,
