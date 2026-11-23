@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import Image from "next/image"
-import { MapPin, Phone, Mail, Clock, ExternalLink } from "lucide-react"
+import { ChevronRight, Clock, ExternalLink, Mail, MapPin, Phone, ShieldCheck } from "lucide-react"
 
 export default function Footer({ config }: { config?: Record<string, string | null> }) {
   const currentYear = new Date().getFullYear()
@@ -18,138 +18,93 @@ export default function Footer({ config }: { config?: Record<string, string | nu
   const linkPncp = safeConfig.link_pncp || 'https://pncp.gov.br'
   const linkSiteOficial = safeConfig.link_site_oficial || 'https://www.gov.br'
   const textoRodape = (safeConfig.texto_rodape || '© {ano} Prefeitura Municipal. Todos os direitos reservados.').replace('{ano}', String(currentYear))
+  const acessos = [
+    ["Despesas", "/despesas"], ["Receitas", "/receitas"], ["Licitações", "/licitacoes"],
+    ["Contratos", "/contratos"], ["Servidores", "/servidores"], ["e-SIC", "/esic"],
+  ]
+  const linksExternos = [
+    ["Site Oficial", linkSiteOficial], ["Fala.BR", linkFalaBr], ["PNCP", linkPncp],
+  ]
 
   return (
-    <footer className="bg-slate-800 text-white">
-      <div className="container mx-auto px-4 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+    <footer className="border-t-4 border-t-gold bg-institutional text-white">
+      <div className="container mx-auto px-4 py-10 lg:py-12">
+        <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-[1.15fr_0.9fr_1.25fr] lg:gap-12">
           <div>
-            <div className="mb-4 bg-white p-2 rounded-xl w-fit">
+            <div className="mb-4 flex items-center gap-3">
+              <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-white p-2 shadow-lg">
               <Image
-                src="/logo.webp"
+                src="/logo-portal-transparencia.png"
                 alt="Logotipo do Portal da Transparência de Tefé"
-                width={200}
-                height={48}
-                className="h-10 w-auto object-contain"
+                width={784}
+                height={803}
+                className="h-11 w-auto object-contain"
               />
+              </div>
+              <div>
+                <p className="text-lg font-bold leading-tight">Portal da Transparência</p>
+                <p className="mt-0.5 text-xs text-white/60">Prefeitura Municipal de Tefé</p>
+              </div>
             </div>
-            <p className="text-sm text-slate-300 leading-relaxed">
+            <p className="max-w-sm text-sm leading-relaxed text-white/65">
               {descricao}
             </p>
+            <div className="mt-5 inline-flex items-center gap-2 rounded-lg border border-white/10 bg-white/[0.06] px-3 py-2 text-xs text-white/75">
+              <ShieldCheck className="h-4 w-4 text-gold" aria-hidden="true" />
+              Informação pública, simples e acessível
+            </div>
           </div>
 
           <div>
-            <h4 className="font-semibold mb-4 text-emerald-400">Acesso Rápido</h4>
-            <ul className="space-y-2 text-sm">
-              <li>
-                <Link href="/despesas" className="text-slate-300 hover:text-white transition-colors">
-                  Despesas Públicas
+            <h4 className="mb-4 flex items-center gap-2 font-semibold text-white"><span className="h-4 w-1 rounded-full bg-gold" />Acesso rápido</h4>
+            <ul className="grid grid-cols-2 gap-x-4 gap-y-2.5 text-sm">
+              {acessos.map(([titulo, href]) => <li key={href}>
+                <Link href={href} className="group flex items-center gap-1 text-white/65 transition-colors hover:text-white">
+                  <ChevronRight className="h-3.5 w-3.5 text-gold/70 transition-transform group-hover:translate-x-0.5" />{titulo}
                 </Link>
-              </li>
-              <li>
-                <Link href="/receitas" className="text-slate-300 hover:text-white transition-colors">
-                  Receitas
-                </Link>
-              </li>
-              <li>
-                <Link href="/licitacoes" className="text-slate-300 hover:text-white transition-colors">
-                  Licitações
-                </Link>
-              </li>
-              <li>
-                <Link href="/contratos" className="text-slate-300 hover:text-white transition-colors">
-                  Contratos
-                </Link>
-              </li>
-              <li>
-                <Link href="/servidores" className="text-slate-300 hover:text-white transition-colors">
-                  Servidores
-                </Link>
-              </li>
-              <li>
-                <Link href="/esic" className="text-slate-300 hover:text-white transition-colors">
-                  e-SIC
-                </Link>
-              </li>
+              </li>)}
             </ul>
+            <div className="mt-6 flex flex-wrap gap-2">
+              {linksExternos.map(([titulo, href]) => <a key={titulo} href={href} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 rounded-lg border border-white/10 bg-white/[0.06] px-2.5 py-1.5 text-xs text-white/70 transition hover:border-white/20 hover:bg-white/10 hover:text-white">
+                {titulo}<ExternalLink className="h-3 w-3" aria-hidden="true" />
+              </a>)}
+            </div>
           </div>
 
-          <div>
-            <h4 className="font-semibold mb-4 text-emerald-400">Contato</h4>
-            <ul className="space-y-3 text-sm">
-              <li className="flex items-start gap-2">
-                <MapPin className="h-4 w-4 mt-0.5 text-emerald-500 flex-shrink-0" aria-hidden="true" />
-                <span className="text-slate-300 whitespace-pre-line">{endereco}</span>
-              </li>
-              <li className="flex items-center gap-2">
-                <Phone className="h-4 w-4 text-emerald-500" aria-hidden="true" />
-                <span className="text-slate-300">{telefone}</span>
-              </li>
-              <li className="flex items-center gap-2">
-                <Mail className="h-4 w-4 text-emerald-500" aria-hidden="true" />
-                <a href={`mailto:${email}`} className="text-slate-300 hover:text-white" aria-label={`Enviar e-mail para ${email}`}>
-                  {email}
-                </a>
-              </li>
-              <li className="flex items-center gap-2">
-                <Clock className="h-4 w-4 text-emerald-500" aria-hidden="true" />
-                <span className="text-slate-300">{horario}</span>
-              </li>
-            </ul>
-          </div>
-
-          <div>
-            <h4 className="font-semibold mb-4 text-emerald-400">Links Úteis</h4>
-            <ul className="space-y-2 text-sm">
-              <li>
-                <a 
-                  href={linkSiteOficial} 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="text-slate-300 hover:text-white transition-colors flex items-center gap-1"
-                  aria-label="Site Oficial (abre em nova aba)"
-                >
-                  Site Oficial <ExternalLink className="h-3 w-3" aria-hidden="true" />
-                </a>
-              </li>
-              <li>
-                <a 
-                  href={linkFalaBr} 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="text-slate-300 hover:text-white transition-colors flex items-center gap-1"
-                  aria-label="Fala.BR Ouvidoria (abre em nova aba)"
-                >
-                  Fala.BR (Ouvidoria) <ExternalLink className="h-3 w-3" aria-hidden="true" />
-                </a>
-              </li>
-              <li>
-                <a 
-                  href={linkPncp} 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="text-slate-300 hover:text-white transition-colors flex items-center gap-1"
-                  aria-label="Portal Nacional de Contratações (abre em nova aba)"
-                >
-                  PNCP <ExternalLink className="h-3 w-3" aria-hidden="true" />
-                </a>
-              </li>
-            </ul>
+          <div className="md:col-span-2 lg:col-span-1">
+            <h4 className="mb-4 flex items-center gap-2 font-semibold text-white"><span className="h-4 w-1 rounded-full bg-gold" />Contato</h4>
+            <div className="grid gap-2.5 sm:grid-cols-2 lg:grid-cols-1">
+              <div className="flex items-start gap-3 rounded-xl border border-white/10 bg-white/[0.05] p-3"><MapPin className="mt-0.5 h-4 w-4 shrink-0 text-gold" /><span className="whitespace-pre-line text-sm leading-5 text-white/70">{endereco}</span></div>
+              <a href={`tel:${telefone.replace(/\D/g, '')}`} className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/[0.05] p-3 text-sm text-white/70 transition hover:bg-white/10 hover:text-white"><Phone className="h-4 w-4 shrink-0 text-gold" />{telefone}</a>
+              <a href={`mailto:${email}`} className="flex min-w-0 items-center gap-3 rounded-xl border border-white/10 bg-white/[0.05] p-3 text-sm text-white/70 transition hover:bg-white/10 hover:text-white"><Mail className="h-4 w-4 shrink-0 text-gold" /><span className="truncate">{email}</span></a>
+              <div className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/[0.05] p-3 text-sm text-white/70"><Clock className="h-4 w-4 shrink-0 text-gold" />{horario}</div>
+            </div>
           </div>
         </div>
       </div>
 
-      <div className="border-t border-slate-700">
+      <div className="border-t border-white/10 bg-black/10">
         <div className="container mx-auto px-4 py-4">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-slate-300">
-            <p>
+          <div className="grid items-center gap-3 text-center text-xs text-white/55 md:grid-cols-3 md:text-left">
+            <p className="md:justify-self-start">
               {textoRodape}
             </p>
-            <div className="flex items-center gap-4">
-              <Link href="/privacidade" className="hover:text-white">
+            <p className="font-medium text-white/70 md:justify-self-center">
+              Desenvolvido por{" "}
+              <a
+                href="https://www.instagram.com/sedecti_tefe/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-bold text-gold transition hover:text-white hover:underline"
+              >
+                SEDECTI - Tefé
+              </a>
+            </p>
+            <div className="flex items-center justify-center gap-4 md:justify-self-end">
+              <Link href="/privacidade" className="transition hover:text-white">
                 Política de Privacidade
               </Link>
-              <Link href="/acessibilidade" className="hover:text-white">
+              <Link href="/acessibilidade" className="transition hover:text-white">
                 Acessibilidade
               </Link>
             </div>

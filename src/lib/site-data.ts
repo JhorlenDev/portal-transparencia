@@ -330,13 +330,15 @@ export interface ReceitasFilters {
   tipo?: string
   ordenar?: string
   ordem?: string
+  fase?: 'previsto' | 'arrecadado' | 'excesso' | 'a_arrecadar'
 }
 
-export const RECEITAS_CAMPOS_ORDENACAO = ['codigoNatureza', 'naturezaReceita', 'valorPrevisto', 'valorArrecadado'] as const
+export const RECEITAS_CAMPOS_ORDENACAO = ['codigoNatureza', 'naturezaReceita', 'categoriaEconomica', 'mes', 'valorPrevisto', 'valorArrecadado'] as const
 
 export async function filtrosReceita(filters?: ReceitasFilters): Promise<Prisma.ReceitaWhereInput> {
   const year = filters?.exercicio || new Date().getFullYear()
-  const where: Prisma.ReceitaWhereInput = { exercicio: year, AND: [await receitasVisiveis(filters?.tipo)] }
+  const AND: Prisma.ReceitaWhereInput[] = [await receitasVisiveis(filters?.tipo)]
+  const where: Prisma.ReceitaWhereInput = { exercicio: year, AND }
 
   if (filters?.categoria) {
     where.categoriaEconomica = filters.categoria
@@ -348,6 +350,11 @@ export async function filtrosReceita(filters?: ReceitasFilters): Promise<Prisma.
       { codigoNatureza: { contains: filters.search } }
     ]
   }
+
+  if (filters?.fase === 'previsto') AND.push({ valorPrevisto: { gt: 0 } })
+  if (filters?.fase === 'arrecadado') AND.push({ valorArrecadado: { gt: 0 } })
+  if (filters?.fase === 'excesso') AND.push({ valorArrecadado: { gt: prisma.receita.fields.valorPrevisto } })
+  if (filters?.fase === 'a_arrecadar') AND.push({ valorArrecadado: { lt: prisma.receita.fields.valorPrevisto } })
 
   return where
 }
@@ -401,6 +408,7 @@ export interface DespesasFilters {
   fonteRecurso?: string
   ordenar?: string
   ordem?: string
+  fase?: 'empenhado' | 'liquidado' | 'pago' | 'a_liquidar' | 'liquidado_a_pagar'
 }
 
 export const DESPESAS_CAMPOS_ORDENACAO = ['dataEmpenho', 'valorEmpenhado', 'valorLiquidado', 'valorPago', 'credorNome', 'numeroEmpenho'] as const
@@ -434,6 +442,16 @@ export async function filtrosDespesa(filters?: DespesasFilters): Promise<Prisma.
         { numeroEmpenho: { contains: filters.search } }
       ]
     })
+  }
+
+  if (filters?.fase === 'empenhado') AND.push({ valorEmpenhado: { gt: 0 } })
+  if (filters?.fase === 'liquidado') AND.push({ valorLiquidado: { gt: 0 } })
+  if (filters?.fase === 'pago') AND.push({ valorPago: { gt: 0 } })
+  if (filters?.fase === 'a_liquidar') {
+    AND.push({ valorEmpenhado: { gt: prisma.despesa.fields.valorLiquidado } })
+  }
+  if (filters?.fase === 'liquidado_a_pagar') {
+    AND.push({ valorLiquidado: { gt: prisma.despesa.fields.valorPago } })
   }
 
   where.AND = AND
@@ -476,6 +494,13 @@ function anexosDe(entidadeTipo: string, entidadeId: string) {
     orderBy: { nomeArquivo: 'asc' },
   })
 }
+
+export const getReceitaDetalhe = cache(async (id: string) => {
+  const receita = await prisma.receita.findUnique({ where: { id } })
+  if (!receita) return null
+  const anexos = await anexosDe('receita', id)
+  return { ...receita, anexos }
+})
 
 /**
  * Empenhos da Fiorilli de um processo licitatorio: o empenho guarda o numero do processo
@@ -552,6 +577,24 @@ export const getDiariaDetalhe = cache(async (id: string) => {
       })
     : null
   return { ...diaria, empenho }
+})
+
+export const getServidorDetalhe = cache(async (id: string) => {
+  const servidor = await prisma.servidor.findUnique({ where: { id } })
+  if (!servidor) return null
+  const anexos = await anexosDe('servidor', id)
+  return { ...servidor, anexos }
+})
+
+export const getConvenioDetalhe = cache(async (id: string) => {
+  const convenio = await prisma.convenio.findUnique({ where: { id } })
+  if (!convenio) return null
+  const anexos = await anexosDe('convenio', id)
+  return { ...convenio, anexos }
+})
+
+export const getTransferenciaDetalhe = cache(async (id: string) => {
+  return prisma.transferencia.findUnique({ where: { id } })
 })
 
 interface AttachmentData {
@@ -1084,12 +1127,12 @@ export async function getConveniosPage(filters?: ConveniosFilters, paginationInp
 
 export async function getConveniosStats(ano?: number) {
   const year = ano || new Date().getFullYear()
-  const total = await prisma.convenio.count({ where: { ano: year } })
-  const valorTotal = await prisma.convenio.aggregate({
-    _sum: { valorTotal: true },
-    where: { ano: year }
-  })
-  return { total, valorTotal: valorTotal._sum.valorTotal || 0 }
+  const [total, emExecucao, valorTotal] = await Promise.all([
+    prisma.convenio.count({ where: { ano: year } }),
+    prisma.convenio.count({ where: { ano: year, status: 'em_execucao' } }),
+    prisma.convenio.aggregate({ _sum: { valorTotal: true }, where: { ano: year } }),
+  ])
+  return { total, emExecucao, valorTotal: valorTotal._sum.valorTotal || 0 }
 }
 
 // Datasets

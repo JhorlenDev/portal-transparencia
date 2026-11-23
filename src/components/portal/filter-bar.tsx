@@ -3,6 +3,7 @@
 import { useRouter, useSearchParams, usePathname } from "next/navigation"
 import { Search, X, Loader2, Download, FileSpreadsheet, FileJson, ChevronDown } from "lucide-react"
 import { useState, useEffect, useCallback, useRef, useTransition } from "react"
+import type { ReactNode } from "react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import {
@@ -38,6 +39,7 @@ interface FilterBarProps {
   searchPlaceholder?: string
   onExport?: (params: URLSearchParams) => void
   isLoading?: boolean
+  leading?: ReactNode
 }
 
 const DEFAULT_YEARS = () => {
@@ -51,7 +53,7 @@ const FORMATOS_EXPORTACAO = [
   { formato: "json", rotulo: "JSON", icone: FileJson },
 ] as const
 
-const SELECT_CLASS = "px-3 py-2 border border-slate-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
+const SELECT_CLASS = "px-3 py-2 border border-border-subtle rounded-lg text-sm text-text-primary bg-white focus:outline-none focus:border-digital focus:ring-2 focus:ring-digital/20"
 
 export function FilterBar({
   page,
@@ -61,7 +63,8 @@ export function FilterBar({
   extras = [],
   searchPlaceholder = "Buscar...",
   onExport,
-  isLoading = false
+  isLoading = false,
+  leading,
 }: FilterBarProps) {
   const router = useRouter()
   const pathname = usePathname()
@@ -93,6 +96,8 @@ export function FilterBar({
     if (nextAno) params.set("ano", nextAno)
     if (nextCategoria) params.set("categoria", nextCategoria)
     if (nextStatus) params.set("status", nextStatus)
+    const fase = searchParams.get("fase")
+    if (fase) params.set("fase", fase)
     for (const [param, valor] of Object.entries(nextExtras)) {
       if (valor.trim()) params.set(param, valor.trim())
     }
@@ -102,7 +107,7 @@ export function FilterBar({
       router.push(queryString ? `${pathname}?${queryString}` : pathname)
     })
     setIsFiltering(false)
-  }, [search, ano, categoria, status, valoresExtras, pathname, router])
+  }, [search, ano, categoria, status, valoresExtras, pathname, router, searchParams])
 
   useEffect(() => {
     if (search.length >= 3) {
@@ -195,6 +200,8 @@ export function FilterBar({
     if (ano) params.set("ano", ano)
     if (categoria) params.set("categoria", categoria)
     if (status) params.set("status", status)
+    const fase = searchParams.get("fase")
+    if (fase) params.set("fase", fase)
     for (const [param, valor] of Object.entries(valoresExtras)) {
       if (valor.trim()) params.set(param, valor.trim())
     }
@@ -211,8 +218,9 @@ export function FilterBar({
 
   return (
     <>
-      <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-4 mb-6">
-        <div className="flex flex-col md:flex-row gap-4">
+      <div className="mb-6 rounded-xl border border-border-subtle bg-white p-4 shadow-[0_1px_3px_rgba(18,52,91,0.06)]">
+        <div className="flex flex-col gap-4 md:flex-row md:items-center">
+          {leading && <div className="shrink-0 md:border-r md:border-border-subtle md:pr-4">{leading}</div>}
           <div className="flex-1 flex gap-2 flex-wrap">
             <div className="relative flex-1 min-w-[200px]">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
@@ -224,7 +232,7 @@ export function FilterBar({
                 className="pl-10"
               />
               {(isFiltering || isPending || isLoading) && (
-                <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-emerald-800 animate-spin" />
+                <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 animate-spin text-digital" />
               )}
             </div>
 
@@ -341,9 +349,9 @@ export function FilterBar({
                       key={formato}
                       role="menuitem"
                       onClick={() => handleExport(formato)}
-                      className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-slate-700 hover:bg-emerald-50"
+                      className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-text-secondary hover:bg-blue-50 hover:text-institutional"
                     >
-                      <Icone className="h-4 w-4 text-emerald-700" />
+                      <Icone className="h-4 w-4 text-digital" />
                       {rotulo}
                     </button>
                   ))}
@@ -366,7 +374,7 @@ export function FilterBar({
             <Button variant="outline" onClick={() => setShowClearConfirm(false)}>
               Cancelar
             </Button>
-            <Button onClick={clearFilters} className="bg-emerald-600 hover:bg-emerald-800">
+            <Button onClick={clearFilters}>
               Confirmar
             </Button>
           </div>
@@ -437,7 +445,7 @@ export function DetailsModal({
             onClick={() => setActiveTab("dicionario")}
             className={`px-4 py-2 text-sm font-medium rounded-t-lg transition-colors ${
               activeTab === "dicionario" 
-                ? "bg-emerald-600 text-white" 
+                ? "bg-digital text-white"
                 : "text-slate-600 hover:bg-slate-100"
             }`}
           >
@@ -447,7 +455,7 @@ export function DetailsModal({
             onClick={() => setActiveTab("downloads")}
             className={`px-4 py-2 text-sm font-medium rounded-t-lg transition-colors ${
               activeTab === "downloads" 
-                ? "bg-emerald-600 text-white" 
+                ? "bg-digital text-white"
                 : "text-slate-600 hover:bg-slate-100"
             }`}
           >
@@ -457,7 +465,7 @@ export function DetailsModal({
             onClick={() => setActiveTab("api")}
             className={`px-4 py-2 text-sm font-medium rounded-t-lg transition-colors ${
               activeTab === "api" 
-                ? "bg-emerald-600 text-white" 
+                ? "bg-digital text-white"
                 : "text-slate-600 hover:bg-slate-100"
             }`}
           >
@@ -480,7 +488,7 @@ export function DetailsModal({
                 <tbody>
                   {columns.map((col, i) => (
                     <tr key={i} className="border-b border-slate-100">
-                      <td className="px-3 py-2 font-mono text-xs text-emerald-800">{col.campo}</td>
+                      <td className="px-3 py-2 font-mono text-xs text-digital">{col.campo}</td>
                       <td className="px-3 py-2 text-slate-600">{col.tipo}</td>
                       <td className="px-3 py-2 text-slate-700">{col.descricao}</td>
                       <td className="px-3 py-2 font-mono text-xs text-slate-600">{col.exemplo}</td>
@@ -499,9 +507,9 @@ export function DetailsModal({
                 className="flex flex-col items-center justify-center p-6 border-2 border-slate-200 rounded-xl hover:border-emerald-500 hover:bg-emerald-50 transition-colors disabled:opacity-50"
               >
                 {isDownloading ? (
-                  <Loader2 className="h-10 w-10 text-emerald-800 animate-spin mb-2" />
+                  <Loader2 className="mb-2 h-10 w-10 animate-spin text-digital" />
                 ) : (
-                  <FileSpreadsheet className="h-10 w-10 text-emerald-800 mb-2" />
+                  <FileSpreadsheet className="mb-2 h-10 w-10 text-digital" />
                 )}
                 <span className="font-medium text-slate-700">Download CSV</span>
                 <span className="text-xs text-slate-600 mt-1">Planilha editável</span>

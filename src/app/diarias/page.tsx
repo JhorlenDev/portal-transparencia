@@ -4,7 +4,7 @@ import { PageSkeleton } from "@/components/ui/skeletons"
 import { FilterBar } from "@/components/portal/filter-bar"
 import { Breadcrumbs } from "@/components/portal/breadcrumbs"
 import { StructuredData } from "@/components/portal/structured-data"
-import { DataPageHero } from "@/components/portal/data-page-hero"
+import { CompactPageTitle } from "@/components/portal/compact-page-title"
 import { getDiariasOrgaos, getDiariasPage, parsePaginationParams } from "@/lib/site-data"
 import { DiariasContent } from "./diarias-client"
 
@@ -71,25 +71,17 @@ export default async function Diarias({ searchParams }: PageProps) {
   const orgaos = await getDiariasOrgaos(parseInt(params.ano || String(currentYear)))
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="portal-page portal-page--diarias container mx-auto px-4 py-8">
       <Breadcrumbs items={[
         { label: "Transparência", href: "/" },
         { label: "Diárias" }
       ]} />
 
-      <DataPageHero
-        icon={<Plane className="h-6 w-6" />}
-        eyebrow="Despesas com pessoal"
-        title="Diárias"
-        description="Consulte as diárias pagas a servidores e autoridades para viagens a serviço, com favorecido, cargo, órgão, motivo, quantidade e valor."
-        accent="rose"
-        badges={["Favorecido", "Cargo", "Motivo da viagem", "Valor pago"]}
-      />
-
       <FilterBar
         page="diarias"
         years={years}
         searchPlaceholder="Buscar no motivo ou no nome..."
+        leading={<CompactPageTitle icon={<Plane className="h-5 w-5" />} title="Diárias" description="Viagens a serviço do município" />}
         extras={[
           { param: "orgao", label: "Órgão", options: orgaos.map((o) => ({ value: o, label: o })) },
           { param: "favorecido", label: "Favorecido", placeholder: "Favorecido (nome ou cargo)" },

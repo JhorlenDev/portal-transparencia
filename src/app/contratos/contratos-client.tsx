@@ -2,9 +2,11 @@
 
 import React from "react"
 import Link from "next/link"
+import { usePathname, useRouter, useSearchParams } from "next/navigation"
+import { Banknote, Building2, CalendarDays, CheckCircle2, CircleDot, FileCheck2, Files, FileText, Hash } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
-import { AttachmentsCell } from "@/components/attachments/attachments-modal"
 import { PaginationControls } from "@/components/portal/pagination-controls"
+import { ExecutionIndicators } from "@/components/portal/execution-indicators"
 import type { PaginationMeta } from "@/lib/site-data"
 
 function formatCurrency(value: number): string {
@@ -68,58 +70,53 @@ interface ContratosContentProps {
 }
 
 export function ContratosContent({ contratos, stats, currentYear, pagination }: ContratosContentProps) {
+  const router = useRouter()
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
+  const statusAtivo = searchParams.get('status')
+  const linkStatus = (status?: string) => {
+    const params = new URLSearchParams(searchParams.toString())
+    if (status) params.set('status', status)
+    else params.delete('status')
+    params.delete('page')
+    return `${pathname}${params.size ? `?${params}` : ''}`
+  }
+  const percentual = (valor: number) => stats.total > 0 ? valor / stats.total * 100 : 0
+  const indicadores = [
+    { label: `Total em ${currentYear}`, value: stats.total.toLocaleString('pt-BR'), percentage: 100, percentageLabel: '100%', color: '#1677B8', softColor: '#EAF5FB', icon: <Files className="h-4 w-4" />, href: linkStatus(), active: !statusAtivo },
+    { label: 'Vigentes', value: stats.vigentes.toLocaleString('pt-BR'), percentage: percentual(stats.vigentes), percentageLabel: `${percentual(stats.vigentes).toLocaleString('pt-BR', { maximumFractionDigits: 1 })}% do total`, color: '#16845D', softColor: '#E8F6F0', icon: <CheckCircle2 className="h-4 w-4" />, href: linkStatus('vigente'), active: statusAtivo === 'vigente' },
+    { label: 'Valor total', value: formatCurrency(stats.valorTotal), percentage: 100, percentageLabel: 'contratado', color: '#A87512', softColor: '#FFF6DE', icon: <Banknote className="h-4 w-4" />, href: linkStatus(), active: false },
+    { label: 'Encerrados', value: stats.encerrados.toLocaleString('pt-BR'), percentage: percentual(stats.encerrados), percentageLabel: `${percentual(stats.encerrados).toLocaleString('pt-BR', { maximumFractionDigits: 1 })}% do total`, color: '#475569', softColor: '#EDF1F5', icon: <FileCheck2 className="h-4 w-4" />, href: linkStatus('encerrado'), active: statusAtivo === 'encerrado' },
+  ]
+  const titulo = (rotulo: string, Icone: typeof Files) => <span className="inline-flex items-center gap-1.5"><Icone className="h-3.5 w-3.5 text-gold" aria-hidden="true" />{rotulo}</span>
   return (
     <>
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-        <Card>
-          <CardContent className="p-4">
-            <p className="text-sm text-slate-600">Total em {currentYear}</p>
-            <p className="text-2xl font-bold">{stats.total}</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-4">
-            <p className="text-sm text-slate-600">Vigentes</p>
-            <p className="text-2xl font-bold text-green-600">{stats.vigentes}</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-4">
-            <p className="text-sm text-slate-600">Valor Total</p>
-            <p className="text-lg font-bold">{formatCurrency(stats.valorTotal)}</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-4">
-            <p className="text-sm text-slate-600">Encerrados</p>
-            <p className="text-lg font-bold">{stats.encerrados}</p>
-          </CardContent>
-        </Card>
-      </div>
+      <ExecutionIndicators title="Panorama dos contratos" subtitle={`Instrumentos administrativos de ${currentYear}`} items={indicadores} />
+
+      <div className="portal-listing-heading mb-3"><h2 className="text-lg font-bold text-institutional">Contratos encontrados</h2><p className="text-sm text-text-secondary">Instrumentos administrativos do exercício selecionado.</p></div>
 
       <Card className="overflow-x-auto">
         <CardContent className="p-0 min-w-0">
-          <div className="overflow-x-auto">
-            <table className="w-full">
+          <div className="portal-listing-scroll overflow-x-auto">
+            <table className="portal-data-table compact-public-table w-full">
             <thead className="bg-slate-50 border-b border-slate-200">
               <tr>
-                <th className="text-left px-4 py-3 text-sm font-medium text-slate-600">Nº/Ano</th>
-                <th className="text-left px-4 py-3 text-sm font-medium text-slate-600">Contratado</th>
-                <th className="text-left px-4 py-3 text-sm font-medium text-slate-600">Objeto</th>
-                <th className="text-left px-4 py-3 text-sm font-medium text-slate-600">Vigência</th>
-                <th className="text-left px-4 py-3 text-sm font-medium text-slate-600">Status</th>
-                <th className="text-right px-4 py-3 text-sm font-medium text-slate-600">Valor</th>
-                <th className="text-center px-4 py-3 text-sm font-medium text-slate-600">Anexos</th>
+                <th className="text-left px-4 py-3 text-sm font-medium text-slate-600">{titulo('Contrato', Hash)}</th>
+                <th className="text-left px-4 py-3 text-sm font-medium text-slate-600">{titulo('Contratado', Building2)}</th>
+                <th className="text-left px-4 py-3 text-sm font-medium text-slate-600">{titulo('Objeto', FileText)}</th>
+                <th className="text-left px-4 py-3 text-sm font-medium text-slate-600">{titulo('Vigência', CalendarDays)}</th>
+                <th className="text-left px-4 py-3 text-sm font-medium text-slate-600">{titulo('Status', CircleDot)}</th>
+                <th className="text-left px-4 py-3 text-sm font-medium text-slate-600">{titulo('Valor', Banknote)}</th>
               </tr>
             </thead>
             <tbody>
               {contratos.length > 0 ? contratos.map((contrato) => (
-                <tr key={contrato.id} id={`record-${contrato.id}`} className="border-b border-slate-200 hover:bg-slate-50 transition-colors target:bg-yellow-100 target:border-yellow-400">
+                <tr key={contrato.id} id={`record-${contrato.id}`} role="link" tabIndex={0} onClick={(evento) => { if (!(evento.target as HTMLElement).closest('a,button')) router.push(`/contratos/${contrato.id}`) }} onKeyDown={(evento) => { if (evento.key === 'Enter') router.push(`/contratos/${contrato.id}`) }} className="cursor-pointer border-b border-slate-200 transition-colors target:border-yellow-400 target:bg-yellow-100 focus:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-digital">
                   <td className="px-4 py-3">
-                    <Link href={`/contratos/${contrato.id}`} className="font-bold text-amber-800 hover:underline">
-                      {contrato.numero.includes('/') ? contrato.numero : `${contrato.numero}/${contrato.ano}`}
+                    <Link href={`/contratos/${contrato.id}`} className="inline-flex items-baseline gap-1 rounded-md border border-blue-100 bg-blue-50 px-2 py-0.5 text-digital hover:no-underline">
+                      <span className="text-[9px] font-semibold uppercase opacity-75">Contrato:</span><span className="font-bold">{contrato.numero.includes('/') ? contrato.numero : `${contrato.numero}/${contrato.ano}`}</span>
                     </Link>
-                    <p className="text-xs text-slate-600">{contrato.modalidade || contrato.tipoContrato || '-'}</p>
+                    <p className="mt-0.5 text-[9px] font-bold uppercase tracking-wide text-slate-500">{contrato.modalidade || contrato.tipoContrato || '-'}</p>
                     {contrato.licitacao ? (
                       <Link
                         href={`/licitacoes/${contrato.licitacao.id}`}
@@ -147,19 +144,16 @@ export function ContratosContent({ contratos, stats, currentYear, pagination }: 
                       {contrato.status}
                     </span>
                   </td>
-                  <td className="px-4 py-3 text-right font-bold text-emerald-800 whitespace-nowrap">
+                  <td className="whitespace-nowrap px-4 py-3 text-left font-bold text-digital">
                     {formatCurrency(contrato.valorAtual ?? contrato.valorInicial)}
                     {contrato.valorAtual != null && contrato.valorAtual !== contrato.valorInicial && (
                       <p className="text-xs font-normal text-slate-500">inicial {formatCurrency(contrato.valorInicial)}</p>
                     )}
                   </td>
-                  <td className="px-4 py-3 text-center">
-                    <AttachmentsCell anexos={contrato.anexos} />
-                  </td>
                 </tr>
               )) : (
                 <tr>
-                  <td colSpan={7} className="px-4 py-8 text-center text-slate-600">
+                  <td colSpan={6} className="px-4 py-8 text-center text-slate-600">
                     Nenhum contrato encontrado
                   </td>
                 </tr>

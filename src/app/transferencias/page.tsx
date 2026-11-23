@@ -4,7 +4,7 @@ import { PageSkeleton } from "@/components/ui/skeletons"
 import { FilterBar } from "@/components/portal/filter-bar"
 import { Breadcrumbs } from "@/components/portal/breadcrumbs"
 import { StructuredData } from "@/components/portal/structured-data"
-import { DataPageHero } from "@/components/portal/data-page-hero"
+import { CompactPageTitle } from "@/components/portal/compact-page-title"
 import { getTransferenciasPage, getTransferenciasPorRecebedora, parsePaginationParams } from "@/lib/site-data"
 import { TransferenciasContent } from "./transferencias-client"
 
@@ -76,25 +76,17 @@ export default async function Transferencias({ searchParams }: PageProps) {
   const years = Array.from({ length: 5 }, (_, i) => currentYear - i)
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="portal-page portal-page--transferencias container mx-auto px-4 py-8">
       <Breadcrumbs items={[
         { label: "Transparência", href: "/" },
         { label: "Transferências" }
       ]} />
 
-      <DataPageHero
-        icon={<ArrowLeftRight className="h-6 w-6" />}
-        eyebrow="Repasses intragovernamentais"
-        title="Transferências entre Entidades"
-        description="Acompanhe os repasses financeiros entre a Prefeitura e os fundos municipais (Educação, Saúde, Assistência Social e outros), com data, valor e devoluções."
-        accent="indigo"
-        badges={["Entidade pagadora", "Entidade recebedora", "Repasse", "Devolução"]}
-      />
-
       <FilterBar
         page="transferencias"
         years={years}
         searchPlaceholder="Buscar entidade (nome ou CNPJ)..."
+        leading={<CompactPageTitle icon={<ArrowLeftRight className="h-5 w-5" />} title="Transferências" description="Repasses entre entidades" />}
         extras={[
           { param: "mes", label: "Mês", options: MESES.map((nome, i) => ({ value: String(i + 1), label: nome })) },
         ]}

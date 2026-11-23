@@ -60,7 +60,7 @@ export default async function LicitacaoDetalhe({ params }: PageProps) {
   const voltar = `/licitacoes?ano=${licitacao.ano}`
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="portal-detail container mx-auto px-4 py-6">
       <StructuredData
         type="webpage"
         data={{
@@ -83,17 +83,18 @@ export default async function LicitacaoDetalhe({ params }: PageProps) {
 
       <Voltar href={voltar}>Voltar para as licitações de {licitacao.ano}</Voltar>
 
-      <Card className="mb-6">
-        <CardContent className="p-6">
+      <Card className="portal-detail-hero relative mb-6 overflow-hidden border-0 bg-institutional text-white shadow-[0_14px_36px_rgba(18,52,91,0.18)]">
+        <span className="absolute -right-16 -top-20 h-52 w-52 rounded-full bg-digital/30" aria-hidden />
+        <CardContent className="relative p-4 sm:p-5">
           <div className="flex flex-wrap items-center gap-2">
-            <h1 className="text-2xl font-bold text-slate-900">{titulo(licitacao)}</h1>
+            <h1 className="text-2xl font-extrabold text-white sm:text-3xl">{titulo(licitacao)}</h1>
             <span className={`rounded px-2 py-0.5 text-xs font-medium ${status.cor}`}>{status.label}</span>
           </div>
-          <p className="mt-2 text-lg font-semibold text-purple-800">{licitacao.modalidade}</p>
-          {licitacao.numeroProcesso && <p className="text-sm text-slate-600">Processo {licitacao.numeroProcesso}</p>}
+          <p className="mt-2 text-lg font-semibold text-amber-800">{licitacao.modalidade}</p>
+          {licitacao.numeroProcesso && <p className="text-sm text-white/60">Processo {licitacao.numeroProcesso}</p>}
           <TextoLongo rotulo="Objeto" texto={objeto.origem === 'cortado' ? `${objeto.texto}…` : objeto.texto} />
           {objeto.origem && (
-            <p className="mt-2 text-xs text-slate-500">
+            <p className="mt-2 text-xs text-white/55">
               {objeto.origem === 'contrato'
                 ? 'O sistema contábil publica o objeto da licitação cortado em 150 caracteres; o texto completo acima vem do contrato gerado por ela.'
                 : 'O sistema contábil publica o objeto da licitação cortado em 150 caracteres.'}

@@ -62,14 +62,14 @@ async function Movimentacao({ despesa }: { despesa: Despesa }) {
   const totalDescontos = movimentos.pagamentos.reduce((t, p) => t + p.desconto, 0)
 
   return (
-    <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-      <Card className="min-w-0">
-        <CardContent className="p-5">
-          <h3 className="mb-3 flex items-center gap-2 font-semibold text-slate-800">
-            <ClipboardCheck className="h-5 w-5 text-amber-700" aria-hidden /> Liquidações
+    <div className="grid grid-cols-1 gap-3 lg:grid-cols-2">
+      <Card className="min-w-0 overflow-hidden border-amber-100 shadow-none">
+        <CardContent className="p-3.5">
+          <h3 className="mb-2 flex items-center gap-2 text-sm font-bold text-institutional">
+            <span className="flex h-7 w-7 items-center justify-center rounded-md bg-amber-50"><ClipboardCheck className="h-4 w-4 text-amber-700" aria-hidden /></span> Liquidações
           </h3>
           {movimentos.liquidacoes.length === 0 ? (
-            <p className="text-sm text-slate-600">Nenhuma liquidação registrada até agora.</p>
+            <p className="rounded-lg bg-slate-50 px-3 py-2.5 text-xs text-slate-500">Nenhuma liquidação registrada.</p>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
@@ -77,7 +77,7 @@ async function Movimentacao({ despesa }: { despesa: Despesa }) {
                   <tr className="border-b border-slate-200 text-left text-xs uppercase tracking-wide text-slate-500">
                     <th className="py-2 pr-3">Nº</th>
                     <th className="py-2 pr-3">Data</th>
-                    <th className="py-2 text-right">Valor</th>
+                    <th className="py-2 text-left">Valor</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
@@ -85,7 +85,7 @@ async function Movimentacao({ despesa }: { despesa: Despesa }) {
                     <tr key={i}>
                       <td className="py-2 pr-3">{l.numero ?? '-'}</td>
                       <td className="py-2 pr-3">{formatarData(l.data)}</td>
-                      <td className="py-2 text-right font-medium text-amber-800 whitespace-nowrap">{formatarMoeda(l.valor)}</td>
+                      <td className="py-2 text-left font-medium text-amber-800 whitespace-nowrap">{formatarMoeda(l.valor)}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -95,13 +95,13 @@ async function Movimentacao({ despesa }: { despesa: Despesa }) {
         </CardContent>
       </Card>
 
-      <Card className="min-w-0">
-        <CardContent className="p-5">
-          <h3 className="mb-3 flex items-center gap-2 font-semibold text-slate-800">
-            <Banknote className="h-5 w-5 text-emerald-700" aria-hidden /> Pagamentos
+      <Card className="min-w-0 overflow-hidden border-emerald-100 shadow-none">
+        <CardContent className="p-3.5">
+          <h3 className="mb-2 flex items-center gap-2 text-sm font-bold text-institutional">
+            <span className="flex h-7 w-7 items-center justify-center rounded-md bg-emerald-50"><Banknote className="h-4 w-4 text-emerald-700" aria-hidden /></span> Pagamentos
           </h3>
           {movimentos.pagamentos.length === 0 ? (
-            <p className="text-sm text-slate-600">Nenhum pagamento registrado até agora.</p>
+            <p className="rounded-lg bg-slate-50 px-3 py-2.5 text-xs text-slate-500">Nenhum pagamento registrado.</p>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
@@ -109,9 +109,9 @@ async function Movimentacao({ despesa }: { despesa: Despesa }) {
                   <tr className="border-b border-slate-200 text-left text-xs uppercase tracking-wide text-slate-500">
                     <th className="py-2 pr-3">Data</th>
                     <th className="py-2 pr-3">Ordem</th>
-                    <th className="py-2 pr-3 text-right">Valor</th>
-                    <th className="py-2 pr-3 text-right">Desconto</th>
-                    <th className="py-2 text-right">Pago</th>
+                    <th className="py-2 pr-3 text-left">Valor</th>
+                    <th className="py-2 pr-3 text-left">Desconto</th>
+                    <th className="py-2 text-left">Pago</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
@@ -122,9 +122,9 @@ async function Movimentacao({ despesa }: { despesa: Despesa }) {
                         {p.ordem ?? '-'}
                         {p.parcela !== null && <span className="text-xs text-slate-500"> · parcela {p.parcela}</span>}
                       </td>
-                      <td className="py-2 pr-3 text-right whitespace-nowrap">{formatarMoeda(p.valor)}</td>
-                      <td className="py-2 pr-3 text-right whitespace-nowrap text-slate-600">{p.desconto ? formatarMoeda(p.desconto) : '-'}</td>
-                      <td className="py-2 text-right font-medium text-emerald-800 whitespace-nowrap">{formatarMoeda(p.valorPago)}</td>
+                      <td className="py-2 pr-3 text-left whitespace-nowrap">{formatarMoeda(p.valor)}</td>
+                      <td className="py-2 pr-3 text-left whitespace-nowrap text-slate-600">{p.desconto ? formatarMoeda(p.desconto) : '-'}</td>
+                      <td className="py-2 text-left font-medium text-emerald-800 whitespace-nowrap">{formatarMoeda(p.valorPago)}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -148,7 +148,7 @@ async function Movimentacao({ despesa }: { despesa: Despesa }) {
         </CardContent>
       </Card>
 
-      <p className="text-xs text-slate-500 lg:col-span-2">
+      <p className="px-1 text-[10px] text-slate-500 lg:col-span-2">
         Consultado no sistema contábil em {movimentos.consultadoEm.toLocaleString('pt-BR', { timeZone: 'America/Manaus' })}.
         Pagamentos de restos a pagar feitos em exercícios seguintes não aparecem aqui.
       </p>
@@ -176,7 +176,7 @@ export default async function DespesaDetalhe({ params }: PageProps) {
   const voltar = `/despesas?ano=${despesa.exercicio}`
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="portal-detail container mx-auto px-4 py-6">
       <StructuredData
         type="webpage"
         data={{
@@ -199,19 +199,19 @@ export default async function DespesaDetalhe({ params }: PageProps) {
 
       <Voltar href={voltar}>Voltar para as despesas de {despesa.exercicio}</Voltar>
 
-      <Card className="mb-6">
-        <CardContent className="p-6">
+      <Card className="portal-detail-hero relative mb-6 overflow-hidden border-0 bg-institutional text-white shadow-[0_14px_36px_rgba(18,52,91,0.18)]">
+        <span className="absolute -right-16 -top-20 h-52 w-52 rounded-full bg-[#B42318]/25" aria-hidden />
+        <CardContent className="relative p-4 sm:p-5">
           <div className="flex flex-wrap items-center gap-2">
-            <h1 className="text-2xl font-bold text-slate-900">{titulo(despesa)}</h1>
+            <h1 className="text-2xl font-extrabold text-white sm:text-3xl">{titulo(despesa)}</h1>
             {despesa.tipoEmpenho && (
               <span className={`rounded px-2 py-0.5 text-xs font-medium ${anulacao ? 'bg-red-100 text-red-700' : 'bg-emerald-100 text-emerald-800'}`}>
                 {TIPOS_EMPENHO[despesa.tipoEmpenho] ?? despesa.tipoEmpenho}
               </span>
             )}
-            <span className="text-sm text-slate-500">emitido em {formatarData(despesa.dataEmpenho)}</span>
+            <span className="text-sm text-white/60">emitido em {formatarData(despesa.dataEmpenho)}</span>
           </div>
-          <p className="mt-4 text-lg font-semibold text-slate-800">{despesa.credorNome ?? 'Credor não informado'}</p>
-          {despesa.credorCpfCnpj && <p className="text-sm text-slate-600">CPF/CNPJ {despesa.credorCpfCnpj}</p>}
+          <div className="mt-3 flex flex-wrap items-baseline gap-x-3 gap-y-1"><p className="text-base font-bold text-white">{despesa.credorNome ?? 'Credor não informado'}</p>{despesa.credorCpfCnpj && <p className="text-xs text-white/60">CPF/CNPJ {despesa.credorCpfCnpj}</p>}</div>
           <TextoLongo rotulo="Histórico" texto={despesa.historico || despesa.objeto} />
           {anulacao && (
             <p className="mt-4 text-sm text-red-700">
@@ -252,8 +252,7 @@ export default async function DespesaDetalhe({ params }: PageProps) {
       </Secao>
 
       {consultaMovimentos && (
-        <section className="mb-6" aria-labelledby="movimentacao">
-          <h2 id="movimentacao" className="mb-3 font-semibold text-slate-800">Movimentação do empenho</h2>
+        <Secao titulo="Movimentação do empenho" icone={<Banknote className="h-4 w-4 text-digital" aria-hidden />}>
           <Suspense
             fallback={
               <p className="flex items-center gap-2 rounded-md bg-slate-50 px-4 py-3 text-sm text-slate-600">
@@ -263,7 +262,7 @@ export default async function DespesaDetalhe({ params }: PageProps) {
           >
             <Movimentacao despesa={despesa} />
           </Suspense>
-        </section>
+        </Secao>
       )}
 
       <ListaAnexos anexos={despesa.anexos} />

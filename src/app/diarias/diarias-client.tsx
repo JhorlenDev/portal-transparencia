@@ -5,6 +5,7 @@ import Link from "next/link"
 import { CalendarDays, Receipt, Wallet } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
 import { PaginationControls } from "@/components/portal/pagination-controls"
+import { ExecutionIndicators } from "@/components/portal/execution-indicators"
 import type { PaginationMeta } from "@/lib/site-data"
 
 function formatCurrency(value: number): string {
@@ -48,75 +49,40 @@ interface DiariasContentProps {
 }
 
 export function DiariasContent({ diarias, totais, currentYear, pagination }: DiariasContentProps) {
+  const cobertura = pagination.total > 0 ? totais.comQuantidade / pagination.total * 100 : 0
+  const indicadores = [
+    { label: 'Total pago', value: formatCurrency(totais.valor), percentage: 100, percentageLabel: String(currentYear), color: '#8B5E34', softColor: '#F8F0E8', icon: <Wallet className="h-4 w-4" /> },
+    { label: 'Diárias concedidas', value: formatarQuantidade(totais.quantidade), percentage: cobertura, percentageLabel: `${cobertura.toLocaleString('pt-BR', { maximumFractionDigits: 1 })}% informada`, color: '#A87512', softColor: '#FFF6DE', icon: <CalendarDays className="h-4 w-4" /> },
+    { label: 'Pagamentos', value: pagination.total.toLocaleString('pt-BR'), percentage: 100, percentageLabel: 'registros', color: '#475569', softColor: '#EDF1F5', icon: <Receipt className="h-4 w-4" /> },
+  ]
   return (
     <>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-        <Card className="border-l-4 border-l-rose-500">
-          <CardContent className="p-5">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-slate-600">Total pago</p>
-                <p className="text-2xl font-bold text-slate-800">{formatCurrency(totais.valor)}</p>
-              </div>
-              <div className="w-12 h-12 bg-rose-100 rounded-xl flex items-center justify-center">
-                <Wallet className="h-6 w-6 text-rose-700" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card className="border-l-4 border-l-amber-500">
-          <CardContent className="p-5">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-slate-600">Diárias concedidas</p>
-                <p className="text-2xl font-bold text-slate-800">{formatarQuantidade(totais.quantidade)}</p>
-                {totais.comQuantidade < pagination.total && (
-                  <p className="text-xs text-slate-500">
-                    informada em {totais.comQuantidade} de {pagination.total} pagamentos
-                  </p>
-                )}
-              </div>
-              <div className="w-12 h-12 bg-amber-100 rounded-xl flex items-center justify-center">
-                <CalendarDays className="h-6 w-6 text-amber-800" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card className="border-l-4 border-l-slate-400">
-          <CardContent className="p-5">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-slate-600">Pagamentos</p>
-                <p className="text-2xl font-bold text-slate-800">{pagination.total.toLocaleString('pt-BR')}</p>
-              </div>
-              <div className="w-12 h-12 bg-slate-100 rounded-xl flex items-center justify-center">
-                <Receipt className="h-6 w-6 text-slate-600" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+      <ExecutionIndicators title="Panorama das diárias" subtitle={`Pagamentos realizados em ${currentYear}`} items={indicadores} />
+
+      <div className="portal-listing-heading mb-3"><h2 className="text-lg font-bold text-institutional">Diárias encontradas</h2><p className="text-sm text-text-secondary">Viagens e pagamentos no exercício selecionado.</p></div>
 
       <Card className="overflow-x-auto">
         <CardContent className="p-0 min-w-0">
-          <div className="overflow-x-auto">
-            <table className="w-full">
+          <div className="portal-listing-scroll overflow-x-auto">
+            <table className="portal-data-table compact-public-table w-full">
               <thead className="bg-slate-50 border-b border-slate-200">
                 <tr>
-                  <th className="text-left px-4 py-3 text-sm font-medium text-slate-600">Data</th>
+                  <th className="text-left px-4 py-3 text-sm font-medium text-slate-600">Empenho</th>
                   <th className="text-left px-4 py-3 text-sm font-medium text-slate-600">Favorecido</th>
                   <th className="text-left px-4 py-3 text-sm font-medium text-slate-600">Órgão</th>
                   <th className="text-left px-4 py-3 text-sm font-medium text-slate-600">Motivo</th>
-                  <th className="text-right px-4 py-3 text-sm font-medium text-slate-600">Qtd.</th>
-                  <th className="text-right px-4 py-3 text-sm font-medium text-slate-600">Valor</th>
+                  <th className="text-left px-4 py-3 text-sm font-medium text-slate-600">Qtd.</th>
+                  <th className="text-left px-4 py-3 text-sm font-medium text-slate-600">Valor</th>
                 </tr>
               </thead>
               <tbody>
                 {diarias.length > 0 ? diarias.map((diaria) => (
                   <tr key={diaria.id} id={`record-${diaria.id}`} className="border-b border-slate-200 hover:bg-slate-50 transition-colors target:bg-yellow-100 target:border-yellow-400 align-top">
-                    <td className="px-4 py-3 text-sm whitespace-nowrap">
-                      {diaria.data ? new Date(diaria.data).toLocaleDateString('pt-BR') : '-'}
-                      {diaria.numeroEmpenho && <p className="text-xs text-slate-500">Empenho {diaria.numeroEmpenho}</p>}
+                    <td className="whitespace-nowrap px-4 py-3">
+                      <p className="font-mono text-sm font-bold text-institutional">{diaria.numeroEmpenho || '—'}</p>
+                      <p className="mt-0.5 text-[10px] text-slate-500">
+                        {diaria.data ? new Date(diaria.data).toLocaleDateString('pt-BR', { timeZone: 'America/Manaus' }) : 'Data não informada'}
+                      </p>
                     </td>
                     <td className="px-4 py-3 min-w-[13rem]">
                       <Link href={`/diarias/${diaria.id}`} className="font-medium text-slate-800 hover:text-rose-700 hover:underline">
@@ -137,8 +103,8 @@ export function DiariasContent({ diarias, totais, currentYear, pagination }: Dia
                         <Link href={`/diarias/${diaria.id}`} className="text-xs text-rose-700 hover:underline">ler tudo</Link>
                       )}
                     </td>
-                    <td className="px-4 py-3 text-right text-sm">{formatarQuantidade(diaria.quantidade)}</td>
-                    <td className="px-4 py-3 text-right font-bold text-rose-800 whitespace-nowrap">
+                    <td className="px-4 py-3 text-left text-sm">{formatarQuantidade(diaria.quantidade)}</td>
+                    <td className="px-4 py-3 text-left font-bold text-rose-800 whitespace-nowrap">
                       {formatCurrency(diaria.valor)}
                     </td>
                   </tr>

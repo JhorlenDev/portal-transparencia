@@ -6,7 +6,7 @@ import { getServidoresPage, getServidoresStats, parsePaginationParams } from "@/
 import { FilterBar } from "@/components/portal/filter-bar"
 import { Breadcrumbs } from "@/components/portal/breadcrumbs"
 import { StructuredData } from "@/components/portal/structured-data"
-import { DataPageHero } from "@/components/portal/data-page-hero"
+import { CompactPageTitle } from "@/components/portal/compact-page-title"
 import { ServidoresContent } from "./servidores-client"
 
 export const dynamic = 'force-dynamic'
@@ -52,21 +52,12 @@ export default function Servidores({ searchParams }: PageProps) {
   const years = Array.from({ length: 5 }, (_, i) => currentYear - i)
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="portal-page portal-page--servidores container mx-auto px-4 py-8">
       <Breadcrumbs
         items={[
           { label: "Início", href: "/" },
           { label: "Servidores Públicos", href: "/servidores" }
         ]}
-      />
-
-      <DataPageHero
-        icon={<Users className="h-6 w-6" />}
-        eyebrow="Quadro de pessoal"
-        title="Servidores Públicos"
-        description="Consulte servidores municipais por ano, vínculo, nome, matrícula ou cargo, com lotação e remuneração informadas em transparência ativa."
-        accent="rose"
-        badges={["Nome e matrícula", "Cargo", "Lotação", "Remuneração"]}
       />
 
       <StructuredData
@@ -86,6 +77,7 @@ export default function Servidores({ searchParams }: PageProps) {
         page="servidores"
         years={years}
         statuses={statuses}
+        leading={<CompactPageTitle icon={<Users className="h-5 w-5" />} title="Servidores" description="Quadro de pessoal municipal" />}
         searchPlaceholder="Buscar por nome, matrícula ou cargo..."
       />
 

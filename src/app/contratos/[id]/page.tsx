@@ -48,7 +48,7 @@ export default async function ContratoDetalhe({ params }: PageProps) {
   const voltar = `/contratos?ano=${contrato.ano}`
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="portal-detail container mx-auto px-4 py-6">
       <StructuredData
         type="webpage"
         data={{
@@ -71,19 +71,20 @@ export default async function ContratoDetalhe({ params }: PageProps) {
 
       <Voltar href={voltar}>Voltar para os contratos de {contrato.ano}</Voltar>
 
-      <Card className="mb-6">
-        <CardContent className="p-6">
+      <Card className="portal-detail-hero relative mb-6 overflow-hidden border-0 bg-institutional text-white shadow-[0_14px_36px_rgba(18,52,91,0.18)]">
+        <span className="absolute -right-16 -top-20 h-52 w-52 rounded-full bg-gold/20" aria-hidden />
+        <CardContent className="relative p-4 sm:p-5">
           <div className="flex flex-wrap items-center gap-2">
-            <h1 className="text-2xl font-bold text-slate-900">{titulo(contrato)}</h1>
+            <h1 className="text-2xl font-extrabold text-white sm:text-3xl">{titulo(contrato)}</h1>
             <span className={`rounded px-2 py-0.5 text-xs font-medium capitalize ${CORES_STATUS[contrato.status] ?? 'bg-slate-100 text-slate-700'}`}>
               {contrato.status}
             </span>
             {(contrato.modalidade || contrato.tipoContrato) && (
-              <span className="text-sm text-slate-500">{contrato.modalidade || contrato.tipoContrato}</span>
+              <span className="text-sm text-white/60">{contrato.modalidade || contrato.tipoContrato}</span>
             )}
           </div>
-          <p className="mt-4 text-lg font-semibold text-slate-800">{contrato.contratadoNome}</p>
-          {contrato.contratadoCnpj && <p className="text-sm text-slate-600">CNPJ/CPF {contrato.contratadoCnpj}</p>}
+          <p className="mt-4 text-lg font-semibold text-white">{contrato.contratadoNome}</p>
+          {contrato.contratadoCnpj && <p className="text-sm text-white/60">CNPJ/CPF {contrato.contratadoCnpj}</p>}
           <TextoLongo rotulo="Objeto" texto={contrato.objeto} />
         </CardContent>
       </Card>

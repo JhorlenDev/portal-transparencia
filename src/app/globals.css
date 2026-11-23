@@ -1,15 +1,117 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f8fafc;
-  --foreground: #0f172a;
-  --emerald-600: #059669;
-  --emerald-700: #047857;
+  --institutional-blue: #12345b;
+  --institutional-blue-hover: #1b4d80;
+  --digital-blue: #1677b8;
+  --amazon-green: #16845d;
+  --institutional-gold: #e5b847;
+  --expense-red: #b42318;
+  --surface: #ffffff;
+  --surface-subtle: #f5f7fa;
+  --text-secondary: #475569;
+  --text-primary: #182b40;
+  --border-subtle: #e2e8f0;
+  --background: var(--surface-subtle);
+  --foreground: var(--text-primary);
+  --portal-fixed-header-height: 9.5rem;
 }
 
-@theme inline {
+@theme {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+
+  --color-institutional: #12345b;
+  --color-institutional-hover: #1b4d80;
+  --color-digital: #1677b8;
+  --color-amazon: #16845d;
+  --color-gold: #e5b847;
+  --color-expense: #b42318;
+  --color-surface: #ffffff;
+  --color-surface-subtle: #f5f7fa;
+  --color-text-primary: #182b40;
+  --color-text-secondary: #475569;
+  --color-border-subtle: #e2e8f0;
+
+  /* Escala neutra institucional usada pelas classes existentes. */
+  --color-slate-50: #f5f7fa;
+  --color-slate-100: #edf1f5;
+  --color-slate-200: #e2e8f0;
+  --color-slate-300: #cbd5e1;
+  --color-slate-400: #94a3b8;
+  --color-slate-500: #64748b;
+  --color-slate-600: #475569;
+  --color-slate-700: #334155;
+  --color-slate-800: #182b40;
+  --color-slate-900: #102237;
+  --color-slate-950: #081625;
+
+  /* Famílias funcionais limitadas à paleta oficial. */
+  --color-blue-50: #eef7fc;
+  --color-blue-100: #dceef8;
+  --color-blue-200: #b9dcf0;
+  --color-blue-300: #83bfdf;
+  --color-blue-400: #459dcc;
+  --color-blue-500: #1677b8;
+  --color-blue-600: #146ba6;
+  --color-blue-700: #125888;
+  --color-blue-800: #12345b;
+  --color-blue-900: #0d2949;
+
+  --color-emerald-50: #eff9f5;
+  --color-emerald-100: #d9f0e7;
+  --color-emerald-200: #b4e0d0;
+  --color-emerald-300: #7bc7aa;
+  --color-emerald-400: #3da47c;
+  --color-emerald-500: #16845d;
+  --color-emerald-600: #147653;
+  --color-emerald-700: #115f44;
+  --color-emerald-800: #104c39;
+  --color-emerald-900: #0d3e30;
+
+  --color-green-50: #eff9f5;
+  --color-green-100: #d9f0e7;
+  --color-green-500: #16845d;
+  --color-green-600: #147653;
+  --color-green-700: #115f44;
+  --color-green-800: #104c39;
+
+  --color-amber-50: #fff9ea;
+  --color-amber-100: #fdf0c5;
+  --color-amber-300: #edcc72;
+  --color-amber-500: #e5b847;
+  --color-amber-600: #c9972c;
+  --color-amber-700: #9d721f;
+  --color-amber-800: #76571e;
+
+  --color-purple-50: #eef7fc;
+  --color-purple-100: #dceef8;
+  --color-purple-300: #83bfdf;
+  --color-purple-500: #1677b8;
+  --color-purple-600: #146ba6;
+  --color-purple-700: #125888;
+  --color-purple-800: #12345b;
+  --color-rose-50: #eff9f5;
+  --color-rose-100: #d9f0e7;
+  --color-rose-500: #16845d;
+  --color-rose-700: #115f44;
+  --color-rose-800: #104c39;
+  --color-cyan-50: #eef7fc;
+  --color-cyan-500: #1677b8;
+  --color-cyan-700: #125888;
+  --color-cyan-800: #12345b;
+  --color-teal-50: #eff9f5;
+  --color-teal-500: #16845d;
+  --color-teal-600: #147653;
+  --color-teal-700: #115f44;
+  --color-indigo-50: #eef7fc;
+  --color-indigo-500: #1677b8;
+  --color-indigo-600: #146ba6;
+  --color-indigo-700: #125888;
+  --color-indigo-800: #12345b;
+
+  --font-sans: var(--font-inter), Inter, ui-sans-serif, system-ui, sans-serif;
+  --radius-card: 0.75rem;
 }
 
 * {
@@ -19,14 +121,17 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Inter, system-ui, -apple-system, sans-serif;
+  font-family: var(--font-inter), Inter, system-ui, -apple-system, sans-serif;
+  min-height: 100vh;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
 }
 
 .skip-link {
   position: absolute;
   top: -40px;
   left: 0;
-  background: #10b981;
+  background: var(--institutional-blue);
   color: white;
   padding: 8px 16px;
   z-index: 100;
@@ -46,8 +151,315 @@ body {
 }
 
 *:focus-visible {
-  outline: 2px solid #10b981;
+  outline: 3px solid var(--digital-blue);
   outline-offset: 2px;
+}
+
+::selection {
+  background: rgb(22 119 184 / 22%);
+  color: var(--text-primary);
+}
+
+a,
+button,
+input,
+select,
+textarea {
+  transition-duration: 160ms;
+}
+
+table tbody tr:nth-child(even) {
+  background-color: rgb(245 247 250 / 65%);
+}
+
+table tbody tr:hover {
+  background-color: rgb(22 119 184 / 5%);
+}
+
+/* Padrão visual das listagens públicas. */
+.portal-page {
+  --portal-accent: #1677b8;
+  --portal-accent-soft: #eaf5fb;
+  --portal-accent-rgb: 22 119 184;
+}
+
+.portal-page--receitas { --portal-accent: #16845d; --portal-accent-soft: #e8f6f0; --portal-accent-rgb: 22 132 93; }
+.portal-page--despesas { --portal-accent: #b42318; --portal-accent-soft: #fdebea; --portal-accent-rgb: 180 35 24; }
+.portal-page--licitacoes { --portal-accent: #a87512; --portal-accent-soft: #fff6de; --portal-accent-rgb: 168 117 18; }
+.portal-page--contratos { --portal-accent: #1677b8; --portal-accent-soft: #eaf5fb; --portal-accent-rgb: 22 119 184; }
+.portal-page--servidores { --portal-accent: #5b5fc7; --portal-accent-soft: #f0f0fc; --portal-accent-rgb: 91 95 199; }
+.portal-page--convenios { --portal-accent: #0f766e; --portal-accent-soft: #e8f6f4; --portal-accent-rgb: 15 118 110; }
+.portal-page--diarias { --portal-accent: #8b5e34; --portal-accent-soft: #f8f0e8; --portal-accent-rgb: 139 94 52; }
+.portal-page--transferencias { --portal-accent: #4f46a5; --portal-accent-soft: #f0effb; --portal-accent-rgb: 79 70 165; }
+.portal-page--esic { --portal-accent: #2563a6; --portal-accent-soft: #ebf2fa; --portal-accent-rgb: 37 99 166; }
+.portal-page--dados { --portal-accent: #12345b; --portal-accent-soft: #eaf0f6; --portal-accent-rgb: 18 52 91; }
+
+.portal-page .portal-page-title-icon {
+  background: var(--portal-accent-soft);
+  color: var(--portal-accent);
+  box-shadow: inset 0 0 0 1px rgb(var(--portal-accent-rgb) / 8%);
+}
+
+.portal-page > .rounded-xl:has(.portal-page-title-icon),
+.portal-page > .mb-6.rounded-xl:has(input[type="search"]) {
+  border-top: 3px solid var(--portal-accent);
+  box-shadow: 0 6px 20px rgb(18 52 91 / 7%);
+}
+
+.portal-data-table thead {
+  background: var(--institutional-blue);
+  color: #fff;
+}
+
+.portal-data-table thead th {
+  padding: 0.7rem 0.75rem;
+  color: #fff;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  background: var(--institutional-blue);
+}
+
+.portal-data-table tbody td {
+  padding: 0.65rem 0.75rem;
+  border-color: rgb(226 232 240 / 75%);
+  font-size: 0.8125rem;
+}
+
+.portal-data-table tbody tr {
+  transition: background-color 160ms ease;
+}
+
+.portal-data-table tbody tr:hover {
+  background-color: rgb(var(--portal-accent-rgb, 22 132 93) / 7%);
+}
+
+@media (min-width: 1024px) {
+  .portal-listing-stage {
+    position: sticky;
+    top: var(--portal-fixed-header-height);
+    display: flex;
+    height: calc(100dvh - var(--portal-fixed-header-height));
+    min-height: 0;
+    flex-direction: column;
+    background: var(--surface-subtle);
+  }
+
+  .portal-listing-stage .portal-listing-heading {
+    position: relative;
+    top: auto;
+    flex: none;
+  }
+
+  .portal-listing-heading {
+    position: sticky;
+    top: var(--portal-fixed-header-height);
+    z-index: 35;
+    isolation: isolate;
+    margin-bottom: 0 !important;
+    margin-inline: -0.25rem;
+    padding: 0.65rem 0.5rem;
+    border-bottom: 1px solid rgb(226 232 240 / 90%);
+    background: var(--surface-subtle);
+    box-shadow: 0 5px 12px rgb(18 52 91 / 7%);
+  }
+
+  .portal-listing-scroll {
+    max-height: calc(100dvh - var(--portal-fixed-header-height) - 5.25rem);
+    overflow: auto !important;
+    overscroll-behavior: contain;
+    scrollbar-gutter: stable;
+  }
+
+  .portal-listing-stage .portal-listing-card {
+    min-height: 0;
+    flex: 1;
+  }
+
+  .portal-listing-stage .portal-listing-card > div,
+  .portal-listing-stage .portal-listing-scroll {
+    height: 100%;
+    max-height: none;
+  }
+
+  .portal-page .portal-listing-scroll .portal-data-table {
+    border-top: 0;
+  }
+
+  .portal-listing-scroll .portal-data-table thead {
+    box-shadow: 0 3px 7px rgb(18 52 91 / 16%);
+  }
+
+  .portal-listing-scroll .portal-data-table thead th {
+    position: sticky;
+    top: 0;
+    z-index: 25;
+    background: var(--institutional-blue);
+    box-shadow: 0 2px 0 rgb(255 255 255 / 8%), 0 3px 7px rgb(18 52 91 / 14%);
+  }
+}
+
+.portal-stat-grid > div {
+  position: relative;
+  min-height: 4.65rem;
+  overflow: hidden;
+  border: 1px solid rgb(var(--portal-accent-rgb, 22 119 184) / 14%);
+  border-top: 3px solid var(--portal-accent, var(--digital-blue));
+  border-radius: 0.75rem;
+  background: linear-gradient(135deg, #fff 62%, var(--portal-accent-soft, #eaf5fb) 100%);
+  box-shadow: 0 6px 18px rgb(18 52 91 / 8%);
+  transition: transform 180ms ease, box-shadow 180ms ease;
+}
+
+.portal-stat-grid > div::after {
+  position: absolute;
+  top: -1.5rem;
+  right: -1.5rem;
+  width: 4.5rem;
+  height: 4.5rem;
+  border-radius: 999px;
+  background: var(--portal-accent-soft, #eaf5fb);
+  content: "";
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+.portal-stat-grid > div:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgb(18 52 91 / 12%);
+}
+
+.portal-stat-grid > div > div {
+  position: relative;
+  z-index: 1;
+  padding: 0.875rem;
+}
+
+.portal-stat-grid p:first-child {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.portal-stat-grid p:nth-child(2) {
+  margin-top: 0.125rem;
+  font-size: 1.25rem;
+  font-weight: 800;
+  line-height: 1.25;
+}
+
+.portal-page .portal-stat-grid p:nth-child(2) {
+  color: var(--portal-accent);
+}
+
+.portal-page div:has(> .portal-data-table) {
+  border-color: rgb(var(--portal-accent-rgb) / 18%);
+}
+
+.portal-page .portal-data-table {
+  border-top: 3px solid var(--portal-accent);
+}
+
+.portal-page .portal-data-table tbody a {
+  color: var(--portal-accent);
+}
+
+/* Licitações têm bastante conteúdo por registro; mantém a leitura sem inflar as linhas. */
+.licitacoes-table thead th {
+  padding-top: 0.55rem;
+  padding-bottom: 0.55rem;
+}
+
+.licitacoes-table tbody td {
+  padding-top: 0.45rem;
+  padding-bottom: 0.45rem;
+}
+
+.compact-public-table thead th {
+  padding-top: 0.55rem;
+  padding-bottom: 0.55rem;
+}
+
+.compact-public-table tbody td {
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+}
+
+.open-data-stat-grid > div {
+  min-height: 3.25rem;
+}
+
+.open-data-stat-grid > div > div {
+  padding: 0.75rem;
+}
+
+/* Detalhes públicos: mesma densidade visual das listagens, sem repetir o identificador. */
+.portal-detail > nav {
+  margin-bottom: 0.5rem;
+  font-size: 0.75rem;
+}
+
+.portal-detail > nav > span:last-child {
+  display: none;
+}
+
+.portal-detail > :is(.portal-detail-hero, .relative.mb-6) {
+  margin-bottom: 1rem;
+  border: 1px solid var(--border-subtle) !important;
+  border-radius: 0.75rem;
+  background: linear-gradient(135deg, #ffffff 65%, #f5f7fa 100%) !important;
+  color: var(--text-primary) !important;
+  box-shadow: 0 8px 24px rgb(18 52 91 / 8%) !important;
+}
+
+.portal-detail > .mb-6.grid {
+  margin-bottom: 1rem;
+  gap: 0.75rem;
+}
+
+.portal-detail > :is(.portal-detail-hero, .relative.mb-6) h1 {
+  font-size: 1.35rem;
+  line-height: 1.25;
+  color: var(--text-primary) !important;
+}
+
+.portal-detail > :is(.portal-detail-hero, .relative.mb-6) .text-white {
+  color: var(--text-primary) !important;
+}
+
+.portal-detail > :is(.portal-detail-hero, .relative.mb-6) .text-white\/55,
+.portal-detail > :is(.portal-detail-hero, .relative.mb-6) .text-white\/60,
+.portal-detail > :is(.portal-detail-hero, .relative.mb-6) .text-white\/65,
+.portal-detail > :is(.portal-detail-hero, .relative.mb-6) .text-white\/85 {
+  color: var(--text-secondary) !important;
+}
+
+/* Tons claros usados nos antigos heróis azuis precisam continuar legíveis no fundo branco. */
+.portal-detail > :is(.portal-detail-hero, .relative.mb-6) :is(.text-emerald-200, .text-emerald-300) {
+  color: #116149 !important;
+}
+
+.portal-detail > :is(.portal-detail-hero, .relative.mb-6) :is(.text-amber-200, .text-amber-300, .text-gold) {
+  color: #8a5a08 !important;
+}
+
+.portal-detail > :is(.portal-detail-hero, .relative.mb-6) :is(.text-blue-200, .text-blue-300) {
+  color: #155e9b !important;
+}
+
+.portal-detail > :is(.portal-detail-hero, .relative.mb-6) [class*="bg-white/10"] {
+  border-color: var(--border-subtle) !important;
+  background: rgb(245 247 250 / 90%) !important;
+}
+
+.portal-detail > :is(.portal-detail-hero, .relative.mb-6) [class*="bg-white/15"] {
+  border-color: var(--border-subtle) !important;
+}
+
+.portal-detail > :is(.portal-detail-hero, .relative.mb-6) > span[aria-hidden] {
+  opacity: 0.35;
 }
 
 @media print {

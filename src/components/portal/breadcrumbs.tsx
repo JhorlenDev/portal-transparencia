@@ -11,23 +11,24 @@ interface BreadcrumbsProps {
 }
 
 export function Breadcrumbs({ items }: BreadcrumbsProps) {
+  const normalizedItems = items.filter((item, index) => !(index === 0 && item.href === "/"))
   return (
     <nav className="flex items-center gap-1 text-sm text-slate-600 mb-4">
       <Link 
         href="/" 
-        className="flex items-center gap-1 hover:text-emerald-800 transition-colors"
+        className="flex items-center gap-1 transition-colors hover:text-digital"
       >
         <Home className="h-4 w-4" />
-        <span className="sr-only">Home</span>
+        <span>Transparência</span>
       </Link>
       
-      {items.map((item, index) => (
+      {normalizedItems.map((item, index) => (
         <span key={index} className="flex items-center gap-1">
           <ChevronRight className="h-4 w-4 text-slate-300" />
           {item.href ? (
             <Link 
               href={item.href} 
-              className="hover:text-emerald-800 transition-colors"
+              className="transition-colors hover:text-digital"
             >
               {item.label}
             </Link>

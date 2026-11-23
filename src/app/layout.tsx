@@ -6,7 +6,11 @@ import Footer from "@/components/portal/footer";
 import { StructuredData } from "@/components/portal/structured-data";
 import { getSiteConfig } from "@/lib/site-data";
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-inter",
+  display: "swap",
+});
 
 export const dynamic = 'force-dynamic'
 
@@ -57,7 +61,7 @@ export async function generateMetadata(): Promise<Metadata> {
       siteName,
       images: [
         {
-          url: "/logo.webp",
+          url: "/logo-portal-transparencia.png",
           width: 800,
           height: 600,
           alt: "Logo Portal da Transparência de Tefé",
@@ -68,12 +72,12 @@ export async function generateMetadata(): Promise<Metadata> {
       card: "summary_large_image",
       title: siteName,
       description,
-      images: ["/logo.webp"],
+      images: ["/logo-portal-transparencia.png"],
     },
     icons: {
-      icon: "/favicon.webp",
-      shortcut: "/favicon.webp",
-      apple: "/favicon.webp",
+      icon: "/logo-portal-transparencia.png",
+      shortcut: "/logo-portal-transparencia.png",
+      apple: "/logo-portal-transparencia.png",
     },
     manifest: "/manifest.json",
     robots: {
@@ -102,7 +106,7 @@ export default async function RootLayout({
 
   return (
     <html lang="pt-BR">
-      <body className={`${inter.className} min-h-screen flex flex-col bg-slate-50`}>
+      <body className={`${inter.variable} min-h-screen flex flex-col bg-surface-subtle text-text-primary`}>
         <StructuredData
           type="website"
           data={{
@@ -118,7 +122,7 @@ export default async function RootLayout({
             name: "Prefeitura Municipal de Tefé",
             description: "Portal oficial de transparência pública da Prefeitura Municipal de Tefé, Amazonas.",
             url: baseUrl,
-            logo: `${baseUrl}/logo.webp`,
+            logo: `${baseUrl}/logo-portal-transparencia.png`,
             contactPoint: {
               telephone: config.telefone_contato || "",
               email: config.email_contato || "",

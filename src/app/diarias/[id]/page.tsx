@@ -36,7 +36,7 @@ export default async function DiariaDetalhe({ params }: PageProps) {
   const voltar = `/diarias?ano=${diaria.exercicio}`
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="portal-detail container mx-auto px-4 py-6">
       <StructuredData
         type="webpage"
         data={{
@@ -59,14 +59,15 @@ export default async function DiariaDetalhe({ params }: PageProps) {
 
       <Voltar href={voltar}>Voltar para as diárias de {diaria.exercicio}</Voltar>
 
-      <Card className="mb-6">
-        <CardContent className="p-6">
+      <Card className="portal-detail-hero relative mb-6 overflow-hidden border-0 bg-institutional text-white shadow-[0_14px_36px_rgba(18,52,91,0.18)]">
+        <span className="absolute -right-16 -top-20 h-52 w-52 rounded-full bg-[#B42318]/20" aria-hidden />
+        <CardContent className="relative p-4 sm:p-5">
           <div className="flex flex-wrap items-center gap-2">
-            <h1 className="text-2xl font-bold text-slate-900">{diaria.favorecido}</h1>
-            <span className="text-sm text-slate-500">diária paga em {formatarData(diaria.data)}</span>
+            <h1 className="text-2xl font-extrabold text-white sm:text-3xl">{diaria.favorecido}</h1>
+            <span className="text-sm text-white/60">diária paga em {formatarData(diaria.data)}</span>
           </div>
-          {diaria.cargo && <p className="mt-2 text-lg font-semibold text-rose-800">{diaria.cargo}</p>}
-          {diaria.cpf && <p className="text-sm text-slate-600">CPF {diaria.cpf}</p>}
+          {diaria.cargo && <p className="mt-2 text-lg font-semibold text-amber-800">{diaria.cargo}</p>}
+          {diaria.cpf && <p className="text-sm text-white/60">CPF {diaria.cpf}</p>}
           <TextoLongo rotulo="Motivo da viagem" texto={diaria.descricao} />
         </CardContent>
       </Card>
@@ -78,10 +79,10 @@ export default async function DiariaDetalhe({ params }: PageProps) {
           cor="border-l-rose-500"
           detalhe={diaria.valorAnulado ? `anulado ${formatarMoeda(Math.abs(diaria.valorAnulado))}` : undefined}
         />
-        <Card className="border-l-4 border-l-amber-500">
-          <CardContent className="p-5">
-            <p className="text-sm text-slate-600">Quantidade de diárias</p>
-            <p className="text-2xl font-bold text-slate-800">
+        <Card className="overflow-hidden rounded-xl border border-l-4 border-amber-100 border-l-gold bg-gradient-to-br from-white to-amber-50/50 shadow-[0_4px_14px_rgba(18,52,91,0.06)]">
+          <CardContent className="p-4">
+            <p className="text-[10px] font-bold uppercase tracking-[0.06em] text-amber-700">Quantidade de diárias</p>
+            <p className="mt-0.5 text-xl font-extrabold tracking-tight text-institutional">
               {diaria.quantidade !== null ? diaria.quantidade.toLocaleString('pt-BR', { maximumFractionDigits: 1 }) : 'Não informada'}
             </p>
           </CardContent>

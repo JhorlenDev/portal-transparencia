@@ -8,10 +8,10 @@
   "theme_color": "#065f46",
   "icons": [
     {
-      "src": "/favicon.webp",
-      "sizes": "192x192 512x512",
-      "type": "image/webp",
-      "purpose": "any maskable"
+      "src": "/logo-portal-transparencia.png",
+      "sizes": "784x803",
+      "type": "image/png",
+      "purpose": "any"
     }
   ]
 }

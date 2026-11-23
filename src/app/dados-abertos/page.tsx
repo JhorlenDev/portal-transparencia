@@ -4,7 +4,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { PageSkeleton } from "@/components/ui/skeletons"
 import { Breadcrumbs } from "@/components/portal/breadcrumbs"
 import { StructuredData } from "@/components/portal/structured-data"
-import { DataPageHero } from "@/components/portal/data-page-hero"
+import { CompactPageTitle } from "@/components/portal/compact-page-title"
 import DatasetGridClient from "./dataset-grid-client"
 import { prisma } from "@/lib/prisma"
 import { contratosVisiveis, despesasVisiveis, licitacoesVisiveis, receitasVisiveis } from "@/lib/site-data"
@@ -226,7 +226,7 @@ export default async function DadosAbertos() {
   ]
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="portal-page portal-page--dados container mx-auto px-4 py-8">
       <StructuredData 
         type="webpage" 
         data={{
@@ -240,51 +240,38 @@ export default async function DadosAbertos() {
         { label: "Dados Abertos" }
       ]} />
 
-      <DataPageHero
-        icon={<Database className="h-6 w-6" />}
-        eyebrow="Catálogo público"
-        title="Dados Abertos"
-        description="Acesse bases públicas do município em formatos abertos, com dicionário de dados, periodicidade de atualização e API REST pública."
-        accent="indigo"
-        badges={["CSV", "JSON", "API pública", "Dicionário de dados"]}
-      />
+      <div className="mb-5 rounded-xl border border-border-subtle bg-white p-4 shadow-[0_4px_14px_rgba(18,52,91,0.06)]">
+        <CompactPageTitle icon={<Database className="h-5 w-5" />} title="Dados Abertos" description="Bases públicas em CSV, JSON e API" />
+      </div>
 
       <Suspense fallback={<PageSkeleton />}>
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
+        <div className="portal-stat-grid open-data-stat-grid mb-5 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
           <Card>
-            <CardContent className="p-4 flex items-center gap-3">
-              <Database className="h-8 w-8 text-indigo-500" />
-              <div>
-                <p className="text-2xl font-bold">{PUBLIC_DATABASES.length}</p>
-                <p className="text-xs text-slate-600">Bases disponíveis</p>
-              </div>
+            <CardContent className="flex items-center gap-2.5 whitespace-nowrap p-3">
+              <Database className="h-5 w-5 shrink-0 text-indigo-500" />
+              <span className="text-lg font-extrabold text-institutional">{PUBLIC_DATABASES.length}</span>
+              <span className="text-xs font-medium text-slate-600">Bases disponíveis</span>
             </CardContent>
           </Card>
           <Card>
-            <CardContent className="p-4 flex items-center gap-3">
-              <FileSpreadsheet className="h-8 w-8 text-green-500" />
-              <div>
-                <p className="text-2xl font-bold">CSV</p>
-                <p className="text-xs text-slate-600">Formato disponível</p>
-              </div>
+            <CardContent className="flex items-center gap-2.5 whitespace-nowrap p-3">
+              <FileSpreadsheet className="h-5 w-5 shrink-0 text-green-500" />
+              <span className="text-base font-extrabold text-amazon">CSV</span>
+              <span className="text-xs font-medium text-slate-600">Formato disponível</span>
             </CardContent>
           </Card>
           <Card>
-            <CardContent className="p-4 flex items-center gap-3">
-              <FileJson className="h-8 w-8 text-amber-500" />
-              <div>
-                <p className="text-2xl font-bold">JSON</p>
-                <p className="text-xs text-slate-600">Formato disponível</p>
-              </div>
+            <CardContent className="flex items-center gap-2.5 whitespace-nowrap p-3">
+              <FileJson className="h-5 w-5 shrink-0 text-amber-500" />
+              <span className="text-base font-extrabold text-amber-700">JSON</span>
+              <span className="text-xs font-medium text-slate-600">Formato disponível</span>
             </CardContent>
           </Card>
           <Card>
-            <CardContent className="p-4 flex items-center gap-3">
-              <Database className="h-8 w-8 text-purple-500" />
-              <div>
-                <p className="text-2xl font-bold">API</p>
-                <p className="text-xs text-slate-600">GET livre</p>
-              </div>
+            <CardContent className="flex items-center gap-2.5 whitespace-nowrap p-3">
+              <Database className="h-5 w-5 shrink-0 text-purple-500" />
+              <span className="text-base font-extrabold text-digital">API</span>
+              <span className="text-xs font-medium text-slate-600">GET livre</span>
             </CardContent>
           </Card>
         </div>

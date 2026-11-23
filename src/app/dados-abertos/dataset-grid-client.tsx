@@ -181,7 +181,7 @@ export default function DatasetGridClient({ databases }: { databases: Dataset[] 
                             <p className="text-xs text-slate-600 mt-1">Abre direto no Excel ou LibreOffice</p>
                           </div>
                         </div>
-                        <Button asChild className="w-full bg-emerald-700 hover:bg-emerald-800 text-white gap-2 cursor-pointer">
+                        <Button asChild className="w-full cursor-pointer gap-2">
                           <a href={`/api/export?type=${selectedDb.slug}&format=xlsx`}>
                             <Download className="h-4 w-4" /> Baixar XLSX
                           </a>

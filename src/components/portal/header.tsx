@@ -1,363 +1,189 @@
 "use client"
 
-import React, { useState, useEffect, useRef } from "react"
-import Link from "next/link"
+import { useEffect, useState } from "react"
 import Image from "next/image"
-import { useRouter, usePathname } from "next/navigation"
-import { Search, Menu, Loader2 } from "lucide-react"
+import Link from "next/link"
+import { usePathname } from "next/navigation"
+import { ArrowLeftRight, CalendarDays, CloudSun, Database, FileText, HandCoins, Menu, MessageSquare, Plane, Scale, TrendingUp, Users, WalletCards, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
 
 const menuItems = [
-  { title: "Receitas", href: "/receitas" },
-  { title: "Despesas", href: "/despesas" },
-  { title: "Licitações", href: "/licitacoes" },
-  { title: "Contratos", href: "/contratos" },
-  { title: "Servidores", href: "/servidores" },
-  { title: "Convênios", href: "/convenios" },
-  { title: "Diárias", href: "/diarias" },
-  { title: "Transferências", href: "/transferencias" },
-  { title: "e-SIC", href: "/esic" },
-  { title: "Dados Abertos", href: "/dados-abertos" },
+  { title: "Receitas", href: "/receitas", icon: TrendingUp },
+  { title: "Despesas", href: "/despesas", icon: WalletCards },
+  { title: "Licitações", href: "/licitacoes", icon: Scale },
+  { title: "Contratos", href: "/contratos", icon: FileText },
+  { title: "Servidores", href: "/servidores", icon: Users },
+  { title: "Convênios", href: "/convenios", icon: HandCoins },
+  { title: "Diárias", href: "/diarias", icon: Plane },
+  { title: "Transferências", href: "/transferencias", icon: ArrowLeftRight },
+  { title: "e-SIC", href: "/esic", icon: MessageSquare },
+  { title: "Dados Abertos", href: "/dados-abertos", icon: Database },
 ]
 
-interface SearchResultItem {
-  id: string
-  credorNome?: string | null
-  naturezaReceita?: string | null
-  categoriaEconomica?: string | null
-  numero?: string | null
-  ano?: number | null
-  contratadoNome?: string | null
-  nome?: string | null
-  cargo?: string | null
-  objeto?: string | null
+const WEATHER_URL = "https://api.open-meteo.com/v1/forecast?latitude=-3.35417&longitude=-64.71111&current=temperature_2m,weather_code&timezone=America%2FManaus"
+
+function descricaoClima(codigo: number | undefined) {
+  if (codigo === 0) return "Céu limpo"
+  if (codigo !== undefined && codigo <= 3) return "Parcialmente nublado"
+  if (codigo !== undefined && codigo <= 48) return "Neblina"
+  if (codigo !== undefined && codigo <= 67) return "Chuva"
+  if (codigo !== undefined && codigo <= 82) return "Pancadas de chuva"
+  if (codigo !== undefined && codigo >= 95) return "Trovoadas"
+  return "Clima em Tefé"
 }
 
-interface SearchResults {
-  despesas: SearchResultItem[]
-  receitas: SearchResultItem[]
-  licitacoes: SearchResultItem[]
-  contratos: SearchResultItem[]
-  servidores: SearchResultItem[]
-}
+function DesktopMenuItem({ item, pathname }: { item: (typeof menuItems)[number]; pathname: string }) {
+  const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`)
 
-const emptySearchResults: SearchResults = {
-  despesas: [],
-  receitas: [],
-  licitacoes: [],
-  contratos: [],
-  servidores: [],
-}
-
-function DesktopMenuItem({ item, pathname }: { item: typeof menuItems[0]; pathname: string }) {
-  const isActive = pathname === item.href || pathname.startsWith(item.href + "/")
-  
   return (
-    <li>
+    <li className="border-r border-white/15 last:border-r-0">
       <Link
         href={item.href}
-        className={`flex items-center h-12 px-3 xl:px-4 text-sm font-medium transition-colors ${
-          isActive 
-            ? "bg-emerald-800 text-white" 
-            : "text-white hover:bg-emerald-600"
+        className={`group relative flex h-14 items-center justify-center gap-1.5 px-1.5 text-[11px] font-semibold transition-all xl:gap-2 xl:px-2 xl:text-xs ${
+          isActive
+            ? "bg-white/12 text-white shadow-[inset_0_-3px_0_#E5B847]"
+            : "text-white/85 hover:bg-white/10 hover:text-white"
         }`}
       >
-        {item.title}
+        <item.icon className={`h-4 w-4 shrink-0 transition-transform group-hover:-translate-y-0.5 ${isActive ? "text-gold" : "text-white/70 group-hover:text-gold"}`} aria-hidden="true" />
+        <span className="whitespace-nowrap">{item.title}</span>
       </Link>
     </li>
   )
 }
 
 export default function Header({ config }: { config?: Record<string, string | null> }) {
-  const router = useRouter()
   const pathname = usePathname()
-  const [searchQuery, setSearchQuery] = useState("")
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-  const [searchResults, setSearchResults] = useState<SearchResults | null>(null)
-  const [isSearching, setIsSearching] = useState(false)
-  const [showDropdown, setShowDropdown] = useState(false)
-  const dropdownRef = useRef<HTMLFormElement>(null)
+  const [temperatura, setTemperatura] = useState<number | null>(null)
+  const [condicao, setCondicao] = useState("Clima em Tefé")
+
+  const nomeSite = config?.nome_site || "Portal da Transparência"
+  const subtitulo = "Prefeitura Municipal de Tefé"
+  const dataFormatada = new Intl.DateTimeFormat("pt-BR", {
+    timeZone: "America/Manaus",
+    weekday: "long",
+    day: "2-digit",
+    month: "long",
+    year: "numeric",
+  }).format(new Date())
+  const dataHoje = dataFormatada.charAt(0).toUpperCase() + dataFormatada.slice(1)
 
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setShowDropdown(false)
-      }
-    }
-    document.addEventListener("mousedown", handleClickOutside)
-    return () => document.removeEventListener("mousedown", handleClickOutside)
-  }, [])
+    const controller = new AbortController()
 
-  useEffect(() => {
-    if (searchQuery.length < 2) {
-      setSearchResults(null)
-      setShowDropdown(false)
-      return
-    }
-
-    const timer = setTimeout(async () => {
-      setIsSearching(true)
-      try {
-        const res = await fetch(`/api/busca?q=${encodeURIComponent(searchQuery)}`)
-        if (res.ok) {
-          const data = await res.json() as Partial<SearchResults>
-          setSearchResults({ ...emptySearchResults, ...data })
-          setShowDropdown(true)
+    fetch(WEATHER_URL, { signal: controller.signal })
+      .then((response) => {
+        if (!response.ok) throw new Error("Não foi possível consultar o clima")
+        return response.json() as Promise<{ current?: { temperature_2m?: number; weather_code?: number } }>
+      })
+      .then((data) => {
+        if (typeof data.current?.temperature_2m === "number") {
+          setTemperatura(Math.round(data.current.temperature_2m))
         }
-      } catch (error) {
-        console.error(error)
-      } finally {
-        setIsSearching(false)
-      }
-    }, 300)
+        setCondicao(descricaoClima(data.current?.weather_code))
+      })
+      .catch((error: unknown) => {
+        if (!(error instanceof DOMException && error.name === "AbortError")) {
+          setCondicao("Clima indisponível")
+        }
+      })
 
-    return () => clearTimeout(timer)
-  }, [searchQuery])
-
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault()
-    if (searchQuery.trim()) {
-      setShowDropdown(false)
-      router.push(`/busca?q=${encodeURIComponent(searchQuery)}`)
-    }
-  }
-
-  const nomeSite = config?.nome_site || 'Portal da Transparência'
-  const subtitulo = config?.subtitulo_site || 'Prefeitura Municipal'
+    return () => controller.abort()
+  }, [])
 
   return (
     <>
-      <a 
-        href="#conteudo" 
-        className="sr-only focus:not-sr-only focus:fixed focus:top-0 focus:left-0 focus:z-[100] focus:p-4 focus:bg-emerald-800 focus:text-white focus:font-bold shadow-lg"
+      <a
+        href="#conteudo"
+        className="sr-only shadow-lg focus:fixed focus:left-0 focus:top-0 focus:z-[100] focus:p-4 focus:not-sr-only focus:bg-institutional focus:font-bold focus:text-white"
       >
         Pular para o conteúdo principal
       </a>
-      <header className="bg-white shadow-sm border-b">
-      <div className="container mx-auto px-4 py-4">
-        <div className="flex items-center justify-between gap-4">
-          <Link href="/" className="flex items-center gap-3 flex-shrink-0">
-            <Image
-              src="/logo.webp"
-              alt="Logotipo do Portal da Transparência de Tefé"
-              width={200}
-              height={48}
-              className="h-12 w-auto object-contain"
-              priority
-            />
-            <div className="hidden sm:block">
-              <h1 className="text-lg font-bold text-slate-800 leading-tight">
-                {nomeSite}
-              </h1>
-              <p className="text-xs text-slate-600">{subtitulo}</p>
-            </div>
-          </Link>
 
-          <form onSubmit={handleSearch} className="flex-1 max-w-xl hidden md:flex" role="search" ref={dropdownRef}>
-            <div className="relative w-full">
-              <Input
-                type="search"
-                placeholder="Buscar despesas, licitações, contratos..."
-                className="pr-10 bg-slate-50 border-slate-200 focus:bg-white"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                onFocus={() => { if (searchResults) setShowDropdown(true) }}
-                aria-label="Campo de busca"
+      <header className="sticky top-0 z-[60] border-b border-border-subtle bg-white shadow-[0_4px_14px_rgba(18,52,91,0.10)]">
+        <div className="container mx-auto px-4 py-4">
+          <div className="flex items-center justify-between gap-4">
+            <Link href="/" className="flex min-w-0 items-center gap-3">
+              <Image
+                src="/logo-portal-transparencia.png"
+                alt="Logotipo do Portal da Transparência de Tefé"
+                width={784}
+                height={803}
+                className="h-14 w-auto shrink-0 object-contain sm:h-16"
+                priority
               />
-              <Button
-                type="submit"
-                size="sm"
-                className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7 p-0 bg-emerald-600 hover:bg-emerald-800"
-                aria-label="Buscar"
+              <div className="hidden min-w-0 sm:block">
+                <p className="truncate text-xl font-bold leading-tight text-institutional lg:text-2xl">{nomeSite}</p>
+                <p className="mt-0.5 text-sm text-text-secondary">{subtitulo}</p>
+              </div>
+            </Link>
+
+            <div className="ml-auto flex items-center gap-2 sm:gap-4">
+              <div className="hidden items-center gap-2 border-r border-border-subtle pr-4 text-right lg:flex">
+                <p className="text-sm font-semibold text-institutional">{dataHoje}</p>
+                <CalendarDays className="h-6 w-6 text-digital" aria-hidden="true" />
+              </div>
+
+              <div
+                className="flex items-center gap-2 px-1 py-2 text-institutional"
+                title={`${condicao}${temperatura === null ? "" : `, ${temperatura}°C`}`}
+                aria-label={`${condicao} em Tefé${temperatura === null ? "" : `, ${temperatura} graus Celsius`}`}
               >
-                {isSearching ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
-              </Button>
-
-              {showDropdown && searchResults && (
-                <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-xl border border-slate-100 max-h-[80vh] overflow-y-auto z-50">
-                  <div className="p-2 space-y-4">
-                    {searchResults.despesas?.length > 0 && (
-                      <div>
-                        <div className="px-3 py-1.5 text-xs font-semibold text-emerald-800 uppercase tracking-wider bg-emerald-50 rounded-md">Despesas</div>
-                        <ul className="mt-1 space-y-1">
-                          {searchResults.despesas.slice(0, 3).map((d) => (
-                            <li key={d.id}>
-                              <Link 
-                                href={`/despesas?q=${encodeURIComponent(searchQuery)}#record-${d.id}`}
-                                onClick={() => setShowDropdown(false)}
-                                className="block px-3 py-2 rounded-lg hover:bg-slate-50 text-sm transition-colors"
-                              >
-                                <p className="font-medium text-slate-800 truncate">{d.credorNome || 'Sem credor'}</p>
-                                <p className="text-xs text-slate-500 truncate">{d.objeto}</p>
-                              </Link>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-
-                    {searchResults.receitas?.length > 0 && (
-                      <div>
-                        <div className="px-3 py-1.5 text-xs font-semibold text-blue-800 uppercase tracking-wider bg-blue-50 rounded-md">Receitas</div>
-                        <ul className="mt-1 space-y-1">
-                          {searchResults.receitas.slice(0, 3).map((r) => (
-                            <li key={r.id}>
-                              <Link 
-                                href={`/receitas?q=${encodeURIComponent(searchQuery)}#record-${r.id}`}
-                                onClick={() => setShowDropdown(false)}
-                                className="block px-3 py-2 rounded-lg hover:bg-slate-50 text-sm transition-colors"
-                              >
-                                <p className="font-medium text-slate-800 truncate">{r.naturezaReceita}</p>
-                                <p className="text-xs text-slate-500 truncate">{r.categoriaEconomica}</p>
-                              </Link>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-
-                    {searchResults.licitacoes?.length > 0 && (
-                      <div>
-                        <div className="px-3 py-1.5 text-xs font-semibold text-purple-800 uppercase tracking-wider bg-purple-50 rounded-md">Licitações</div>
-                        <ul className="mt-1 space-y-1">
-                          {searchResults.licitacoes.slice(0, 3).map((l) => (
-                            <li key={l.id}>
-                              <Link 
-                                href={`/licitacoes?q=${encodeURIComponent(searchQuery)}#record-${l.id}`}
-                                onClick={() => setShowDropdown(false)}
-                                className="block px-3 py-2 rounded-lg hover:bg-slate-50 text-sm transition-colors"
-                              >
-                                <p className="font-medium text-slate-800 truncate">Nº {l.numero}/{l.ano}</p>
-                                <p className="text-xs text-slate-500 truncate">{l.objeto}</p>
-                              </Link>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-
-                    {searchResults.contratos?.length > 0 && (
-                      <div>
-                        <div className="px-3 py-1.5 text-xs font-semibold text-amber-800 uppercase tracking-wider bg-amber-50 rounded-md">Contratos</div>
-                        <ul className="mt-1 space-y-1">
-                          {searchResults.contratos.slice(0, 3).map((c) => (
-                            <li key={c.id}>
-                              <Link 
-                                href={`/contratos?q=${encodeURIComponent(searchQuery)}#record-${c.id}`}
-                                onClick={() => setShowDropdown(false)}
-                                className="block px-3 py-2 rounded-lg hover:bg-slate-50 text-sm transition-colors"
-                              >
-                                <p className="font-medium text-slate-800 truncate">{c.contratadoNome}</p>
-                                <p className="text-xs text-slate-500 truncate">{c.objeto}</p>
-                              </Link>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-
-                    {searchResults.servidores?.length > 0 && (
-                      <div>
-                        <div className="px-3 py-1.5 text-xs font-semibold text-rose-800 uppercase tracking-wider bg-rose-50 rounded-md">Servidores</div>
-                        <ul className="mt-1 space-y-1">
-                          {searchResults.servidores.slice(0, 3).map((s) => (
-                            <li key={s.id}>
-                              <Link 
-                                href={`/servidores?q=${encodeURIComponent(searchQuery)}#record-${s.id}`}
-                                onClick={() => setShowDropdown(false)}
-                                className="block px-3 py-2 rounded-lg hover:bg-slate-50 text-sm transition-colors"
-                              >
-                                <p className="font-medium text-slate-800 truncate">{s.nome}</p>
-                                <p className="text-xs text-slate-500 truncate">{s.cargo}</p>
-                              </Link>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-
-                    {Object.values(searchResults).every((arr) => arr.length === 0) && (
-                      <div className="p-4 text-center text-sm text-slate-600">
-                        Nenhum resultado encontrado para &quot;{searchQuery}&quot;
-                      </div>
-                    )}
-
-                    {!Object.values(searchResults).every((arr) => arr.length === 0) && (
-                      <Link 
-                        href={`/busca?q=${encodeURIComponent(searchQuery)}`}
-                        onClick={() => setShowDropdown(false)}
-                        className="block mt-2 p-3 text-center text-sm font-medium text-emerald-700 bg-slate-50 hover:bg-emerald-50 rounded-lg transition-colors"
-                      >
-                        Ver todos os resultados
-                      </Link>
-                    )}
-                  </div>
+                <CloudSun className="h-6 w-6 text-gold" aria-hidden="true" />
+                <div className="leading-tight">
+                  <p className="text-sm font-bold sm:text-base">Tefé {temperatura === null ? "--°" : `${temperatura}°C`}</p>
+                  <p className="hidden text-xs text-text-secondary md:block">{condicao}</p>
                 </div>
-              )}
-            </div>
-          </form>
+              </div>
 
-          <Button
-            variant="outline"
-            size="icon"
-            className="lg:hidden"
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            aria-expanded={mobileMenuOpen}
-            aria-label={mobileMenuOpen ? "Fechar menu principal" : "Abrir menu principal"}
-            aria-controls="mobile-menu"
-          >
-            <Menu className="h-5 w-5" aria-hidden="true" />
-          </Button>
-        </div>
-      </div>
-
-      <nav className="bg-emerald-800 hidden lg:block" aria-label="Menu Principal">
-        <div className="container mx-auto px-4">
-          <ul className="flex flex-wrap">
-            {menuItems.map((item) => (
-              <DesktopMenuItem key={item.href} item={item} pathname={pathname} />
-            ))}
-          </ul>
-        </div>
-      </nav>
-
-      {mobileMenuOpen && (
-        <div id="mobile-menu" className="lg:hidden border-t p-4 bg-white">
-          <form onSubmit={handleSearch} className="mb-4" role="search">
-            <div className="relative">
-              <Input
-                type="search"
-                placeholder="Buscar..."
-                className="pr-10"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
               <Button
-                type="submit"
-                size="sm"
-                className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7 p-0 bg-emerald-600"
-                aria-label="Buscar versão mobile"
+                type="button"
+                variant="outline"
+                size="icon"
+                className="lg:hidden"
+                onClick={() => setMobileMenuOpen((open) => !open)}
+                aria-expanded={mobileMenuOpen}
+                aria-label={mobileMenuOpen ? "Fechar menu principal" : "Abrir menu principal"}
+                aria-controls="mobile-menu"
               >
-                <Search className="h-4 w-4" aria-hidden="true" />
+                {mobileMenuOpen ? <X className="h-5 w-5" aria-hidden="true" /> : <Menu className="h-5 w-5" aria-hidden="true" />}
               </Button>
             </div>
-          </form>
-          <nav className="space-y-1" aria-label="Menu Mobile">
-            {menuItems.map((item) => (
-              <Link
-                key={item.title}
-                href={item.href}
-                className="block px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 rounded-md"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                {item.title}
-              </Link>
-            ))}
-          </nav>
+          </div>
         </div>
-      )}
-    </header>
+
+        <nav className="hidden bg-institutional lg:block" aria-label="Menu principal">
+          <div className="container mx-auto px-4">
+            <ul className="grid grid-cols-10">
+              {menuItems.map((item) => <DesktopMenuItem key={item.href} item={item} pathname={pathname} />)}
+            </ul>
+          </div>
+        </nav>
+
+        {mobileMenuOpen && (
+          <nav id="mobile-menu" className="border-t border-border-subtle bg-white p-4 lg:hidden" aria-label="Menu mobile">
+            <div className="grid grid-cols-2 gap-1 sm:grid-cols-3">
+              {menuItems.map((item) => {
+                const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`)
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    onClick={() => setMobileMenuOpen(false)}
+                    className={`flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
+                      isActive ? "bg-blue-50 text-institutional" : "text-text-secondary hover:bg-slate-100 hover:text-institutional"
+                    }`}
+                  >
+                    <item.icon className={`h-4 w-4 shrink-0 ${isActive ? "text-digital" : "text-slate-400"}`} aria-hidden="true" />
+                    {item.title}
+                  </Link>
+                )
+              })}
+            </div>
+          </nav>
+        )}
+      </header>
     </>
   )
 }

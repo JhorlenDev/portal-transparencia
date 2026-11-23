@@ -4,7 +4,7 @@ import { PageSkeleton } from "@/components/ui/skeletons"
 import { FilterBar } from "@/components/portal/filter-bar"
 import { Breadcrumbs } from "@/components/portal/breadcrumbs"
 import { StructuredData } from "@/components/portal/structured-data"
-import { DataPageHero } from "@/components/portal/data-page-hero"
+import { CompactPageTitle } from "@/components/portal/compact-page-title"
 import { getContratosPage, getContratosStats, parsePaginationParams } from "@/lib/site-data"
 import { ContratosContent } from "./contratos-client"
 
@@ -49,25 +49,17 @@ export default async function Contratos({ searchParams }: PageProps) {
   const years = Array.from({ length: 5 }, (_, i) => currentYear - i)
   
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="portal-page portal-page--contratos container mx-auto px-4 py-8">
       <Breadcrumbs items={[
         { label: "Transparência", href: "/" },
         { label: "Contratos" }
       ]} />
 
-      <DataPageHero
-        icon={<FileText className="h-6 w-6" />}
-        eyebrow="Execução contratual"
-        title="Contratos Administrativos"
-        description="Consulte contratos, atas de registro de preços, aditivos e instrumentos similares com contratado, objeto, vigência e valores."
-        accent="amber"
-        badges={["Contratado", "Vigência", "Valor inicial", "Anexos"]}
-      />
-
       <FilterBar 
         page="contratos"
         years={years}
         statuses={statuses}
+        leading={<CompactPageTitle icon={<FileText className="h-5 w-5" />} title="Contratos" description="Contratos administrativos" />}
         extras={[{ param: "fornecedor", label: "Fornecedor", placeholder: "Fornecedor (nome ou CNPJ)" }]}
         searchPlaceholder="Buscar por objeto, número..."
       />

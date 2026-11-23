@@ -1,9 +1,12 @@
 "use client"
 
 import React from "react"
+import Link from "next/link"
+import { Banknote, CalendarDays, Users } from "lucide-react"
+import { useRouter } from "next/navigation"
 import { Card, CardContent } from "@/components/ui/card"
-import { AttachmentsCell } from "@/components/attachments/attachments-modal"
 import { PaginationControls } from "@/components/portal/pagination-controls"
+import { ExecutionIndicators } from "@/components/portal/execution-indicators"
 import type { PaginationMeta } from "@/lib/site-data"
 
 function formatCurrency(value: number): string {
@@ -33,6 +36,7 @@ interface ServidorWithAnexos {
   remuneracaoBruta: number | null
   remuneracaoLiquida: number | null
   anoReferencia: number | null
+  mesReferencia?: number | null
   anexos?: Attachment[]
 }
 
@@ -49,55 +53,38 @@ interface ServidoresContentProps {
 }
 
 export function ServidoresContent({ servidores, stats, currentYear, pagination }: ServidoresContentProps) {
+  const router = useRouter()
+  const indicadores = [
+    { label: 'Servidores', value: stats.total.toLocaleString('pt-BR'), percentage: 100, percentageLabel: 'registros', color: '#5B5FC7', softColor: '#F0F0FC', icon: <Users className="h-4 w-4" /> },
+    { label: 'Folha bruta', value: formatCurrency(stats.totalRemuneracao), percentage: 100, percentageLabel: 'no período', color: '#16845D', softColor: '#E8F6F0', icon: <Banknote className="h-4 w-4" /> },
+    { label: 'Referência', value: String(currentYear || '—'), percentage: 100, percentageLabel: 'exercício', color: '#1677B8', softColor: '#EAF5FB', icon: <CalendarDays className="h-4 w-4" /> },
+  ]
   return (
     <>
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-        <Card>
-          <CardContent className="p-4">
-            <p className="text-sm text-slate-600">Total de Servidores</p>
-            <p className="text-2xl font-bold">{stats.total}</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-4">
-            <p className="text-sm text-slate-600">Em {currentYear}</p>
-            <p className="text-2xl font-bold">{stats.total}</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-4">
-            <p className="text-sm text-slate-600">Folha Bruta</p>
-            <p className="text-lg font-bold">{formatCurrency(stats.totalRemuneracao)}</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-4">
-            <p className="text-sm text-slate-600">Ano Referência</p>
-            <p className="text-xl font-bold">{currentYear}</p>
-          </CardContent>
-        </Card>
-      </div>
+      <ExecutionIndicators title="Panorama dos servidores" subtitle="Quadro e remuneração municipal" items={indicadores} />
+
+      <div className="portal-listing-heading mb-3"><h2 className="text-lg font-bold text-institutional">Servidores encontrados</h2><p className="text-sm text-text-secondary">Quadro de pessoal no período selecionado.</p></div>
 
       <Card className="overflow-x-auto">
         <CardContent className="p-0 min-w-0">
-          <div className="overflow-x-auto">
-            <table className="w-full">
+          <div className="portal-listing-scroll overflow-x-auto">
+            <table className="portal-data-table compact-public-table w-full">
             <thead className="bg-slate-50 border-b border-slate-200">
               <tr>
                 <th className="text-left px-4 py-3 text-sm font-medium text-slate-600">Nome</th>
                 <th className="text-left px-4 py-3 text-sm font-medium text-slate-600">Cargo/Função</th>
                 <th className="text-left px-4 py-3 text-sm font-medium text-slate-600">Lotação</th>
                 <th className="text-left px-4 py-3 text-sm font-medium text-slate-600">Vínculo</th>
-                <th className="text-right px-4 py-3 text-sm font-medium text-slate-600">Rem. Bruta</th>
-                <th className="text-right px-4 py-3 text-sm font-medium text-slate-600">Rem. Líquida</th>
-                <th className="text-center px-4 py-3 text-sm font-medium text-slate-600">Anexos</th>
+                <th className="text-left px-4 py-3 text-sm font-medium text-slate-600">Referência</th>
+                <th className="text-left px-4 py-3 text-sm font-medium text-slate-600">Rem. Bruta</th>
+                <th className="text-left px-4 py-3 text-sm font-medium text-slate-600">Rem. Líquida</th>
               </tr>
             </thead>
             <tbody>
               {servidores.length > 0 ? servidores.map((servidor) => (
-                <tr key={servidor.id} id={`record-${servidor.id}`} className="border-b border-slate-200 hover:bg-slate-50 transition-colors target:bg-yellow-100 target:border-yellow-400">
+                <tr key={servidor.id} id={`record-${servidor.id}`} role="link" tabIndex={0} onClick={(evento) => { if (!(evento.target as HTMLElement).closest("a,button")) router.push(`/servidores/${servidor.id}`) }} onKeyDown={(evento) => { if (evento.key === "Enter" || evento.key === " ") router.push(`/servidores/${servidor.id}`) }} className="cursor-pointer border-b border-slate-200 transition-colors target:border-yellow-400 target:bg-yellow-100 focus:bg-indigo-50 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500">
                   <td className="px-4 py-3">
-                    <p className="font-medium">{servidor.nome}</p>
+                    <Link href={`/servidores/${servidor.id}`} className="font-medium text-institutional hover:text-digital hover:underline">{servidor.nome}</Link>
                     <p className="text-xs text-slate-600">{servidor.matricula}</p>
                   </td>
                   <td className="px-4 py-3">
@@ -112,14 +99,14 @@ export function ServidoresContent({ servidores, stats, currentYear, pagination }
                       {servidor.vinculo}
                     </span>
                   </td>
-                  <td className="px-4 py-3 text-right font-medium">
+                  <td className="whitespace-nowrap px-4 py-3 text-sm text-slate-600">
+                    {servidor.mesReferencia ? `${String(servidor.mesReferencia).padStart(2, '0')}/${servidor.anoReferencia || currentYear}` : servidor.anoReferencia || currentYear}
+                  </td>
+                  <td className="px-4 py-3 text-left font-medium">
                     {formatCurrency(servidor.remuneracaoBruta || 0)}
                   </td>
-                  <td className="px-4 py-3 text-right font-bold text-emerald-800">
+                  <td className="px-4 py-3 text-left font-bold text-emerald-800">
                     {formatCurrency(servidor.remuneracaoLiquida || 0)}
-                  </td>
-                  <td className="px-4 py-3 text-center">
-                    <AttachmentsCell anexos={servidor.anexos} />
                   </td>
                 </tr>
               )) : (

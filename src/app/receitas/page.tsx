@@ -4,7 +4,6 @@ import { PageSkeleton } from "@/components/ui/skeletons"
 import { FilterBar } from "@/components/portal/filter-bar"
 import { Breadcrumbs } from "@/components/portal/breadcrumbs"
 import { StructuredData } from "@/components/portal/structured-data"
-import { DataPageHero } from "@/components/portal/data-page-hero"
 import { getReceitasPage, getReceitasTipos, getReceitasStats, parsePaginationParams } from "@/lib/site-data"
 import { ReceitasContent } from "./receitas-client"
 
@@ -19,7 +18,7 @@ export async function generateMetadata() {
 }
 
 interface PageProps {
-  searchParams: Promise<{ q?: string; ano?: string; categoria?: string; tipo?: string; page?: string; limit?: string }>
+  searchParams: Promise<{ q?: string; ano?: string; categoria?: string; tipo?: string; ordenar?: string; ordem?: string; fase?: 'previsto' | 'arrecadado' | 'excesso' | 'a_arrecadar'; page?: string; limit?: string }>
 }
 
 async function ReceitasWrapper({ searchParams }: PageProps) {
@@ -31,6 +30,9 @@ async function ReceitasWrapper({ searchParams }: PageProps) {
     search: params.q || undefined,
     categoria: params.categoria || undefined,
     tipo: params.tipo || undefined,
+    ordenar: params.ordenar || undefined,
+    ordem: params.ordem || undefined,
+    fase: params.fase,
   }
   
   const [receitasPage, stats] = await Promise.all([
@@ -38,7 +40,7 @@ async function ReceitasWrapper({ searchParams }: PageProps) {
     getReceitasStats(currentYear, filters.tipo)
   ])
 
-  return <ReceitasContent receitas={receitasPage.data} stats={stats} currentYear={currentYear} pagination={receitasPage.pagination} />
+  return <ReceitasContent receitas={receitasPage.data} stats={stats} currentYear={currentYear} activePhase={params.fase} pagination={receitasPage.pagination} />
 }
 
 // Receita orcamentaria e o padrao (sem o filtro); Uniao e Estado sao recortes das transferencias.
@@ -54,25 +56,27 @@ export default async function Receitas({ searchParams }: PageProps) {
   const tipos = (await getReceitasTipos(parseInt(params.ano || String(currentYear)))).filter((t) => t in NOMES_TIPOS)
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="portal-page portal-page--receitas container mx-auto px-4 py-8">
       <Breadcrumbs items={[
         { label: "Transparência", href: "/" },
         { label: "Receitas" }
       ]} />
       
-      <DataPageHero
-        icon={<TrendingUp className="h-6 w-6" />}
-        eyebrow="Arrecadação municipal"
-        title="Receitas Públicas"
-        description="Acompanhe a previsão e a arrecadação das receitas municipais por natureza, categoria econômica e fonte de recurso."
-        accent="blue"
-        badges={["Receita prevista", "Receita arrecadada", "Realização", "Dados por ano"]}
-      />
-
       <FilterBar
         page="receitas"
         years={years}
         searchPlaceholder="Buscar por natureza, código..."
+        leading={
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-emerald-50 text-amazon" aria-hidden="true">
+              <TrendingUp className="h-5 w-5" />
+            </div>
+            <div className="min-w-0">
+              <h1 className="whitespace-nowrap text-base font-extrabold text-institutional">Receitas Públicas</h1>
+              <p className="hidden whitespace-nowrap text-xs text-text-secondary xl:block">Previsão e arrecadação municipal</p>
+            </div>
+          </div>
+        }
         extras={tipos.length > 0 ? [
           { param: "tipo", label: "Receita orçamentária", options: tipos.map((t) => ({ value: t, label: NOMES_TIPOS[t] })) },
         ] : []}

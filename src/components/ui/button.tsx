@@ -4,16 +4,16 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "@/lib/utils"
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-digital focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
   {
     variants: {
       variant: {
-        default: "bg-emerald-800 text-white hover:bg-emerald-800 shadow-sm",
+        default: "bg-digital text-white hover:bg-institutional-hover shadow-sm",
         destructive: "bg-red-600 text-white hover:bg-red-700 shadow-sm",
-        outline: "border border-slate-300 bg-white hover:bg-slate-50 text-slate-700",
+        outline: "border border-digital bg-white text-digital hover:bg-blue-50",
         secondary: "bg-slate-100 text-slate-900 hover:bg-slate-200",
-        ghost: "hover:bg-slate-100 text-slate-700",
-        link: "text-emerald-800 underline-offset-4 hover:underline",
+        ghost: "text-text-secondary hover:bg-slate-100 hover:text-institutional",
+        link: "text-digital underline-offset-4 hover:text-institutional hover:underline",
       },
       size: {
         default: "h-10 px-4 py-2",

@@ -4,7 +4,7 @@ import { PageSkeleton } from "@/components/ui/skeletons"
 import { FilterBar } from "@/components/portal/filter-bar"
 import { Breadcrumbs } from "@/components/portal/breadcrumbs"
 import { StructuredData } from "@/components/portal/structured-data"
-import { DataPageHero } from "@/components/portal/data-page-hero"
+import { CompactPageTitle } from "@/components/portal/compact-page-title"
 import { getDynamicOptions, getLicitacoesPage, getLicitacoesStats, parsePaginationParams } from "@/lib/site-data"
 import { STATUS_LICITACAO } from "./status"
 import { LicitacoesContent } from "./licitacoes-client"
@@ -50,25 +50,17 @@ export default async function Licitacoes({ searchParams }: PageProps) {
   const modalidades = await getDynamicOptions("licitacoes", "modalidade", parseInt(params.ano || String(currentYear)))
   
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="portal-page portal-page--licitacoes container mx-auto px-4 py-8">
       <Breadcrumbs items={[
         { label: "Transparência", href: "/" },
         { label: "Licitações" }
       ]} />
 
-      <DataPageHero
-        icon={<Scale className="h-6 w-6" />}
-        eyebrow="Compras públicas"
-        title="Licitações e Contratações"
-        description="Acompanhe processos licitatórios, dispensas, inexigibilidades e adesões com status, modalidade, valores e documentos vinculados."
-        accent="purple"
-        badges={["Modalidade", "Status", "Valor estimado", "PNCP e anexos"]}
-      />
-
       <FilterBar 
         page="licitacoes"
         years={years}
         statuses={statuses}
+        leading={<CompactPageTitle icon={<Scale className="h-5 w-5" />} title="Licitações" description="Compras e contratações públicas" />}
         extras={modalidades.length > 0 ? [{ param: "modalidade", label: "Modalidade", options: modalidades }] : []}
         searchPlaceholder="Buscar por objeto, número ou processo..."
       />

@@ -40,7 +40,7 @@ interface DialogContentProps {
 
 export function DialogContent({ children, className, onClose }: DialogContentProps) {
   return (
-    <div className={cn("bg-white rounded-xl shadow-xl border border-slate-200 w-full max-w-lg", className)}>
+    <div className={cn("w-full max-w-lg rounded-xl border border-border-subtle bg-white shadow-[0_18px_45px_rgba(18,52,91,0.16)]", className)}>
       <div className="flex items-center justify-between p-4 border-b border-slate-200">
         <div />
         {onClose && (
@@ -79,7 +79,7 @@ interface DialogTitleProps {
 
 export function DialogTitle({ children, className }: DialogTitleProps) {
   return (
-    <h2 className={cn("text-lg font-semibold text-slate-800", className)}>
+    <h2 className={cn("text-lg font-semibold text-institutional", className)}>
       {children}
     </h2>
   )

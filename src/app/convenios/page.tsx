@@ -5,7 +5,7 @@ import { getConveniosPage, getConveniosStats, parsePaginationParams } from "@/li
 import { FilterBar } from "@/components/portal/filter-bar"
 import { Breadcrumbs } from "@/components/portal/breadcrumbs"
 import { StructuredData } from "@/components/portal/structured-data"
-import { DataPageHero } from "@/components/portal/data-page-hero"
+import { CompactPageTitle } from "@/components/portal/compact-page-title"
 import { ConveniosContent } from "./convenios-client"
 
 export const dynamic = 'force-dynamic'
@@ -48,19 +48,10 @@ export default function Convenios({ searchParams }: PageProps) {
   const years = Array.from({ length: 5 }, (_, i) => currentYear - i)
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="portal-page portal-page--convenios container mx-auto px-4 py-8">
       <Breadcrumbs items={breadcrumbs} />
       
-      <DataPageHero
-        icon={<HandCoins className="h-6 w-6" />}
-        eyebrow="Parcerias e repasses"
-        title="Convênios e Transferências"
-        description="Consulte convênios, termos de colaboração, termos de fomento e transferências voluntárias com concedente, vigência e valores."
-        accent="cyan"
-        badges={["Concedente", "Objeto", "Vigência", "Valor total"]}
-      />
-
-      <FilterBar page="convenios" years={years} statuses={statuses} searchPlaceholder="Buscar convênios..." />
+      <FilterBar page="convenios" years={years} statuses={statuses} searchPlaceholder="Buscar convênios..." leading={<CompactPageTitle icon={<HandCoins className="h-5 w-5" />} title="Convênios" description="Parcerias e transferências" />} />
 
       <StructuredData 
         type="webpage" 
