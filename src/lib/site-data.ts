@@ -66,6 +66,21 @@ export async function getSiteConfig(): Promise<SiteConfig> {
   return configMap
 }
 
+/** Última carga concluída da integração contábil exibida no cabeçalho público. */
+export async function getUltimaAtualizacaoDados(): Promise<string | null> {
+  const ultima = await prisma.sincronizacaoLog.findFirst({
+    where: {
+      fonte: 'fiorilli',
+      status: { in: ['SUCESSO', 'DIVERGENTE'] },
+      finalizadoEm: { not: null },
+    },
+    orderBy: { finalizadoEm: 'desc' },
+    select: { finalizadoEm: true },
+  })
+
+  return ultima?.finalizadoEm?.toISOString() ?? null
+}
+
 export async function getSiteConfigValue(key: string): Promise<string | null> {
   const config = await prisma.configuracaoSite.findUnique({
     where: { chave: key }
@@ -256,8 +271,7 @@ function buildPaginatedResult<T>(data: T[], total: number, page: number, pageSiz
   }
 }
 
-export async function getSiteStats(): Promise<SiteStats> {
-  const currentYear = new Date().getFullYear()
+export async function getSiteStats(ano = new Date().getFullYear()): Promise<SiteStats> {
 
   const [receitasWhere, despesasWhere, licitacoesWhere, contratosWhere] = await Promise.all([
     receitasVisiveis(), despesasVisiveis(), licitacoesVisiveis(), contratosVisiveis(),
@@ -266,17 +280,17 @@ export async function getSiteStats(): Promise<SiteStats> {
   const [receitas, despesas, licitacoes, contratos] = await Promise.all([
     prisma.receita.aggregate({
       _sum: { valorArrecadado: true },
-      where: { exercicio: currentYear, AND: [receitasWhere] }
+      where: { exercicio: ano, AND: [receitasWhere] }
     }),
     prisma.despesa.aggregate({
       _sum: { valorEmpenhado: true },
-      where: { exercicio: currentYear, AND: [despesasWhere] }
+      where: { exercicio: ano, AND: [despesasWhere] }
     }),
     prisma.licitacao.count({
-      where: { ano: currentYear, AND: [licitacoesWhere] }
+      where: { ano, AND: [licitacoesWhere] }
     }),
     prisma.contrato.count({
-      where: { status: 'vigente', AND: [contratosWhere] }
+      where: { ano, status: 'vigente', AND: [contratosWhere] }
     })
   ])
 
@@ -288,26 +302,26 @@ export async function getSiteStats(): Promise<SiteStats> {
   }
 }
 
-export async function getLatestDespesas(limit = 5) {
+export async function getLatestDespesas(limit = 5, ano?: number) {
   return prisma.despesa.findMany({
-    where: await despesasVisiveis(),
+    where: { exercicio: ano, AND: [await despesasVisiveis()] },
     orderBy: { dataEmpenho: 'desc' },
     take: limit,
     include: { orgao: false }
   })
 }
 
-export async function getLatestReceitas(limit = 5) {
+export async function getLatestReceitas(limit = 5, ano?: number) {
   return prisma.receita.findMany({
-    where: await receitasVisiveis(),
+    where: { exercicio: ano, AND: [await receitasVisiveis()] },
     take: limit,
     orderBy: { createdAt: 'desc' }
   })
 }
 
-export async function getLatestLicitacoes(limit = 5) {
+export async function getLatestLicitacoes(limit = 5, ano?: number) {
   return prisma.licitacao.findMany({
-    where: await licitacoesVisiveis(),
+    where: { ano, AND: [await licitacoesVisiveis()] },
     orderBy: { dataAbertura: 'desc' },
     take: limit
   })
@@ -1014,7 +1028,7 @@ export async function getServidoresPage(filters?: ServidoresFilters, paginationI
   return buildPaginatedResult(servidores, total, pagination.page, pagination.pageSize)
 }
 
-export async function getGlobalSearch(query: string) {
+export async function getGlobalSearch(query: string, ano?: number) {
   if (!query) return { despesas: [], receitas: [], licitacoes: [], contratos: [], servidores: [] }
 
   const [despesasWhere, receitasWhere, licitacoesWhere, contratosWhere] = await Promise.all([
@@ -1023,23 +1037,23 @@ export async function getGlobalSearch(query: string) {
 
   const [despesas, receitas, licitacoes, contratos, servidores] = await Promise.all([
     prisma.despesa.findMany({
-      where: { OR: [{ credorNome: { contains: query } }, { credorCpfCnpj: { contains: query } }, { objeto: { contains: query } }, { numeroEmpenho: { contains: query } }], AND: [despesasWhere] },
+      where: { exercicio: ano, OR: [{ credorNome: { contains: query } }, { credorCpfCnpj: { contains: query } }, { objeto: { contains: query } }, { numeroEmpenho: { contains: query } }], AND: [despesasWhere] },
       take: 5
     }),
     prisma.receita.findMany({
-      where: { OR: [{ naturezaReceita: { contains: query } }, { categoriaEconomica: { contains: query } }, { fonteRecursoNome: { contains: query } }], AND: [receitasWhere] },
+      where: { exercicio: ano, OR: [{ naturezaReceita: { contains: query } }, { categoriaEconomica: { contains: query } }, { fonteRecursoNome: { contains: query } }], AND: [receitasWhere] },
       take: 5
     }),
     prisma.licitacao.findMany({
-      where: { OR: [{ objeto: { contains: query } }, { numero: { contains: query } }, { modalidade: { contains: query } }], AND: [licitacoesWhere] },
+      where: { ano, OR: [{ objeto: { contains: query } }, { numero: { contains: query } }, { modalidade: { contains: query } }], AND: [licitacoesWhere] },
       take: 5
     }),
     prisma.contrato.findMany({
-      where: { OR: [{ objeto: { contains: query } }, { contratadoNome: { contains: query } }, { numero: { contains: query } }, { contratadoCnpj: { contains: query } }], AND: [contratosWhere] },
+      where: { ano, OR: [{ objeto: { contains: query } }, { contratadoNome: { contains: query } }, { numero: { contains: query } }, { contratadoCnpj: { contains: query } }], AND: [contratosWhere] },
       take: 5
     }),
     prisma.servidor.findMany({
-      where: { OR: [{ nome: { contains: query } }, { matricula: { contains: query } }, { cargo: { contains: query } }, { lotacao: { contains: query } }] },
+      where: { anoReferencia: ano, OR: [{ nome: { contains: query } }, { matricula: { contains: query } }, { cargo: { contains: query } }, { lotacao: { contains: query } }] },
       take: 5
     })
   ])
@@ -1199,6 +1213,14 @@ export async function getAvailableYears(table: 'receitas' | 'despesas' | 'licita
     default:
       return [currentYear]
   }
+}
+
+/** União dos exercícios que possuem algum dado pesquisável no portal. */
+export async function getGlobalAvailableYears(): Promise<number[]> {
+  const tabelas = ['receitas', 'despesas', 'licitacoes', 'contratos', 'servidores', 'convenios'] as const
+  const listas = await Promise.all(tabelas.map((tabela) => getAvailableYears(tabela)))
+  const anos = listas.flat().filter((ano): ano is number => typeof ano === 'number')
+  return [...new Set(anos)].sort((a, b) => b - a)
 }
 
 // Dynamic filter options - categorias/status/modalidades disponíveis

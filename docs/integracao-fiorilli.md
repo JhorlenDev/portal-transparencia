@@ -52,7 +52,7 @@ Variáveis de ambiente (veja também o [.env.example](../.env.example)):
 | Variável | Padrão | Para quê |
 |---|---|---|
 | `FIORILLI_SYNC_ENABLED` | `false` | liga a sincronização diária automática |
-| `FIORILLI_SYNC_HORARIO` | `02:00,10:00,18:00` | horários das execuções diárias, separados por vírgula, no fuso de Manaus. O histórico de domingo roda no primeiro |
+| `FIORILLI_SYNC_HORARIO` | de hora em hora | horários das execuções diárias, separados por vírgula, no fuso de Manaus. O histórico de domingo roda no primeiro |
 | `FIORILLI_SYNC_ANOS_HISTORICOS` | vazio | anos recarregados aos domingos, ex. `2022,2023,2024,2025` |
 | `FIORILLI_BASE_URL` | URL de Tefé | endereço da API |
 | `FIORILLI_DEFAULT_EMPRESA` | `1` | código da entidade na Fiorilli |

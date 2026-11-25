@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/portal/header";
 import Footer from "@/components/portal/footer";
 import { StructuredData } from "@/components/portal/structured-data";
-import { getSiteConfig } from "@/lib/site-data";
+import { getSiteConfig, getUltimaAtualizacaoDados } from "@/lib/site-data";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -100,7 +101,10 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const config = await getSiteConfig()
+  const [config, ultimaAtualizacao] = await Promise.all([
+    getSiteConfig(),
+    getUltimaAtualizacaoDados(),
+  ])
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://transparencia.tefe.am.gov.br"
   const siteName = config.nome_site || config.nomeSite || "Portal da Transparência de Tefé"
 
@@ -134,7 +138,13 @@ export default async function RootLayout({
             },
           }}
         />
-        <Header config={config} />
+        <Suspense fallback={null}>
+          <Header
+            config={config}
+            ultimaAtualizacao={ultimaAtualizacao}
+            horariosAtualizacao={process.env.FIORILLI_SYNC_HORARIO || "00:00,01:00,02:00,03:00,04:00,05:00,06:00,07:00,08:00,09:00,10:00,11:00,12:00,13:00,14:00,15:00,16:00,17:00,18:00,19:00,20:00,21:00,22:00,23:00"}
+          />
+        </Suspense>
         <main className="flex-1" id="conteudo">
           {children}
         </main>

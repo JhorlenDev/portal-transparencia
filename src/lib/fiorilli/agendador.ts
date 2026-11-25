@@ -3,7 +3,7 @@
  * acordar-cron e do backup) e so liga com FIORILLI_SYNC_ENABLED=true.
  *
  * Todo dia, em cada horario de FIORILLI_SYNC_HORARIO (Manaus, lista separada por virgula, padrao
- * 02:00,10:00,18:00), sincroniza o exercicio corrente. Aos domingos, so no primeiro horario do dia,
+ * de hora em hora), sincroniza o exercicio corrente. Aos domingos, so no primeiro horario do dia,
  * tambem recarrega os exercicios de FIORILLI_SYNC_ANOS_HISTORICOS, que ainda mudam com
  * anulacoes e pagamentos tardios.
  */
@@ -32,7 +32,7 @@ export interface Horario {
   minuto: number
 }
 
-export const HORARIOS_PADRAO = '02:00,10:00,18:00'
+export const HORARIOS_PADRAO = '00:00,01:00,02:00,03:00,04:00,05:00,06:00,07:00,08:00,09:00,10:00,11:00,12:00,13:00,14:00,15:00,16:00,17:00,18:00,19:00,20:00,21:00,22:00,23:00'
 
 function horarioValido(texto: string): Horario | null {
   const [hora, minuto] = texto.trim().split(':').map(Number)

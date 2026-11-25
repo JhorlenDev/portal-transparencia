@@ -654,7 +654,7 @@ async function testarAgendador() {
       igual(config.exerciciosDaProxima.join(','), '2024,2025,2026', 'domingo inclui historicos')
       delete process.env.FIORILLI_SYNC_HORARIO
       const padrao = configuracaoAgendador(new Date('2026-11-08T07:00:00Z')) // domingo 03:00 em Manaus
-      igual(padrao.horarios.join(','), '02:00,10:00,18:00', 'horarios padrao')
+      igual(padrao.horarios.join(','), '00:00,01:00,02:00,03:00,04:00,05:00,06:00,07:00,08:00,09:00,10:00,11:00,12:00,13:00,14:00,15:00,16:00,17:00,18:00,19:00,20:00,21:00,22:00,23:00', 'horarios padrao')
       igual(padrao.exerciciosDaProxima.join(','), '2026', 'domingo 10:00 sem historicos')
       process.env.FIORILLI_SYNC_ENABLED = 'false'
       igual(configuracaoAgendador().proximaExecucao, null, 'desligado')
@@ -666,7 +666,7 @@ async function testarAgendador() {
   await teste('parse das variaveis de ambiente', async () => {
     igual(JSON.stringify(parsearHorarios('03:30')), '[{"hora":3,"minuto":30}]', 'horario valido')
     igual(parsearHorarios('18:00, 10:00,25:00,10:00').map((h) => `${h.hora}:${h.minuto}`).join(','), '10:0,18:0', 'ordena, descarta invalido e repetido')
-    igual(parsearHorarios('25:00').length, 3, 'nenhum valido usa o padrao')
+    igual(parsearHorarios('25:00').length, 24, 'nenhum valido usa o padrao')
     igual(parsearAnos('2022, 2023,abc,1999').join(','), '2022,2023', 'anos')
   })
 }

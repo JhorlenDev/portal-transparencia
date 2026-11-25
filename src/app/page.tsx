@@ -4,7 +4,8 @@ import { Search, DollarSign, Scale, FileText, Users, HandCoins, MessageSquare, D
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { getSiteConfig, getSiteStats, getLatestDespesas, getLatestReceitas, getLatestLicitacoes } from "@/lib/site-data"
+import { getSiteConfig, getSiteStats, getLatestDespesas, getLatestReceitas, getLatestLicitacoes, getGlobalAvailableYears } from "@/lib/site-data"
+import { GlobalYearSelector } from "@/components/portal/global-year-selector"
 
 const quickLinks = [
   { title: 'Despesas', icon: DollarSign, href: '/despesas', color: '#B42318', softColor: '#FDEDEC' },
@@ -41,21 +42,26 @@ export const metadata: Metadata = {
   },
 }
 
-export default async function Home() {
+interface HomeProps { searchParams: Promise<{ ano?: string }> }
+
+export default async function Home({ searchParams }: HomeProps) {
+  const availableYears = await getGlobalAvailableYears()
+  const params = await searchParams
+  const anoInformado = Number(params.ano)
+  const currentYear = Number.isInteger(anoInformado) && availableYears.includes(anoInformado) ? anoInformado : new Date().getFullYear()
   const [siteConfig, stats, latestDespesas, latestReceitas, latestLicitacoes] = await Promise.all([
     getSiteConfig(),
-    getSiteStats(),
-    getLatestDespesas(3),
-    getLatestReceitas(3),
-    getLatestLicitacoes(3)
+    getSiteStats(currentYear),
+    getLatestDespesas(3, currentYear),
+    getLatestReceitas(3, currentYear),
+    getLatestLicitacoes(3, currentYear),
   ])
 
-  const currentYear = new Date().getFullYear()
   const heroStats = [
     {
       label: `Receitas ${currentYear}`,
       value: formatCurrency(stats.totalReceitas),
-      href: "/receitas",
+      href: `/receitas?ano=${currentYear}`,
       icon: TrendingUp,
       iconBackground: "var(--amazon-green)",
       iconColor: "#ffffff",
@@ -68,7 +74,7 @@ export default async function Home() {
     {
       label: `Despesas ${currentYear}`,
       value: formatCurrency(stats.totalDespesas),
-      href: "/despesas",
+      href: `/despesas?ano=${currentYear}`,
       icon: WalletCards,
       iconBackground: "#b42318",
       iconColor: "#ffffff",
@@ -81,7 +87,7 @@ export default async function Home() {
     {
       label: `Licitações ${currentYear}`,
       value: stats.totalLicitacoes.toLocaleString("pt-BR"),
-      href: "/licitacoes",
+      href: `/licitacoes?ano=${currentYear}`,
       icon: Scale,
       iconBackground: "var(--institutional-gold)",
       iconColor: "var(--institutional-blue)",
@@ -92,9 +98,9 @@ export default async function Home() {
       valueClass: "text-amber-700",
     },
     {
-      label: "Contratos ativos",
+      label: `Contratos ativos ${currentYear}`,
       value: stats.totalContratos.toLocaleString("pt-BR"),
-      href: "/contratos",
+      href: `/contratos?ano=${currentYear}`,
       icon: FileCheck2,
       iconBackground: "var(--digital-blue)",
       iconColor: "#ffffff",
@@ -112,24 +118,30 @@ export default async function Home() {
         <div className="container mx-auto px-4 py-7 lg:py-8">
           <h1 className="sr-only">Portal da Transparência da Prefeitura Municipal de Tefé</h1>
 
-          <div className="mb-4 text-left">
-            <p className="text-lg font-semibold text-white sm:text-xl">Olá, cidadão!</p>
-            <p className="mt-1 text-sm text-white/65">Encontre informações públicas do município de forma rápida e transparente.</p>
+          <div className="mb-4 flex items-end justify-between gap-3 text-left">
+            <div>
+              <p className="text-lg font-semibold text-white sm:text-xl">Olá, cidadão!</p>
+              <p className="mt-1 text-sm text-white/65">Encontre informações públicas do município de forma rápida e transparente.</p>
+            </div>
+            <GlobalYearSelector years={availableYears} value={currentYear} />
           </div>
 
           <form action="/busca" method="GET" role="search" className="w-full">
-              <div className="relative rounded-xl border border-gold/50 bg-white p-1.5 shadow-[0_14px_34px_rgba(0,0,0,0.20)]">
-                <Search className="pointer-events-none absolute left-5 top-1/2 h-5 w-5 -translate-y-1/2 text-digital" aria-hidden="true" />
-                <Input
-                  type="search"
-                  name="q"
-                  placeholder="Buscar despesas, licitações, contratos, servidores..."
-                  className="h-12 rounded-lg border-0 bg-white pl-12 pr-14 text-base text-text-primary shadow-none focus-visible:ring-0 sm:pr-36"
-                  aria-label="Digite o que deseja buscar no portal"
-                />
+              <div className="flex items-center gap-1.5 rounded-xl border border-gold/50 bg-white p-1.5 shadow-[0_14px_34px_rgba(0,0,0,0.20)]">
+                <input type="hidden" name="ano" value={currentYear} />
+                <div className="relative min-w-0 flex-1">
+                  <Search className="pointer-events-none absolute left-3.5 top-1/2 h-5 w-5 -translate-y-1/2 text-digital" aria-hidden="true" />
+                  <Input
+                    type="search"
+                    name="q"
+                    placeholder="Buscar despesas, licitações, contratos, servidores..."
+                    className="h-12 rounded-lg border-0 bg-white pl-11 text-sm text-text-primary shadow-none focus-visible:ring-0 sm:text-base"
+                    aria-label="Digite o que deseja buscar no portal"
+                  />
+                </div>
                 <Button
                   type="submit"
-                  className="absolute right-2.5 top-1/2 h-10 -translate-y-1/2 gap-2 rounded-lg bg-gold px-3 text-institutional shadow-[0_4px_12px_rgba(229,184,71,0.30)] hover:bg-amber-300 sm:px-5"
+                  className="h-10 shrink-0 gap-2 rounded-lg bg-gold px-3 text-institutional shadow-[0_4px_12px_rgba(229,184,71,0.30)] hover:bg-amber-300 sm:h-12 sm:px-5"
                   aria-label="Realizar busca"
                 >
                   <Search className="h-4 w-4" aria-hidden="true" />
@@ -182,7 +194,7 @@ export default async function Home() {
             {quickLinks.map((link) => (
               <Link
                 key={link.title}
-                href={link.href}
+                href={['/esic', '/dados-abertos'].includes(link.href) ? link.href : `${link.href}?ano=${currentYear}`}
                 className="group relative flex min-h-24 flex-col items-start justify-between overflow-hidden rounded-xl border border-border-subtle bg-white p-3.5 shadow-[0_4px_14px_rgba(18,52,91,0.07)] transition-all duration-200 hover:-translate-y-0.5 hover:border-digital/40 hover:shadow-[0_10px_24px_rgba(18,52,91,0.13)]"
               >
                 <span
